@@ -1,4 +1,4 @@
-package projet_alasca.equipements.projecteur.connections;
+package projet_alasca.equipements.refrigerateur.connections;
 
 import fr.sorbonne_u.components.connectors.AbstractConnector;
 import projet_alasca.equipements.refrigerateur.RefrigerateurUserCI;
@@ -6,27 +6,27 @@ import projet_alasca.equipements.refrigerateur.RefrigerateurUserCI;
 public class RefrigerateurUserConnector extends		AbstractConnector implements RefrigerateurUserCI {
 
 	@Override
-	public double getTargetTemperature() throws Exception {
+	public double getRefrigeratorTargetTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.offering).getTargetTemperature();
+		return ((RefrigerateurUserCI)this.offering).getRefrigeratorTargetTemperature();
 	}
 
 	@Override
-	public double getCongelateurTargetTemperature() throws Exception {
+	public double getFreezerTargetTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.offering).getCongelateurTargetTemperature();
+		return ((RefrigerateurUserCI)this.offering).getFreezerTargetTemperature();
 	}
 
 	@Override
-	public double getCurrentTemperature() throws Exception {
+	public double getRefrigeratorCurrentTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.offering).getCurrentTemperature();
+		return ((RefrigerateurUserCI)this.offering).getRefrigeratorCurrentTemperature();
 	}
 
 	@Override
-	public double getCongelateurCurrentTemperature() throws Exception {
+	public double getFreezerCurrentTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.offering).getCongelateurCurrentTemperature();
+		return ((RefrigerateurUserCI)this.offering).getFreezerCurrentTemperature();
 	}
 
 	@Override
@@ -48,15 +48,15 @@ public class RefrigerateurUserConnector extends		AbstractConnector implements Re
 	}
 
 	@Override
-	public void setTargetTemperature(double target) throws Exception {
+	public void setRefrigeratorTargetTemperature(double target) throws Exception {
 
-		((RefrigerateurUserCI)this.offering).setTargetTemperature(target);
+		((RefrigerateurUserCI)this.offering).setRefrigeratorTargetTemperature(target);
 	}
 
 	@Override
-	public void setCongelateurTargetTemperature(double target) throws Exception {
+	public void setFreezerTargetTemperature(double target) throws Exception {
 
-		((RefrigerateurUserCI)this.offering).setCongelateurTargetTemperature(target);
+		((RefrigerateurUserCI)this.offering).setFreezerTargetTemperature(target);
 	}
 
 	@Override

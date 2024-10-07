@@ -1,9 +1,9 @@
-package projet_alasca.equipements.projecteur.connections;
+package projet_alasca.equipements.refrigerateur.connections;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 import projet_alasca.equipements.refrigerateur.RefrigerateurExternalControlI;
-import projet_alasca.equipements.refrigerateur.RefrigerateurTemperateurI;
+import projet_alasca.equipements.refrigerateur.RefrigerateurTemperatureI;
 import projet_alasca.equipements.refrigerateur.RefrigerateurUserCI;
 import projet_alasca.equipements.refrigerateur.RefrigerateurUserI;
 
@@ -22,23 +22,23 @@ public class RefrigerateurUserInboundPort extends		AbstractInboundPort implement
 		}
 
 	@Override
-	public double getTargetTemperature() throws Exception {
-		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperateurI)o).getTargetTemperature());
+	public double getRefrigeratorTargetTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getRefrigeratorTargetTemperature());
 	}
 
 	@Override
-	public double getCongelateurTargetTemperature() throws Exception {
-		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperateurI)o).getCongelateurTargetTemperature());
+	public double getFreezerTargetTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getFreezerTargetTemperature());
 	}
 
 	@Override
-	public double getCurrentTemperature() throws Exception {
-		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperateurI)o).getCurrentTemperature());
+	public double getRefrigeratorCurrentTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getRefrigeratorCurrentTemperature());
 	}
 
 	@Override
-	public double getCongelateurCurrentTemperature() throws Exception {
-		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperateurI)o).getCongelateurCurrentTemperature());
+	public double getFreezerCurrentTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getFreezerCurrentTemperature());
 	}
 
 	@Override
@@ -64,17 +64,17 @@ public class RefrigerateurUserInboundPort extends		AbstractInboundPort implement
 }
 
 	@Override
-	public void setTargetTemperature(double target) throws Exception {
+	public void setRefrigeratorTargetTemperature(double target) throws Exception {
 		this.getOwner().handleRequest(
-				o -> {	((RefrigerateurUserI)o).setTargetTemperature(target);;
+				o -> {	((RefrigerateurUserI)o).setRefrigeratorTargetTemperature(target);;
 						return null;
 				});
 }
 
 	@Override
-	public void setCongelateurTargetTemperature(double target) throws Exception {
+	public void setFreezerTargetTemperature(double target) throws Exception {
 		this.getOwner().handleRequest(
-				o -> {	((RefrigerateurUserI)o).setCongelateurTargetTemperature(target);;
+				o -> {	((RefrigerateurUserI)o).setFreezerTargetTemperature(target);;
 						return null;
 				});
 }

@@ -1,4 +1,4 @@
-package projet_alasca.equipements.projecteur.connections;
+package projet_alasca.equipements.refrigerateur.connections;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractOutboundPort;
@@ -17,6 +17,31 @@ public class RefrigerateurExternalControlOutboundPort extends		AbstractOutboundP
 			throws Exception {
 		super(uri,RefrigerateurExternalControlCI.class, owner);
 	}
+	
+	@Override
+	public double getRefrigeratorTargetTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				getRefrigeratorTargetTemperature();
+	}
+
+	@Override
+	public double getFreezerTargetTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				getFreezerTargetTemperature();
+	}
+
+	@Override
+	public double getRefrigeratorCurrentTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				getRefrigeratorCurrentTemperature();
+	}
+
+	@Override
+	public double getFreezerCurrentTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				getFreezerCurrentTemperature();
+	}
+
 
 	@Override
 	public double getMaxPowerLevel() throws Exception {
@@ -36,28 +61,5 @@ public class RefrigerateurExternalControlOutboundPort extends		AbstractOutboundP
 				getCurrentPowerLevel();
 	}
 
-	@Override
-	public double getTargetTemperature() throws Exception {
-		return ((RefrigerateurExternalControlCI)this.getConnector()).
-				getTargetTemperature();
-	}
-
-	@Override
-	public double getCongelateurTargetTemperature() throws Exception {
-		return ((RefrigerateurExternalControlCI)this.getConnector()).
-				getCongelateurTargetTemperature();
-	}
-
-	@Override
-	public double getCurrentTemperature() throws Exception {
-		return ((RefrigerateurExternalControlCI)this.getConnector()).
-				getCurrentTemperature();
-	}
-
-	@Override
-	public double getCongelateurCurrentTemperature() throws Exception {
-		return ((RefrigerateurExternalControlCI)this.getConnector()).
-				getCongelateurCurrentTemperature();
-	}
-
+	
 }

@@ -11,12 +11,24 @@ public interface MachineCafeUserCI extends OfferedCI, RequiredCI, MachineCafeImp
 	// -------------------------------------------------------------------------
 
 
-	public CofeeMachineState	getState() throws Exception;
+	@Override
+	public CoffeeMachineState	getState() throws Exception;
 
-	public Button getButton() throws Exception;
+	@Override
+	public CoffeeMachineAction getMode() throws Exception;
 
+	@Override
+	public void setModeCoffee() throws Exception;
+
+	@Override
+	public void setModeLongCoffee() throws Exception;
+
+	@Override
+	public void setModeExpresso() throws Exception;
+
+	@Override
 	public void			turnOn() throws Exception;
 
-
+	@Override
 	public void			turnOff() throws Exception;
 }

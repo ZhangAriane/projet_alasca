@@ -1,23 +1,21 @@
-package projet_alasca.equipements.machineCafe;
+package projet_alasca.equipements.refrigerateur;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
-public class CVMUnitTest extends		AbstractCVM{
-
-
+public class CVMUnitTest extends AbstractCVM {
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
 
 	public				CVMUnitTest() throws Exception
 	{
-		MachineCafeTester.VERBOSE = true;
-		MachineCafeTester.X_RELATIVE_POSITION = 0;
-		MachineCafeTester.Y_RELATIVE_POSITION = 0;
-		MachineCafe.VERBOSE = true;
-		MachineCafe.X_RELATIVE_POSITION = 1;
-		MachineCafe.Y_RELATIVE_POSITION = 0;
+		RefrigerateurTester.VERBOSE = true;
+		RefrigerateurTester.X_RELATIVE_POSITION = 0;
+		RefrigerateurTester.Y_RELATIVE_POSITION = 0;
+		Refrigerateur.VERBOSE = true;
+		Refrigerateur.X_RELATIVE_POSITION = 1;
+		Refrigerateur.Y_RELATIVE_POSITION = 0;
 	}
 
 
@@ -32,22 +30,22 @@ public class CVMUnitTest extends		AbstractCVM{
 	public void			deploy() throws Exception
 	{
 		AbstractComponent.createComponent(
-				MachineCafe.class.getCanonicalName(),
+				Refrigerateur.class.getCanonicalName(),
 				new Object[]{});
 
 		AbstractComponent.createComponent(
-				MachineCafeTester.class.getCanonicalName(),
+				RefrigerateurTester.class.getCanonicalName(),
 				new Object[]{true});
 
 		super.deploy();
 	}
 
-	public static void		main(String[] args)
+	public static void	main(String[] args)
 	{
 		try {
 			CVMUnitTest cvm = new CVMUnitTest();
-			cvm.startStandardLifeCycle(100000L);
-			Thread.sleep(10000L);
+			cvm.startStandardLifeCycle(1000L);
+			Thread.sleep(100000L);
 			System.exit(0);
 		} catch (Exception e) {
 			e.printStackTrace();

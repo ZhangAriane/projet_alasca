@@ -15,11 +15,11 @@ public interface RefrigerateurUserCI extends OfferedCI, RequiredCI, Refrigerateu
 	public void			switchOff() throws Exception;
 
 	@Override
-	public void			setTargetTemperature(double target)
+	public void			setRefrigeratorTargetTemperature(double target)
 	throws Exception;
 	
 	@Override
-	public void			setCongelateurTargetTemperature(double target)
+	public void			setFreezerTargetTemperature(double target)
 			throws Exception;
 	
 	@Override

@@ -8,35 +8,40 @@ public interface MachineCafeImplementationI {
 	// Inner interfaces and types
 	// -------------------------------------------------------------------------
 
-	public static enum	CofeeMachineState
+	public static enum	CoffeeMachineState
 	{
-		/** projector is on.												*/
+		/** coffee machine is on.												*/
 		ON,
-		/** projector is off.												*/
+		/** coffee machine is off.												*/
 		OFF
 	}
-	
-	
-	public static enum Button{
-		None,
-		Cofee,
-		LongCofee,
-		Expresso
+
+
+	public static enum CoffeeMachineAction{
+		NONE,
+		COFFEE,
+		LONG_COFFEE,
+		EXPRESSO
 	}
-	
+
 	// -------------------------------------------------------------------------
-		// Component services signatures
-		// -------------------------------------------------------------------------
+	// Component services signatures
+	// -------------------------------------------------------------------------
 
-	
 
-	public CofeeMachineState	getState() throws Exception;
-	
-	public Button getButton() throws Exception;
+
+	public CoffeeMachineState	getState() throws Exception;
+
+	public CoffeeMachineAction getMode() throws Exception;
+
+	public void setModeCoffee() throws Exception;
+
+	public void setModeLongCoffee() throws Exception;
+
+	public void setModeExpresso() throws Exception;
 
 	public void			turnOn() throws Exception;
-	
-	
+
 	public void			turnOff() throws Exception;
 
 }
