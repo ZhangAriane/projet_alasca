@@ -22,8 +22,15 @@ import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
 import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
+import projet_alasca.equipements.batterie.Batterie;
+import projet_alasca.equipements.batterie.BatterieConnector;
+import projet_alasca.equipements.batterie.BatterieI.State;
+import projet_alasca.equipements.batterie.BatterieOutboundPort;
 import projet_alasca.equipements.chauffeEau.ChauffeEau;
 import projet_alasca.equipements.chauffeEau.ChauffeEauTester;
+import projet_alasca.equipements.panneauSolaire.PanneauSolaire;
+import projet_alasca.equipements.panneauSolaire.PanneauSolaireConnector;
+import projet_alasca.equipements.panneauSolaire.PanneauSolaireOutboundPort;
 import projet_alasca.equipements.refrigerateur.Refrigerateur;
 import projet_alasca.equipements.refrigerateur.RefrigerateurTester;
 import projet_alasca.equipements.refrigerateur.connections.RegistrationInboundPort;
@@ -52,7 +59,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	protected boolean						isPreFirstStep;
 	/** port to connect to the refrigerator when managed in a customised way.		*/
 	protected AdjustableOutboundPort		refrigerateurExternalControlOutboundPort;
-	
+
 	protected AdjustableOutboundPort		chauffeEauExternalControlOutboundPort;
 
 	/** when true, this implementation of the HEM performs the tests
@@ -62,10 +69,15 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	protected AcceleratedClock				ac;
 
 	protected RegistrationInboundPort registrationInboundPort;
-	
+
 	private ArrayList<String> equipementEnregistrer;
-	
+
 	public static final String registrationInboundPortURI = "registrationInboundPorURI";
+
+	protected BatterieOutboundPort batterieOutboundPort;
+	protected PanneauSolaireOutboundPort panneauSolaireOutboundPort;
+
+
 
 	protected 			GestionEnergie()
 	{
@@ -104,16 +116,17 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 					Y_RELATIVE_POSITION);
 			this.toggleTracing();
 		}
-		
+
 		try {
 			this.registrationInboundPort = new RegistrationInboundPort(this.registrationInboundPortURI,this);
 			this.registrationInboundPort.publishPort();
+
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		
-		
+
+
 		this.equipementEnregistrer = new ArrayList<>();
 	}
 
@@ -149,17 +162,31 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 						this.refrigerateurExternalControlOutboundPort.getPortURI(),
 						Refrigerateur.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 						RefrigerateurConnector.class.getCanonicalName());
-				
+
 				this.chauffeEauExternalControlOutboundPort = new AdjustableOutboundPort(this);
 				this.chauffeEauExternalControlOutboundPort.publishPort();
 				this.doPortConnection(
 						this.chauffeEauExternalControlOutboundPort.getPortURI(),
 						ChauffeEau.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 						ChauffeEauConnector.class.getCanonicalName());
-				
-//				this.registrationInboundPort = new RegistrationInboundPort(this.registrationInboundPortURI,this);
-//				this.registrationInboundPort.publishPort();
-				
+
+				this.batterieOutboundPort = new BatterieOutboundPort(this);
+				this.batterieOutboundPort.publishPort();
+				this.doPortConnection(
+						this.batterieOutboundPort.getPortURI(),
+						Batterie.batterieInboundPortURI,
+						BatterieConnector.class.getCanonicalName());
+
+				this.panneauSolaireOutboundPort = new PanneauSolaireOutboundPort(this);
+				this.panneauSolaireOutboundPort.publishPort();
+				this.doPortConnection(
+						this.panneauSolaireOutboundPort.getPortURI(),
+						PanneauSolaire.panneauSolaireInboundPortURI,
+						PanneauSolaireConnector.class.getCanonicalName());
+
+				//				this.registrationInboundPort = new RegistrationInboundPort(this.registrationInboundPortURI,this);
+				//				this.registrationInboundPort.publishPort();
+
 			}
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
@@ -190,10 +217,11 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 
 		if (this.performTest) {
 			this.testMeter();
+			this.testBatterie();
 			if (this.isPreFirstStep) {
 				this.testRefrigerateur();
-//				this.testChauffeEau();
-			}
+				this.testChauffeEau();			}
+
 		}
 	}
 
@@ -204,6 +232,8 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 		this.doPortDisconnection(this.meterop.getPortURI());
 		if (this.isPreFirstStep) {
 			this.doPortDisconnection(this.refrigerateurExternalControlOutboundPort.getPortURI());
+			this.doPortDisconnection(this.batterieOutboundPort.getPortURI());
+			this.doPortDisconnection(this.panneauSolaireOutboundPort.getPortURI());
 		}
 		super.finalise();
 	}
@@ -215,6 +245,8 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 			this.meterop.unpublishPort();
 			if (this.isPreFirstStep) {
 				this.refrigerateurExternalControlOutboundPort.unpublishPort();
+				this.batterieOutboundPort.unpublishPort();
+				this.panneauSolaireOutboundPort.unpublishPort();
 			}
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
@@ -265,12 +297,12 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 		Instant refrigeratorTestStart =
 				this.ac.getStartInstant().plusSeconds((RefrigerateurTester.SWITCH_ON_DELAY +
 						RefrigerateurTester.SWITCH_OFF_DELAY)/2);
-		
-	
+
+
 		this.traceMessage("HEM schedules the refrigerator test.\n");
 		long delay = this.ac.nanoDelayUntilInstant(refrigeratorTestStart);
-		
-		
+
+
 		// schedule the switch on refrigerator in one second
 		this.scheduleTaskOnComponent(
 				new AbstractComponent.AbstractTask() {
@@ -316,26 +348,26 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 						}
 					}
 				}, delay, TimeUnit.NANOSECONDS);
-		
-		
+
+
 
 
 	}
 
 	protected void		testChauffeEau()
 	{
-		
+
 		// Test for the chauffe eau
 		Instant chauffeEauTestStart =
 				this.ac.getStartInstant().plusSeconds(
 						(ChauffeEauTester.SWITCH_ON_DELAY +
 								ChauffeEauTester.SWITCH_OFF_DELAY)/2);
-		
-		
-		
+
+
+
 		this.traceMessage("HEM schedules the chauffe eau test.\n");
 		long delay = this.ac.nanoDelayUntilInstant(chauffeEauTestStart);
-		
+
 		this.scheduleTaskOnComponent(
 				new AbstractComponent.AbstractTask() {
 					@Override
@@ -382,12 +414,25 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 				}, delay, TimeUnit.NANOSECONDS);
 
 	}
-		
-	// -------------------------------------------------------------------------
-		// Service methods
-		// -------------------------------------------------------------------------
 
-	
+
+	private void testBatterie() {
+		State state;
+		try {
+			state = this.batterieOutboundPort.getState();
+
+			this.logMessage("Batterie : " + state ); 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+
+	// -------------------------------------------------------------------------
+	// Service methods
+	// -------------------------------------------------------------------------
+
+
 	@Override
 	public boolean registered(String uid) throws Exception {
 		boolean res = this.equipementEnregistrer.contains(uid);
@@ -398,7 +443,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	@Override
 	public boolean register(String uid, String controlPortURI, String xmlControlAdapter) throws Exception {
 		this.logMessage("Register : " + uid);
-		
+
 		this.equipementEnregistrer.add(uid);
 		return this.equipementEnregistrer.contains(uid);
 	}
@@ -407,7 +452,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	public void unregister(String uid) throws Exception {
 		this.logMessage("Unregister : " + uid);
 		this.equipementEnregistrer.remove(uid);
-		
+
 	}
 
 }

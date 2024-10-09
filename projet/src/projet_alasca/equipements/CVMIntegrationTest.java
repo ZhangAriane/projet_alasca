@@ -8,11 +8,13 @@ import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeter;
 import fr.sorbonne_u.exceptions.ContractException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import projet_alasca.equipements.batterie.Batterie;
 import projet_alasca.equipements.chauffeEau.ChauffeEau;
 import projet_alasca.equipements.chauffeEau.ChauffeEauTester;
 import projet_alasca.equipements.gestionEnergie.GestionEnergie;
 import projet_alasca.equipements.machineCafe.MachineCafe;
 import projet_alasca.equipements.machineCafe.MachineCafeTester;
+import projet_alasca.equipements.panneauSolaire.PanneauSolaire;
 import projet_alasca.equipements.refrigerateur.Refrigerateur;
 import projet_alasca.equipements.refrigerateur.RefrigerateurTester;
 import projet_alasca.equipements.ventilateur.Ventilateur;
@@ -63,18 +65,27 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		Refrigerateur.Y_RELATIVE_POSITION = 3;
 		
 		VentilateurTester.VERBOSE = true;
-		VentilateurTester.X_RELATIVE_POSITION = 0;
-		VentilateurTester.Y_RELATIVE_POSITION = 4;
+		VentilateurTester.X_RELATIVE_POSITION = 2;
+		VentilateurTester.Y_RELATIVE_POSITION = 2;
 		Ventilateur.VERBOSE = true;
-		Ventilateur.X_RELATIVE_POSITION = 1;
-		Ventilateur.Y_RELATIVE_POSITION = 4;
+		Ventilateur.X_RELATIVE_POSITION = 3;
+		Ventilateur.Y_RELATIVE_POSITION = 2;
 		
 		ChauffeEauTester.VERBOSE = true;
 		ChauffeEauTester.X_RELATIVE_POSITION = 2;
-		ChauffeEauTester.Y_RELATIVE_POSITION = 1;
+		ChauffeEauTester.Y_RELATIVE_POSITION = 3;
 		ChauffeEau.VERBOSE = true;
-		ChauffeEau.X_RELATIVE_POSITION = 2;
-		ChauffeEau.Y_RELATIVE_POSITION = 2;
+		ChauffeEau.X_RELATIVE_POSITION = 3;
+		ChauffeEau.Y_RELATIVE_POSITION = 3;
+		
+		Batterie.VERBOSE = true;
+		Batterie.X_RELATIVE_POSITION = 3;
+		Batterie.Y_RELATIVE_POSITION = 1;
+		
+		PanneauSolaire.VERBOSE = true;
+		PanneauSolaire.X_RELATIVE_POSITION = 2;
+		PanneauSolaire.Y_RELATIVE_POSITION = 1;
+
 	}
 	
 	@Override
@@ -145,7 +156,13 @@ public class CVMIntegrationTest extends		AbstractCVM{
 				new Object[]{});
 		
 		
+		AbstractComponent.createComponent(
+				Batterie.class.getCanonicalName(),
+				new Object[]{});
 		
+		AbstractComponent.createComponent(
+				PanneauSolaire.class.getCanonicalName(),
+				new Object[]{});
 
 		super.deploy();
 	}
@@ -154,7 +171,7 @@ public class CVMIntegrationTest extends		AbstractCVM{
 	{
 		try {
 			CVMIntegrationTest cvm = new CVMIntegrationTest();
-			cvm.startStandardLifeCycle(12000L);
+			cvm.startStandardLifeCycle(240000L);
 			Thread.sleep(100000L);
 			System.exit(0);
 		} catch (Exception e) {

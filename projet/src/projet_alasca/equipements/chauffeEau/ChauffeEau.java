@@ -3,12 +3,15 @@ package projet_alasca.equipements.chauffeEau;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
-
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.exceptions.PostconditionException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import projet_alasca.equipements.chauffeEau.connections.ChauffeEauExternalControlInboundPort;
 import projet_alasca.equipements.chauffeEau.connections.ChauffeEauInternalControlInboundPort;
 import projet_alasca.equipements.chauffeEau.connections.ChauffeEauUserInboundPort;
+import projet_alasca.equipements.gestionEnergie.GestionEnergie;
+import projet_alasca.equipements.gestionEnergie.RegistrationConnector;
+import projet_alasca.equipements.gestionEnergie.RegistrationOutboundPort;
 
 @OfferedInterfaces(offered={ChauffeEauUserCI.class, ChauffeEauInternalControlCI.class,
 		ChauffeEauExternalControlCI.class})
@@ -77,6 +80,11 @@ implements ChauffeEauUserI,
 	 *  interface.															*/
 	protected ChauffeEauExternalControlInboundPort	hecip;
 
+	protected RegistrationOutboundPort rop;
+	protected static final String registrationOutboundPortURI = "registrationOutboundPortURI";
+	
+	protected final String chauffeEauID = "chauffeEauID";
+	
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -200,6 +208,10 @@ implements ChauffeEauUserI,
 		this.hecip = new ChauffeEauExternalControlInboundPort(
 									ChauffeEauExternalControlInboundPortURI, this);
 		this.hecip.publishPort();
+		this.rop = new RegistrationOutboundPort(this.registrationOutboundPortURI,this);
+		this.rop.publishPort();
+		
+		
 
 		if (VERBOSE) {
 			this.tracer.get().setTitle("ChauffeEau component");
@@ -213,6 +225,29 @@ implements ChauffeEauUserI,
 	// Component life-cycle
 	// -------------------------------------------------------------------------
 
+	@Override
+	public synchronized void	start() throws ComponentStartException
+	{
+		super.start();
+			
+			try {
+				this.doPortConnection(
+						this.rop.getPortURI(),
+						GestionEnergie.registrationInboundPortURI,
+						RegistrationConnector.class.getCanonicalName());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	
+	@Override
+	public synchronized void	finalise() throws Exception
+	{
+		this.rop.doDisconnection();
+		super.finalise();
+	}
+	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
@@ -223,6 +258,7 @@ implements ChauffeEauUserI,
 			this.hip.unpublishPort();
 			this.hicip.unpublishPort();
 			this.hecip.unpublishPort();
+			this.rop.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}
@@ -260,6 +296,8 @@ implements ChauffeEauUserI,
 		assert	!this.on() : new PreconditionException("!on()");
 
 		this.currentState = ChauffeEauState.ON;
+		
+		this.rop.register(this.chauffeEauID, this.registrationOutboundPortURI, null);
 
 		assert	 this.on() : new PostconditionException("on()");
 	}
@@ -277,6 +315,8 @@ implements ChauffeEauUserI,
 		assert	this.on() : new PreconditionException("on()");
 
 		this.currentState = ChauffeEauState.OFF;
+		
+		this.rop.unregister(chauffeEauID);
 
 		assert	 !this.on() : new PostconditionException("!on()");
 	}

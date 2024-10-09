@@ -11,7 +11,6 @@ public interface VentilateurImplementationI
 	}
 	
 	public static enum VentilateurMode{
-		
 		// la ventilateur a 3 modes : low , medium et high 
 		LOW, 
 		MEDIUM,

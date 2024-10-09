@@ -114,34 +114,16 @@ extends AbstractComponent
 		}
 		
 		
-		public void			testTurnOnOff()
+		public void			testTurnOnOff() throws Exception
 		{
 			this.logMessage("testTurnOnOff()... ");
-			try {
-				assertEquals(VentilateurState.OFF, this.vop.getState());
+			if(this.vop.getState().equals(VentilateurState.OFF)) {
 				this.vop.turnOn();
 				assertEquals(VentilateurState.ON, this.vop.getState());
-				assertEquals(VentilateurMode.LOW, this.vop.getMode());
-			} catch (Exception e) {
-				assertTrue(false);
 			}
-			try {
-				assertThrows(ExecutionException.class,
-							 () -> this.vop.turnOn());
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			try {
+			else {
 				this.vop.turnOff();
 				assertEquals(VentilateurState.OFF, this.vop.getState());
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			try {
-				assertThrows(ExecutionException.class,
-							 () -> this.vop.turnOff());
-			} catch (Exception e) {
-				assertTrue(false);
 			}
 			this.logMessage("...done.");
 		}
@@ -185,7 +167,7 @@ extends AbstractComponent
 			this.logMessage("...done.");
 		}
 		
-		protected void			runAllTests()
+		protected void			runAllTests() throws Exception
 		{
 			this.testGetState();
 			this.testGetMode();

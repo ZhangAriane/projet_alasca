@@ -27,7 +27,7 @@ public class CVMUnitTest extends AbstractCVM {
 	{
 		AbstractComponent.createComponent(
 				ChauffeEau.class.getCanonicalName(),
-				new Object[]{});
+				new Object[]{true});
 
 		AbstractComponent.createComponent(
 				ChauffeEauTester.class.getCanonicalName(),
