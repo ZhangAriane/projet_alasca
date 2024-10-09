@@ -48,6 +48,7 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		ElectricMeter.VERBOSE = true;
 		ElectricMeter.X_RELATIVE_POSITION = 1;
 		ElectricMeter.Y_RELATIVE_POSITION = 1;
+		
 		MachineCafeTester.VERBOSE = true;
 		MachineCafeTester.X_RELATIVE_POSITION = 0;
 		MachineCafeTester.Y_RELATIVE_POSITION = 2;
@@ -142,6 +143,9 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		AbstractComponent.createComponent(
 				GestionEnergie.class.getCanonicalName(),
 				new Object[]{});
+		
+		
+		
 
 		super.deploy();
 	}
