@@ -80,7 +80,7 @@ protected VentilateurInboundPort	vip;
 				this.vip.publishPort();
 
 				if (Ventilateur.VERBOSE) {
-					this.tracer.get().setTitle("Hair dryer component");
+					this.tracer.get().setTitle("Ventilateur component");
 					this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 														  Y_RELATIVE_POSITION);
 					this.toggleTracing();
