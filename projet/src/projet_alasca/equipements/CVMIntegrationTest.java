@@ -8,11 +8,15 @@ import fr.sorbonne_u.components.cvm.AbstractCVM;
 import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeter;
 import fr.sorbonne_u.exceptions.ContractException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import projet_alasca.equipements.chauffeEau.ChauffeEau;
+import projet_alasca.equipements.chauffeEau.ChauffeEauTester;
 import projet_alasca.equipements.gestionEnergie.GestionEnergie;
 import projet_alasca.equipements.machineCafe.MachineCafe;
 import projet_alasca.equipements.machineCafe.MachineCafeTester;
 import projet_alasca.equipements.refrigerateur.Refrigerateur;
 import projet_alasca.equipements.refrigerateur.RefrigerateurTester;
+import projet_alasca.equipements.ventilateur.Ventilateur;
+import projet_alasca.equipements.ventilateur.VentilateurTester;
 
 public class CVMIntegrationTest extends		AbstractCVM{
 
@@ -43,6 +47,7 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		ElectricMeter.VERBOSE = true;
 		ElectricMeter.X_RELATIVE_POSITION = 1;
 		ElectricMeter.Y_RELATIVE_POSITION = 1;
+		
 		MachineCafeTester.VERBOSE = true;
 		MachineCafeTester.X_RELATIVE_POSITION = 0;
 		MachineCafeTester.Y_RELATIVE_POSITION = 2;
@@ -55,6 +60,19 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		Refrigerateur.VERBOSE = true;
 		Refrigerateur.X_RELATIVE_POSITION = 1;
 		Refrigerateur.Y_RELATIVE_POSITION = 3;
+		
+		VentilateurTester.VERBOSE = true;
+		VentilateurTester.X_RELATIVE_POSITION = 2;
+		VentilateurTester.Y_RELATIVE_POSITION = 2;
+		Ventilateur.VERBOSE = true;
+		Ventilateur.X_RELATIVE_POSITION = 3;
+		Ventilateur.Y_RELATIVE_POSITION = 2;
+		ChauffeEauTester.VERBOSE = true;
+		ChauffeEauTester.X_RELATIVE_POSITION = 2;
+		ChauffeEauTester.Y_RELATIVE_POSITION = 3;
+		ChauffeEau.VERBOSE = true;
+		ChauffeEau.X_RELATIVE_POSITION = 3;
+		ChauffeEau.Y_RELATIVE_POSITION = 3;
 	}
 	
 	@Override
@@ -103,6 +121,33 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		AbstractComponent.createComponent(
 				GestionEnergie.class.getCanonicalName(),
 				new Object[]{});
+		
+		AbstractComponent.createComponent(
+				MachineCafe.class.getCanonicalName(),
+				new Object[]{});
+		// At this stage, the tester for the hair dryer is added only
+		// to show the hair dryer functioning; later on, it will be replaced
+		// by a simulation of users' actions.
+		AbstractComponent.createComponent(
+				VentilateurTester.class.getCanonicalName(),
+				new Object[]{false});
+
+		AbstractComponent.createComponent(
+				Ventilateur.class.getCanonicalName(),
+				new Object[]{});
+
+		// At this stage, the tester for the heater is added only
+		// to switch on and off the heater; later on, it will be replaced
+		// by a simulation of users' actions.
+		AbstractComponent.createComponent(
+				ChauffeEauTester.class.getCanonicalName(),
+				new Object[]{false});
+		
+		AbstractComponent.createComponent(
+				ChauffeEau.class.getCanonicalName(),
+				new Object[]{});
+		
+		
 
 		super.deploy();
 	}

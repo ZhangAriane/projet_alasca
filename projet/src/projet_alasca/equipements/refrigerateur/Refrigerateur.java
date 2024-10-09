@@ -1,16 +1,35 @@
 package projet_alasca.equipements.refrigerateur;
 
+import java.time.Instant;
+import java.util.concurrent.TimeUnit;
+
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
+import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.hem2024.bases.RegistrationCI;
+import fr.sorbonne_u.components.hem2024e1.CVMIntegrationTest;
+import fr.sorbonne_u.components.hem2024e1.equipments.hem.AdjustableOutboundPort;
+import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeter;
+import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeterConnector;
+import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeterOutboundPort;
 import fr.sorbonne_u.exceptions.PostconditionException;
 import fr.sorbonne_u.exceptions.PreconditionException;
+import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
+import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
+import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
+import projet_alasca.equipements.chauffeEau.ChauffeEau;
+import projet_alasca.equipements.gestionEnergie.ChauffeEauConnector;
+import projet_alasca.equipements.gestionEnergie.GestionEnergie;
+import projet_alasca.equipements.gestionEnergie.RefrigerateurConnector;
+import projet_alasca.equipements.gestionEnergie.RegistrationConnector;
 import projet_alasca.equipements.gestionEnergie.RegistrationOutboundPort;
 import projet_alasca.equipements.refrigerateur.connections.RefrigerateurExternalControlInboundPort;
 import projet_alasca.equipements.refrigerateur.connections.RefrigerateurInternalControlInboundPort;
 import projet_alasca.equipements.refrigerateur.connections.RefrigerateurUserInboundPort;
+import projet_alasca.equipements.refrigerateur.connections.RegistrationInboundPort;
 
 @RequiredInterfaces(required = {RegistrationCI.class})
 @OfferedInterfaces(offered={RefrigerateurUserCI.class, RefrigerateurInternalControlCI.class, RefrigerateurExternalControlCI.class})
@@ -30,6 +49,8 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
+	protected final String REFRIGERATEUR_ID ="REFRIGERATEUR-ID";
+	
 	/** URI of the refrigerator inbound port used in tests.						*/
 	public static final String		REFLECTION_INBOUND_PORT_URI =
 			"REFRIGERATEUR-RIP-URI";	
@@ -172,7 +193,30 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 	// -------------------------------------------------------------------------
 	// Component life-cycle
 	// -------------------------------------------------------------------------
-
+	
+	@Override
+	public synchronized void	start() throws ComponentStartException
+	{
+		super.start();
+			
+			try {
+				this.doPortConnection(
+						this.registrationOutboundPort.getPortURI(),
+						GestionEnergie.registrationInboundPortURI,
+						RegistrationConnector.class.getCanonicalName());
+			} catch (Exception e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+	}
+	
+	@Override
+	public synchronized void	finalise() throws Exception
+	{
+		this.registrationOutboundPort.doDisconnection();
+		super.finalise();
+	}
+	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
 	 */
@@ -217,7 +261,11 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 
 		this.currentRefrigeratorState = RefrigeratorState.ON;
 		this.currentFreezerState = RefrigeratorState.ON;
+		
+		
 
+		
+		this.registrationOutboundPort.register(REFRIGERATEUR_ID, STANDARD_SCHEDULABLE_HANDLER_URI, "refrigerateur-adapter.xml");
 		assert	 this.on() : new PostconditionException("on()");
 
 	}
@@ -232,6 +280,8 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 
 		this.currentRefrigeratorState = RefrigeratorState.OFF;
 		this.currentFreezerState = RefrigeratorState.OFF;
+		
+		this.registrationOutboundPort.unregister(REFRIGERATEUR_ID);
 
 		assert	 !this.on() : new PostconditionException("!on()");
 

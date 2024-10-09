@@ -1,7 +1,7 @@
 <control-adapter
     xmlns="http://www.sorbonne-universite.fr/alasca/control-adapter"
     uid="1A10000"
-    offered="projet_alasca.equipements.refrigerateur.RefrigerateurExternalControlCI">
+    offered="fr.sorbonne_u.components.hem2024e1.equipments.heater.HeaterExternalControlCI">
   <consumption nominal="2000" min="0" max="2000"/>
   <required>java.lang.Math</required>
   <instance-var modifiers= "protected static" type="int" name="MAX_MODE"
@@ -18,10 +18,10 @@
             name="computeAndSetNewPowerLevel">
     <parameter type="int" name="newMode"/>
     <thrown>java.lang.Exception</thrown>
-    <body equipmentRef="refrigerateur">
-      double maxPowerLevel = refrigerateur.getMaxPowerLevel();
+    <body equipmentRef="heater">
+      double maxPowerLevel = heater.getMaxPowerLevel();
       double newPowerLevel = (newMode - 1) * maxPowerLevel/(MAX_MODE - 1);
-      refrigerateur.setCurrentPowerLevel(newPowerLevel);
+      heater.setCurrentPowerLevel(newPowerLevel);
     </body>
   </internal>
   <maxMode><body>return MAX_MODE;</body></maxMode>
@@ -74,9 +74,9 @@
     </body>
   </suspended>
   <suspend>
-    <body equipmentRef="refrigerateur">
+    <body equipmentRef="heater">
       try {
-        refrigerateur.setCurrentPowerLevel(0.0);
+        heater.setCurrentPowerLevel(0.0);
         isSuspended = true;
       } catch(Exception e) {
         return false;
@@ -85,7 +85,7 @@
     </body>
   </suspend>
   <resume>
-    <body equipmentRef="refrigerateur">
+    <body equipmentRef="heater">
       try {
         computeAndSetNewPowerLevel(currentMode);
         isSuspended = false;
@@ -96,10 +96,10 @@
     </body>
   </resume>
   <emergency>
-    <body equipmentRef="refrigerateur">
-      double currentTemperature = refrigerateur.getCurrentTemperature();
-      double targetTemperature = herefrigerateurater.getTargetTemperature();
-      double delta = Math.abs(targetRefrigerateurTemperature - currentRefrigerateurTemperature);
+    <body equipmentRef="heater">
+      double currentTemperature = heater.getCurrentTemperature();
+      double targetTemperature = heater.getTargetTemperature();
+      double delta = Math.abs(targetTemperature - currentTemperature);
       double ret = -1.0;
       if (currentTemperature &lt; MIN_ADMISSIBLE_TEMP ||
                                     delta &gt;= MAX_ADMISSIBLE_DELTA) {

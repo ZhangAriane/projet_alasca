@@ -8,5 +8,6 @@
 	<classpathentry kind="lib" path="ALASCA-etape-1/jing.jar"/>
 	<classpathentry kind="lib" path="ALASCA-etape-1/HEM-2024-etape1-20092024.jar"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
+	<classpathentry kind="lib" path="src/adapter/jing.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
