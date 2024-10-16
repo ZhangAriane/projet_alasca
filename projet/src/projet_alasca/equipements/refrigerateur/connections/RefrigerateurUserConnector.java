@@ -76,5 +76,39 @@ public class RefrigerateurUserConnector extends		AbstractConnector implements Re
 
 		return ((RefrigerateurUserCI)this.offering).getCurrentPowerLevel();
 	}
+	
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		((RefrigerateurUserCI)this.offering).switchOnRefrigeratorCompressor();
+
+	}
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		((RefrigerateurUserCI)this.offering).switchOffRefrigeratorCompressor();
+
+	}
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		((RefrigerateurUserCI)this.offering).switchOnFreezerCompressor();
+
+	}
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		((RefrigerateurUserCI)this.offering).switchOnFreezerCompressor();
+
+	}
+
+	@Override
+	public boolean onRegrigeratorCompressor() throws Exception {
+		return ((RefrigerateurUserCI)this.offering).onRegrigeratorCompressor();
+	}
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return ((RefrigerateurUserCI)this.offering).onFreezerCompressor();
+	}
 
 }

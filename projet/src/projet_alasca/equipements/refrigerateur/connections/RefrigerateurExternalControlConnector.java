@@ -40,6 +40,39 @@ public class RefrigerateurExternalControlConnector extends		AbstractConnector im
 	public double getCurrentPowerLevel() throws Exception {
 		return ((RefrigerateurExternalControlCI)this.offering).getCurrentPowerLevel();
 	}
+	
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOnRefrigeratorCompressor();
+	}
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOffRefrigeratorCompressor();
+
+	}
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOnFreezerCompressor();
+
+	}
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOffFreezerCompressor();
+
+	}
+
+	@Override
+	public boolean onRegrigeratorCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).onRegrigeratorCompressor();
+	}
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).onFreezerCompressor();
+	}
 
 	
 }

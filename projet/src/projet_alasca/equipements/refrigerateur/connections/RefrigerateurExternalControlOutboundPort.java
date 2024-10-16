@@ -60,6 +60,47 @@ public class RefrigerateurExternalControlOutboundPort extends		AbstractOutboundP
 		return ((RefrigerateurExternalControlCI)this.getConnector()).
 				getCurrentPowerLevel();
 	}
+	
+
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+				switchOnRefrigeratorCompressor();
+		
+	}
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+		switchOffRefrigeratorCompressor();
+		
+	}
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+		switchOnFreezerCompressor();
+		
+	}
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+		switchOffFreezerCompressor();
+		
+	}
+
+	@Override
+	public boolean onRegrigeratorCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				onRegrigeratorCompressor();
+	}
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				onFreezerCompressor();
+	}
 
 	
 }
