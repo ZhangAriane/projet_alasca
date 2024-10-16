@@ -1,0 +1,19 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<classpath>
+	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
+	<classpathentry kind="src" path="BCM4Java-08102024-src/examples"/>
+	<classpathentry kind="src" path="BCM4Java-08102024-src/examples-basic-plugins"/>
+	<classpathentry kind="src" path="BCM4Java-08102024-src/src"/>
+	<classpathentry kind="src" path="BCM4Java-08102024-src/src-basic-plugins"/>
+	<classpathentry kind="src" path="HEM-2024-etape2-14102024-src/hem-2024-base"/>
+	<classpathentry kind="src" path="HEM-2024-etape2-14102024-src/hem-2024-e1"/>
+	<classpathentry kind="src" path="HEM-2024-etape2-14102024-src/hem-2024-e2"/>
+	<classpathentry kind="src" path="NeoSim4Java-14102024-src/examples-advanced"/>
+	<classpathentry kind="src" path="NeoSim4Java-14102024-src/examples-basic"/>
+	<classpathentry kind="src" path="NeoSim4Java-14102024-src/extra"/>
+	<classpathentry kind="src" path="NeoSim4Java-14102024-src/src"/>
+	<classpathentry kind="lib" path="BCM4Java-08102024.jar"/>
+	<classpathentry kind="lib" path="HEM-2024-etape2-14102024.jar"/>
+	<classpathentry kind="lib" path="NeoSim4Java-14102024.jar"/>
+	<classpathentry kind="output" path="bin"/>
+</classpath>
