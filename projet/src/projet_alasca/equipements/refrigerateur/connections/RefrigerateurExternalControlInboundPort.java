@@ -14,6 +14,9 @@ public class RefrigerateurExternalControlInboundPort extends		AbstractInboundPor
 	public RefrigerateurExternalControlInboundPort( ComponentI owner)
 			throws Exception {
 		super(RefrigerateurExternalControlCI.class, owner);
+		assert	owner instanceof RefrigerateurExternalControlI :
+			new PreconditionException(
+					"owner instanceof RefrigerateurExternalControlI");
 	}
 	
 	

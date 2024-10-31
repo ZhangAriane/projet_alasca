@@ -11,6 +11,7 @@ import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import projet_alasca.equipements.batterie.Batterie;
 import projet_alasca.equipements.chauffeEau.ChauffeEau;
 import projet_alasca.equipements.chauffeEau.ChauffeEauTester;
+import projet_alasca.equipements.generatriceGaz.GeneratriceGaz;
 import projet_alasca.equipements.gestionEnergie.GestionEnergie;
 import projet_alasca.equipements.machineCafe.MachineCafe;
 import projet_alasca.equipements.machineCafe.MachineCafeTester;
@@ -78,13 +79,17 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		ChauffeEau.X_RELATIVE_POSITION = 3;
 		ChauffeEau.Y_RELATIVE_POSITION = 3;
 		
-		Batterie.VERBOSE = true;
-		Batterie.X_RELATIVE_POSITION = 3;
-		Batterie.Y_RELATIVE_POSITION = 1;
+		GeneratriceGaz.VERBOSE = true;
+		GeneratriceGaz.X_RELATIVE_POSITION = 3;
+		GeneratriceGaz.Y_RELATIVE_POSITION = 1;
 		
 		PanneauSolaire.VERBOSE = true;
 		PanneauSolaire.X_RELATIVE_POSITION = 2;
 		PanneauSolaire.Y_RELATIVE_POSITION = 1;
+		
+		Batterie.VERBOSE = true;
+		Batterie.X_RELATIVE_POSITION = 3;
+		Batterie.Y_RELATIVE_POSITION = 0;
 
 	}
 	
@@ -162,6 +167,10 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		
 		AbstractComponent.createComponent(
 				PanneauSolaire.class.getCanonicalName(),
+				new Object[]{});
+		
+		AbstractComponent.createComponent(
+				GeneratriceGaz.class.getCanonicalName(),
 				new Object[]{});
 
 		super.deploy();

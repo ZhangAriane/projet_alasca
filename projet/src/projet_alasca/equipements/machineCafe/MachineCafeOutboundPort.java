@@ -25,30 +25,6 @@ public class MachineCafeOutboundPort extends		AbstractOutboundPort implements Ma
 	}
 
 	@Override
-	public CoffeeMachineAction getMode() throws Exception {
-		return ((MachineCafeUserCI)this.getConnector()).getMode();
-	}
-
-
-	@Override
-	public void setModeCoffee() throws Exception {
-		((MachineCafeUserCI)this.getConnector()).setModeCoffee();
-
-	}
-
-	@Override
-	public void setModeLongCoffee() throws Exception {
-		((MachineCafeUserCI)this.getConnector()).setModeLongCoffee();
-
-	}
-
-	@Override
-	public void setModeExpresso() throws Exception {
-		((MachineCafeUserCI)this.getConnector()).setModeExpresso();
-
-	}
-
-	@Override
 	public void turnOn() throws Exception {
 		((MachineCafeUserCI)this.getConnector()).turnOn();
 

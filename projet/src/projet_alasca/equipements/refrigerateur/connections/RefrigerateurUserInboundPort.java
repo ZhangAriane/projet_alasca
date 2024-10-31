@@ -2,6 +2,7 @@ package projet_alasca.equipements.refrigerateur.connections;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
+import fr.sorbonne_u.exceptions.PreconditionException;
 import projet_alasca.equipements.refrigerateur.RefrigerateurExternalControlI;
 import projet_alasca.equipements.refrigerateur.RefrigerateurTemperatureI;
 import projet_alasca.equipements.refrigerateur.RefrigerateurUserCI;
@@ -14,11 +15,15 @@ public class RefrigerateurUserInboundPort extends		AbstractInboundPort implement
 	public RefrigerateurUserInboundPort( ComponentI owner)
 			throws Exception {
 		super(RefrigerateurUserCI.class, owner);
+		assert	owner instanceof RefrigerateurUserI :
+			new PreconditionException("owner instanceof RefrigerateurUserI");
 		}
 	
 	public RefrigerateurUserInboundPort(String uri, ComponentI owner)
 			throws Exception {
 		super(uri, RefrigerateurUserCI.class, owner);
+		assert	owner instanceof RefrigerateurUserI :
+			new PreconditionException("owner instanceof RefrigerateurUserI");
 		}
 
 	@Override

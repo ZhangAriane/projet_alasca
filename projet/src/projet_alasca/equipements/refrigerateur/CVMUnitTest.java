@@ -2,6 +2,7 @@ package projet_alasca.equipements.refrigerateur;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import projet_alasca.equipements.gestionEnergie.GestionEnergie;
 
 public class CVMUnitTest extends AbstractCVM {
 	// -------------------------------------------------------------------------
@@ -36,6 +37,11 @@ public class CVMUnitTest extends AbstractCVM {
 		AbstractComponent.createComponent(
 				RefrigerateurTester.class.getCanonicalName(),
 				new Object[]{true});
+		
+		
+		AbstractComponent.createComponent(
+				GestionEnergie.class.getCanonicalName(),
+				new Object[]{true,false});
 
 		super.deploy();
 	}

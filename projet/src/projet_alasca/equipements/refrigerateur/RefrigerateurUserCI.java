@@ -31,4 +31,34 @@ public interface RefrigerateurUserCI extends OfferedCI, RequiredCI, Refrigerateu
 
 	@Override
 	public double		getCurrentPowerLevel() throws Exception;
+	
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception;
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception;
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception;
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception;
+	
+	@Override
+	public boolean onRegrigeratorCompressor() throws Exception;
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception;
+	
+	@Override
+	public double		getRefrigeratorTargetTemperature() throws Exception;
+	
+	@Override
+	public double		getFreezerTargetTemperature() throws Exception;
+	
+	@Override
+	public double		getRefrigeratorCurrentTemperature() throws Exception;
+	
+	@Override
+	public double		getFreezerCurrentTemperature() throws Exception;
 }

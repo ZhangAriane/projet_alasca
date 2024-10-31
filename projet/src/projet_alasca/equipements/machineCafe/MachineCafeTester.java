@@ -15,7 +15,6 @@ import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
 import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
-import projet_alasca.equipements.machineCafe.MachineCafeImplementationI.CoffeeMachineAction;
 import projet_alasca.equipements.machineCafe.MachineCafeImplementationI.CoffeeMachineState;
 
 @RequiredInterfaces(required = {MachineCafeUserCI.class, ClocksServerCI.class})
@@ -130,31 +129,11 @@ public class MachineCafeTester extends AbstractComponent{
 	}
 
 
-	public void testMakeCoffee(CoffeeMachineAction button) throws Exception {
-		this.logMessage("testMakeCoffee()... ");
-
-		if(this.machineCafeOutboundPort.getState().equals(CoffeeMachineState.ON)) {
-			switch(button) {
-			case COFFEE : this.machineCafeOutboundPort.setModeCoffee(); break;
-			case LONG_COFFEE : this.machineCafeOutboundPort.setModeLongCoffee();  break;
-			case EXPRESSO : this.machineCafeOutboundPort.setModeExpresso();  break;
-			case NONE : break;
-			}
-		}
-		else {
-			this.logMessage("Coffee machine is off, can't make coffee!");
-		}
-
-		this.logMessage("...done.");
-	}
-
 
 	protected void			runAllTests() throws Exception
 	{
 		this.testTurnOnOff();
-		testMakeCoffee(CoffeeMachineAction.COFFEE);
 		this.testTurnOnOff();
-		testMakeCoffee(CoffeeMachineAction.LONG_COFFEE);
 	}
 
 	// -------------------------------------------------------------------------

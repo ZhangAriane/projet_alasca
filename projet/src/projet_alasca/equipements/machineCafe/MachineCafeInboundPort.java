@@ -34,40 +34,6 @@ public class MachineCafeInboundPort extends		AbstractInboundPort implements Mach
 	}
 
 	@Override
-	public CoffeeMachineAction getMode() throws Exception {
-		return this.getOwner().handleRequest(
-				o -> ((MachineCafeImplementationI)o).getMode());
-	}
-
-
-	@Override
-	public void setModeCoffee() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((MachineCafeImplementationI)o).setModeCoffee();
-				return null;
-				});
-
-	}
-
-	@Override
-	public void setModeLongCoffee() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((MachineCafeImplementationI)o).setModeLongCoffee();
-				return null;
-				});
-
-	}
-
-	@Override
-	public void setModeExpresso() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((MachineCafeImplementationI)o).setModeExpresso();
-				return null;
-				});
-
-	}
-
-	@Override
 	public void turnOn() throws Exception {
 		this.getOwner().handleRequest(
 				o -> {	((MachineCafeImplementationI)o).turnOn();

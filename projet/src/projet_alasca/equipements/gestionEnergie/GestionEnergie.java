@@ -65,6 +65,13 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	/** when true, this implementation of the HEM performs the tests
 	 *  that are planned in the method execute.								*/
 	protected boolean						performTest;
+	/** when true, this implementation of the HEM performs the tests
+	 *  that are planned in the method execute.								*/
+	protected boolean						refrigeratorTest;
+	/** when true, this implementation of the HEM performs the tests
+	 *  that are planned in the method execute.								*/
+	protected boolean						chauffeEauTest;
+
 	/** accelerated clock used for the tests.								*/
 	protected AcceleratedClock				ac;
 
@@ -83,6 +90,15 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	{
 		// by default, perform the tests planned in the method execute.
 		this(true);
+	}
+
+	protected 			GestionEnergie(boolean refrigeratorTest,boolean chauffeEauTest)
+	{
+		this(false);
+
+		this.refrigeratorTest = refrigeratorTest;
+		this.chauffeEauTest = chauffeEauTest;
+
 	}
 
 	/**
@@ -145,17 +161,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 		super.start();
 
 		try {
-			this.meterop = new ElectricMeterOutboundPort(this);
-			this.meterop.publishPort();
-			this.doPortConnection(
-					this.meterop.getPortURI(),
-					ElectricMeter.ELECTRIC_METER_INBOUND_PORT_URI,
-					ElectricMeterConnector.class.getCanonicalName());
-
-			if (this.isPreFirstStep) {
-				// in this case, connect using the statically customised
-				// heater connector and keep a specific outbound port to
-				// call the heater.
+			if(this.refrigeratorTest) {
 				this.refrigerateurExternalControlOutboundPort = new AdjustableOutboundPort(this);
 				this.refrigerateurExternalControlOutboundPort.publishPort();
 				this.doPortConnection(
@@ -163,30 +169,59 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 						Refrigerateur.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 						RefrigerateurConnector.class.getCanonicalName());
 
+			}
+			if(this.chauffeEauTest) {
 				this.chauffeEauExternalControlOutboundPort = new AdjustableOutboundPort(this);
 				this.chauffeEauExternalControlOutboundPort.publishPort();
 				this.doPortConnection(
 						this.chauffeEauExternalControlOutboundPort.getPortURI(),
 						ChauffeEau.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 						ChauffeEauConnector.class.getCanonicalName());
-
-				this.batterieOutboundPort = new BatterieOutboundPort(this);
-				this.batterieOutboundPort.publishPort();
+			}
+			if(this.performTest) {
+				this.meterop = new ElectricMeterOutboundPort(this);
+				this.meterop.publishPort();
 				this.doPortConnection(
-						this.batterieOutboundPort.getPortURI(),
-						Batterie.batterieInboundPortURI,
-						BatterieConnector.class.getCanonicalName());
+						this.meterop.getPortURI(),
+						ElectricMeter.ELECTRIC_METER_INBOUND_PORT_URI,
+						ElectricMeterConnector.class.getCanonicalName());
 
-				this.panneauSolaireOutboundPort = new PanneauSolaireOutboundPort(this);
-				this.panneauSolaireOutboundPort.publishPort();
-				this.doPortConnection(
-						this.panneauSolaireOutboundPort.getPortURI(),
-						PanneauSolaire.panneauSolaireInboundPortURI,
-						PanneauSolaireConnector.class.getCanonicalName());
+				if (this.isPreFirstStep) {
+					// in this case, connect using the statically customised
+					// heater connector and keep a specific outbound port to
+					// call the heater.
+					this.refrigerateurExternalControlOutboundPort = new AdjustableOutboundPort(this);
+					this.refrigerateurExternalControlOutboundPort.publishPort();
+					this.doPortConnection(
+							this.refrigerateurExternalControlOutboundPort.getPortURI(),
+							Refrigerateur.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+							RefrigerateurConnector.class.getCanonicalName());
 
-				//				this.registrationInboundPort = new RegistrationInboundPort(this.registrationInboundPortURI,this);
-				//				this.registrationInboundPort.publishPort();
+					this.chauffeEauExternalControlOutboundPort = new AdjustableOutboundPort(this);
+					this.chauffeEauExternalControlOutboundPort.publishPort();
+					this.doPortConnection(
+							this.chauffeEauExternalControlOutboundPort.getPortURI(),
+							ChauffeEau.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+							ChauffeEauConnector.class.getCanonicalName());
 
+					this.batterieOutboundPort = new BatterieOutboundPort(this);
+					this.batterieOutboundPort.publishPort();
+					this.doPortConnection(
+							this.batterieOutboundPort.getPortURI(),
+							Batterie.batterieInboundPortURI,
+							BatterieConnector.class.getCanonicalName());
+
+					this.panneauSolaireOutboundPort = new PanneauSolaireOutboundPort(this);
+					this.panneauSolaireOutboundPort.publishPort();
+					this.doPortConnection(
+							this.panneauSolaireOutboundPort.getPortURI(),
+							PanneauSolaire.panneauSolaireInboundPortURI,
+							PanneauSolaireConnector.class.getCanonicalName());
+
+					//				this.registrationInboundPort = new RegistrationInboundPort(this.registrationInboundPortURI,this);
+					//				this.registrationInboundPort.publishPort();
+
+				}
 			}
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
@@ -198,30 +233,39 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	@Override
 	public synchronized void	execute() throws Exception
 	{
-		// First, get the clock and wait until the start time that it specifies.
-		this.ac = null;
-		ClocksServerOutboundPort clocksServerOutboundPort =
-				new ClocksServerOutboundPort(this);
-		clocksServerOutboundPort.publishPort();
-		this.doPortConnection(
-				clocksServerOutboundPort.getPortURI(),
-				ClocksServer.STANDARD_INBOUNDPORT_URI,
-				ClocksServerConnector.class.getCanonicalName());
-		this.traceMessage("HEM gets the clock.\n");
-		this.ac = clocksServerOutboundPort.getClock(CVMIntegrationTest.CLOCK_URI);
-		this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
-		clocksServerOutboundPort.unpublishPort();
-		this.traceMessage("HEM waits until start time.\n");
-		this.ac.waitUntilStart();
-		this.traceMessage("HEM starts.\n");
-
 		if (this.performTest) {
+			// First, get the clock and wait until the start time that it specifies.
+			this.ac = null;
+			ClocksServerOutboundPort clocksServerOutboundPort =
+					new ClocksServerOutboundPort(this);
+			clocksServerOutboundPort.publishPort();
+			this.doPortConnection(
+					clocksServerOutboundPort.getPortURI(),
+					ClocksServer.STANDARD_INBOUNDPORT_URI,
+					ClocksServerConnector.class.getCanonicalName());
+			this.traceMessage("HEM gets the clock.\n");
+			this.ac = clocksServerOutboundPort.getClock(CVMIntegrationTest.CLOCK_URI);
+			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
+			clocksServerOutboundPort.unpublishPort();
+			this.traceMessage("HEM waits until start time.\n");
+			this.ac.waitUntilStart();
+			this.traceMessage("HEM starts.\n");
+
+
 			this.testMeter();
 			this.testBatterie();
 			if (this.isPreFirstStep) {
+				this.testChauffeEau();	
 				this.testRefrigerateur();
-				this.testChauffeEau();			}
+			}
 
+		}
+		else {
+			//test unitaire
+			if(this.refrigeratorTest)
+				this.testRefrigerateur();
+			if(this.chauffeEauTest)
+				this.testChauffeEau();
 		}
 	}
 
@@ -229,12 +273,19 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	@Override
 	public synchronized void	finalise() throws Exception
 	{
-		this.doPortDisconnection(this.meterop.getPortURI());
-		if (this.isPreFirstStep) {
-			this.doPortDisconnection(this.refrigerateurExternalControlOutboundPort.getPortURI());
-			this.doPortDisconnection(this.batterieOutboundPort.getPortURI());
-			this.doPortDisconnection(this.panneauSolaireOutboundPort.getPortURI());
+		if(this.performTest) {
+			this.doPortDisconnection(this.meterop.getPortURI());
+			if (this.isPreFirstStep) {
+				this.doPortDisconnection(this.refrigerateurExternalControlOutboundPort.getPortURI());
+				this.doPortDisconnection(this.batterieOutboundPort.getPortURI());
+				this.doPortDisconnection(this.panneauSolaireOutboundPort.getPortURI());
+				this.doPortDisconnection(this.chauffeEauExternalControlOutboundPort.getPortURI());
+			}
 		}
+		if(this.refrigeratorTest)
+			this.doPortDisconnection(this.refrigerateurExternalControlOutboundPort.getPortURI());
+		if(this.chauffeEauTest)
+			this.doPortDisconnection(this.chauffeEauExternalControlOutboundPort.getPortURI());
 		super.finalise();
 	}
 
@@ -242,12 +293,18 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	public synchronized void	shutdown() throws ComponentShutdownException
 	{
 		try {
-			this.meterop.unpublishPort();
-			if (this.isPreFirstStep) {
-				this.refrigerateurExternalControlOutboundPort.unpublishPort();
-				this.batterieOutboundPort.unpublishPort();
-				this.panneauSolaireOutboundPort.unpublishPort();
+			if(this.performTest) {
+				this.meterop.unpublishPort();
+				if (this.isPreFirstStep) {
+					this.refrigerateurExternalControlOutboundPort.unpublishPort();
+					this.batterieOutboundPort.unpublishPort();
+					this.panneauSolaireOutboundPort.unpublishPort();
+				}
 			}
+			if(this.refrigeratorTest)
+				this.refrigerateurExternalControlOutboundPort.unpublishPort();
+			if(this.chauffeEauTest)
+				this.chauffeEauExternalControlOutboundPort.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}
@@ -293,126 +350,127 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	 */
 	protected void		testRefrigerateur()
 	{
-		// Test for the refrigerator
-		Instant refrigeratorTestStart =
-				this.ac.getStartInstant().plusSeconds((RefrigerateurTester.SWITCH_ON_DELAY +
-						RefrigerateurTester.SWITCH_OFF_DELAY)/2);
+		if(this.performTest) {
+			// Test for the refrigerator
+			Instant refrigeratorTestStart =
+					this.ac.getStartInstant().plusSeconds((RefrigerateurTester.SWITCH_ON_DELAY +
+							RefrigerateurTester.SWITCH_OFF_DELAY)/2);
 
 
-		this.traceMessage("HEM schedules the refrigerator test.\n");
-		long delay = this.ac.nanoDelayUntilInstant(refrigeratorTestStart);
+			this.traceMessage("HEM schedules the refrigerator test.\n");
+			long delay = this.ac.nanoDelayUntilInstant(refrigeratorTestStart);
 
 
-		// schedule the switch on refrigerator in one second
-		this.scheduleTaskOnComponent(
-				new AbstractComponent.AbstractTask() {
-					@Override
-					public void run() {
-						try {
-							traceMessage("Refrigerator maxMode index? " +
-									refrigerateurExternalControlOutboundPort.maxMode() + "\n");
-							traceMessage("Refrigerator current mode index? " +
-									refrigerateurExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("Refrigerator going down one mode? " +
-									refrigerateurExternalControlOutboundPort.downMode() + "\n");
-							traceMessage("Refrigerator current mode is? " +
-									refrigerateurExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("Refrigerator going up one mode? " +
-									refrigerateurExternalControlOutboundPort.upMode() + "\n");
-							traceMessage("Refrigerator current mode is? " +
-									refrigerateurExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("Refrigerator setting current mode? " +
-									refrigerateurExternalControlOutboundPort.setMode(1) + "\n");
-							traceMessage("Refrigerator current mode is? " +
-									refrigerateurExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("Refrigerator is suspended? " +
-									refrigerateurExternalControlOutboundPort.suspended() + "\n");
-							traceMessage("Refrigerator suspends? " +
-									refrigerateurExternalControlOutboundPort.suspend() + "\n");
-							traceMessage("Refrigerator is suspended? " +
-									refrigerateurExternalControlOutboundPort.suspended() + "\n");
-							traceMessage("Refrigerator emergency? " +
-									refrigerateurExternalControlOutboundPort.emergency() + "\n");
-							Thread.sleep(1000);
-							traceMessage("Refrigerator emergency? " +
-									refrigerateurExternalControlOutboundPort.emergency() + "\n");
-							traceMessage("Refrigeratorater resumes? " +
-									refrigerateurExternalControlOutboundPort.resume() + "\n");
-							traceMessage("Refrigerator is suspended? " +
-									refrigerateurExternalControlOutboundPort.suspended() + "\n");
-							traceMessage("Refrigerator current mode is? " +
-									refrigerateurExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("HEM refrigerator ends.\n");
-						} catch (Exception e) {
-							e.printStackTrace();
+			// schedule the switch on refrigerator in one second
+			this.scheduleTaskOnComponent(
+					new AbstractComponent.AbstractTask() {
+						@Override
+						public void run() {
+							try {
+								traceMessage("Refrigerator maxMode index? " +
+										refrigerateurExternalControlOutboundPort.maxMode() + "\n");
+								traceMessage("Refrigerator current mode index? " +
+										refrigerateurExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("Refrigerator going down one mode? " +
+										refrigerateurExternalControlOutboundPort.downMode() + "\n");
+								traceMessage("Refrigerator current mode is? " +
+										refrigerateurExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("Refrigerator going up one mode? " +
+										refrigerateurExternalControlOutboundPort.upMode() + "\n");
+								traceMessage("Refrigerator current mode is? " +
+										refrigerateurExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("Refrigerator setting current mode? " +
+										refrigerateurExternalControlOutboundPort.setMode(1) + "\n");
+								traceMessage("Refrigerator current mode is? " +
+										refrigerateurExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("Refrigerator is suspended? " +
+										refrigerateurExternalControlOutboundPort.suspended() + "\n");
+								traceMessage("Refrigerator suspends? " +
+										refrigerateurExternalControlOutboundPort.suspend() + "\n");
+								traceMessage("Refrigerator is suspended? " +
+										refrigerateurExternalControlOutboundPort.suspended() + "\n");
+								traceMessage("Refrigerator emergency? " +
+										refrigerateurExternalControlOutboundPort.emergency() + "\n");
+								Thread.sleep(1000);
+								traceMessage("Refrigerator emergency? " +
+										refrigerateurExternalControlOutboundPort.emergency() + "\n");
+								traceMessage("Refrigeratorater resumes? " +
+										refrigerateurExternalControlOutboundPort.resume() + "\n");
+								traceMessage("Refrigerator is suspended? " +
+										refrigerateurExternalControlOutboundPort.suspended() + "\n");
+								traceMessage("Refrigerator current mode is? " +
+										refrigerateurExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("HEM refrigerator ends.\n");
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
-					}
-				}, delay, TimeUnit.NANOSECONDS);
+					}, delay, TimeUnit.NANOSECONDS);
 
 
-
+		}
 
 	}
 
 	protected void		testChauffeEau()
 	{
+		if(this.performTest) {
+			// Test for the chauffe eau
+			Instant chauffeEauTestStart =
+					this.ac.getStartInstant().plusSeconds(
+							(ChauffeEauTester.SWITCH_ON_DELAY +
+									ChauffeEauTester.SWITCH_OFF_DELAY)/2);
 
-		// Test for the chauffe eau
-		Instant chauffeEauTestStart =
-				this.ac.getStartInstant().plusSeconds(
-						(ChauffeEauTester.SWITCH_ON_DELAY +
-								ChauffeEauTester.SWITCH_OFF_DELAY)/2);
 
 
+			this.traceMessage("HEM schedules the chauffe eau test.\n");
+			long delay = this.ac.nanoDelayUntilInstant(chauffeEauTestStart);
 
-		this.traceMessage("HEM schedules the chauffe eau test.\n");
-		long delay = this.ac.nanoDelayUntilInstant(chauffeEauTestStart);
-
-		this.scheduleTaskOnComponent(
-				new AbstractComponent.AbstractTask() {
-					@Override
-					public void run() {
-						try {
-							traceMessage("chauffe eau eau maxMode index? " +
-									chauffeEauExternalControlOutboundPort.maxMode() + "\n");
-							traceMessage("chauffe eau current mode index? " +
-									chauffeEauExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("chauffe eau going down one mode? " +
-									chauffeEauExternalControlOutboundPort.downMode() + "\n");
-							traceMessage("chauffe eau current mode is? " +
-									chauffeEauExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("chauffe eau going up one mode? " +
-									chauffeEauExternalControlOutboundPort.upMode() + "\n");
-							traceMessage("chauffe eau current mode is? " +
-									chauffeEauExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("chauffe eau setting current mode? " +
-									chauffeEauExternalControlOutboundPort.setMode(1) + "\n");
-							traceMessage("chauffe eau current mode is? " +
-									chauffeEauExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("chauffe eau is suspended? " +
-									chauffeEauExternalControlOutboundPort.suspended() + "\n");
-							traceMessage("chauffe eau suspends? " +
-									chauffeEauExternalControlOutboundPort.suspend() + "\n");
-							traceMessage("chauffe eau is suspended? " +
-									chauffeEauExternalControlOutboundPort.suspended() + "\n");
-							traceMessage("chauffe eau emergency? " +
-									chauffeEauExternalControlOutboundPort.emergency() + "\n");
-							Thread.sleep(1000);
-							traceMessage("chauffe eau emergency? " +
-									chauffeEauExternalControlOutboundPort.emergency() + "\n");
-							traceMessage("chauffe eau resumes? " +
-									chauffeEauExternalControlOutboundPort.resume() + "\n");
-							traceMessage("chauffe eau is suspended? " +
-									chauffeEauExternalControlOutboundPort.suspended() + "\n");
-							traceMessage("chauffe eau current mode is? " +
-									chauffeEauExternalControlOutboundPort.currentMode() + "\n");
-							traceMessage("HEM chauffe eau ends.\n");
-						} catch (Exception e) {
-							e.printStackTrace();
+			this.scheduleTaskOnComponent(
+					new AbstractComponent.AbstractTask() {
+						@Override
+						public void run() {
+							try {
+								traceMessage("chauffe eau eau maxMode index? " +
+										chauffeEauExternalControlOutboundPort.maxMode() + "\n");
+								traceMessage("chauffe eau current mode index? " +
+										chauffeEauExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("chauffe eau going down one mode? " +
+										chauffeEauExternalControlOutboundPort.downMode() + "\n");
+								traceMessage("chauffe eau current mode is? " +
+										chauffeEauExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("chauffe eau going up one mode? " +
+										chauffeEauExternalControlOutboundPort.upMode() + "\n");
+								traceMessage("chauffe eau current mode is? " +
+										chauffeEauExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("chauffe eau setting current mode? " +
+										chauffeEauExternalControlOutboundPort.setMode(1) + "\n");
+								traceMessage("chauffe eau current mode is? " +
+										chauffeEauExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("chauffe eau is suspended? " +
+										chauffeEauExternalControlOutboundPort.suspended() + "\n");
+								traceMessage("chauffe eau suspends? " +
+										chauffeEauExternalControlOutboundPort.suspend() + "\n");
+								traceMessage("chauffe eau is suspended? " +
+										chauffeEauExternalControlOutboundPort.suspended() + "\n");
+								traceMessage("chauffe eau emergency? " +
+										chauffeEauExternalControlOutboundPort.emergency() + "\n");
+								Thread.sleep(1000);
+								traceMessage("chauffe eau emergency? " +
+										chauffeEauExternalControlOutboundPort.emergency() + "\n");
+								traceMessage("chauffe eau resumes? " +
+										chauffeEauExternalControlOutboundPort.resume() + "\n");
+								traceMessage("chauffe eau is suspended? " +
+										chauffeEauExternalControlOutboundPort.suspended() + "\n");
+								traceMessage("chauffe eau current mode is? " +
+										chauffeEauExternalControlOutboundPort.currentMode() + "\n");
+								traceMessage("HEM chauffe eau ends.\n");
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
 						}
-					}
-				}, delay, TimeUnit.NANOSECONDS);
-
+					}, delay, TimeUnit.NANOSECONDS);
+		}
 	}
 
 

@@ -24,14 +24,9 @@ public class MachineCafe extends AbstractComponent implements MachineCafeImpleme
 	/** initial state of the coffee machine.									*/
 	public static final CoffeeMachineState	INITIAL_STATE = CoffeeMachineState.OFF;
 
-	/** initial state of the coffee machine .									*/
-	public static final CoffeeMachineAction	INITIAL_MODE = CoffeeMachineAction.NONE;
-
 	/** current state (on, off) of the coffee machine .							*/
 	protected CoffeeMachineState		currentState;
 
-	/** current state (on, off) of the coffee machine .							*/
-	protected CoffeeMachineAction	currentMode;
 
 	/** inbound port offering the <code>MachineCafeCI</code> interface.		*/
 	protected MachineCafeInboundPort	machineCafeInboundPort;
@@ -77,7 +72,6 @@ public class MachineCafe extends AbstractComponent implements MachineCafeImpleme
 					"!machineCafeInboundPort.isEmpty()");
 
 		this.currentState = INITIAL_STATE;
-		this.currentMode = CoffeeMachineAction.NONE;
 		this.machineCafeInboundPort = new MachineCafeInboundPort(MachineCafeInboundPortURI, this);
 		this.machineCafeInboundPort.publishPort();
 
@@ -120,85 +114,6 @@ public class MachineCafe extends AbstractComponent implements MachineCafeImpleme
 					this.currentState + ".\n");
 		}
 		return this.currentState;
-	}
-
-	public CoffeeMachineAction getMode() throws Exception{
-		if (MachineCafe.VERBOSE) {
-			this.traceMessage("Coffee machine returns its mode : " +
-					this.currentMode + ".\n");
-		}
-
-		return this.currentMode;
-	}
-
-
-	@Override
-	public void setModeCoffee() throws Exception {
-		if (MachineCafe.VERBOSE) {
-			this.traceMessage("Coffee machine is making coffee.\n");
-		}
-
-		assert	this.getState() == CoffeeMachineState.ON :
-			new PreconditionException("getState() == CoffeeMachineState.ON");
-		assert	this.getMode() == CoffeeMachineAction.NONE :
-			new PreconditionException("getMode() == CoffeeMachineMode.NONE");
-
-		this.currentMode = CoffeeMachineAction.COFFEE;
-
-		this.traceMessage("Wait 5s.\n");
-
-		//Attent 10 secondes
-		Thread.sleep(5000);
-		this.currentMode = CoffeeMachineAction.NONE;
-
-		this.traceMessage("Coffee is ready.\n");
-
-	}
-
-	@Override
-	public void setModeLongCoffee() throws Exception {
-		if (MachineCafe.VERBOSE) {
-			this.traceMessage("Coffee Machine makes long coffee.\n");
-		}
-
-		assert	this.getState() == CoffeeMachineState.ON :
-			new PreconditionException("getState() == CoffeeMachineState.ON");
-		assert	this.getMode() == CoffeeMachineAction.NONE :
-			new PreconditionException("getMode() == CoffeeMachineMode.NONE");
-
-		this.currentMode = CoffeeMachineAction.LONG_COFFEE;
-
-		this.traceMessage("Wait 5s.\n");
-
-		//Attent 10 secondes
-		Thread.sleep(5000);
-		this.currentMode = CoffeeMachineAction.NONE;
-
-		this.traceMessage("Long coffee is ready.\n");
-
-	}
-
-	@Override
-	public void setModeExpresso() throws Exception {
-		if (MachineCafe.VERBOSE) {
-			this.traceMessage("Coffee machine makes an expresso.\n");
-		}
-
-		assert	this.getState() == CoffeeMachineState.ON :
-			new PreconditionException("getState() == CoffeeMachineState.ON");
-		assert	this.getMode() == CoffeeMachineAction.NONE :
-			new PreconditionException("getMode() == CoffeeMachineMode.NONE");
-
-		this.currentMode = CoffeeMachineAction.EXPRESSO;
-
-		this.traceMessage("Wait 5s.\n");
-
-		//Attent 10 secondes
-		Thread.sleep(5000);
-		this.currentMode = CoffeeMachineAction.NONE;
-
-		this.traceMessage("Expresso is ready.\n");
-
 	}
 
 

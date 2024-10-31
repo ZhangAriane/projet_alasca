@@ -9,29 +9,6 @@ public class MachineCafeConnector extends		AbstractConnector implements MachineC
 		return ((MachineCafeUserCI)this.offering).getState();
 	}
 
-	@Override
-	public CoffeeMachineAction getMode() throws Exception {
-		return ((MachineCafeUserCI)this.offering).getMode();
-	}
-
-
-	@Override
-	public void setModeCoffee() throws Exception {
-		((MachineCafeUserCI)this.offering).setModeCoffee();
-
-	}
-
-	@Override
-	public void setModeLongCoffee() throws Exception {
-		((MachineCafeUserCI)this.offering).setModeLongCoffee();
-
-	}
-
-	@Override
-	public void setModeExpresso() throws Exception {
-		((MachineCafeUserCI)this.offering).setModeExpresso();
-
-	}
 
 	@Override
 	public void turnOn() throws Exception {

@@ -175,15 +175,13 @@ public class RefrigerateurTester extends AbstractComponent {
 	{
 		this.traceMessage("testTargetTemperature()...\n");
 		try {
-			this.logMessage("target :" + this.refrigerateurUserOutboundPort.getRefrigeratorTargetTemperature());
-			this.refrigerateurUserOutboundPort.setRefrigeratorTargetTemperature(6.0);
-//			this.logMessage("target :" + this.refrigerateurUserOutboundPort.getRefrigeratorTargetTemperature());
-//			assertEquals(6.0, this.refrigerateurUserOutboundPort.getRefrigeratorTargetTemperature());
-//			this.refrigerateurUserOutboundPort.setRefrigeratorTargetTemperature(Refrigerateur.STANDARD_REFRIGERATOR_TARGET_TEMPERATURE);
+			this.refrigerateurUserOutboundPort.setRefrigeratorTargetTemperature(6.0);			
+			assertEquals(6.0, this.refrigerateurUserOutboundPort.getRefrigeratorTargetTemperature());
+			this.refrigerateurUserOutboundPort.setRefrigeratorTargetTemperature(Refrigerateur.STANDARD_REFRIGERATOR_TARGET_TEMPERATURE);
 
-//			this.refrigerateurUserOutboundPort.setFreezerTargetTemperature(-15.0);
-//			assertEquals(-15.0, this.refrigerateurUserOutboundPort.getFreezerTargetTemperature());
-//			this.refrigerateurUserOutboundPort.setFreezerTargetTemperature(Refrigerateur.STANDARD_FREEZER_TARGET_TEMPERATURE);
+			this.refrigerateurUserOutboundPort.setFreezerTargetTemperature(-15.0);
+			assertEquals(-15.0, this.refrigerateurUserOutboundPort.getFreezerTargetTemperature());
+			this.refrigerateurUserOutboundPort.setFreezerTargetTemperature(Refrigerateur.STANDARD_FREEZER_TARGET_TEMPERATURE);
 
 		} catch (Exception e) {
 			this.traceMessage("...KO. " + e + "\n");
@@ -192,6 +190,8 @@ public class RefrigerateurTester extends AbstractComponent {
 		this.traceMessage("...testTargetTemperature() done.\n");
 
 	}
+	
+	
 
 	protected void		testCurrentTemperature()
 	{
@@ -311,20 +311,20 @@ public class RefrigerateurTester extends AbstractComponent {
 			this.doPortConnection(
 					this.refrigerateurUserOutboundPort.getPortURI(),
 					this.refrigerateurUserInboundPortURI,
-//					RefrigerateurUserConnector.class.getCanonicalName()
-					GenereRefrigerateurConnecteur.genereRefrigeratorUserConnector().getCanonicalName()
+					RefrigerateurUserConnector.class.getCanonicalName()
+//					GenereRefrigerateurConnecteur.genereRefrigeratorUserConnector().getCanonicalName()
 					);
 			this.doPortConnection(
 					this.refrigerateurInternalControlOutboundPort.getPortURI(),
 					this.refrigerateurInternalControlInboundPortURI,
-//					RefrigerateurInternalControlConnector.class.getCanonicalName()
-					GenereRefrigerateurConnecteur.genereRefrigeratorInternalControlConnector().getCanonicalName()
+					RefrigerateurInternalControlConnector.class.getCanonicalName()
+//					GenereRefrigerateurConnecteur.genereRefrigeratorInternalControlConnector().getCanonicalName()
 					);
 			this.doPortConnection(
 					this.refrigerateurExternalControlOutboundPort.getPortURI(),
 					this.refrigerateurExternalControlInboundPortURI,
-//					RefrigerateurExternalControlConnector.class.getCanonicalName()
-					GenereRefrigerateurConnecteur.genereRefrigeratorExternalControlConnector().getCanonicalName()
+					RefrigerateurExternalControlConnector.class.getCanonicalName()
+//					GenereRefrigerateurConnecteur.genereRefrigeratorExternalControlConnector().getCanonicalName()
 					);
 			
 			

@@ -2,6 +2,7 @@ package projet_alasca.equipements.chauffeEau;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
+import projet_alasca.equipements.gestionEnergie.GestionEnergie;
 
 public class CVMUnitTest extends AbstractCVM {
 
@@ -27,11 +28,15 @@ public class CVMUnitTest extends AbstractCVM {
 	{
 		AbstractComponent.createComponent(
 				ChauffeEau.class.getCanonicalName(),
-				new Object[]{true});
+				new Object[]{});
 
 		AbstractComponent.createComponent(
 				ChauffeEauTester.class.getCanonicalName(),
 				new Object[]{true});
+		
+		AbstractComponent.createComponent(
+				GestionEnergie.class.getCanonicalName(),
+				new Object[]{false,true});
 
 		super.deploy();
 	}

@@ -30,7 +30,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#switchOn()
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#switchOn()
 	 */
 	@Override
 	public void			switchOn() throws Exception
@@ -39,7 +39,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#switchOff()
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#switchOff()
 	 */
 	@Override
 	public void			switchOff() throws Exception
@@ -48,7 +48,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#setTargetTemperature(double)
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#setTargetTemperature(double)
 	 */
 	@Override
 	public void			setTargetTemperature(double target) throws Exception
@@ -57,7 +57,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#getTargetTemperature()
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#getTargetTemperature()
 	 */
 	@Override
 	public double		getTargetTemperature() throws Exception
@@ -66,7 +66,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#getCurrentTemperature()
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#getCurrentTemperature()
 	 */
 	@Override
 	public double		getCurrentTemperature() throws Exception
@@ -75,7 +75,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#getMaxPowerLevel()
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#getMaxPowerLevel()
 	 */
 	@Override
 	public double		getMaxPowerLevel() throws Exception
@@ -84,7 +84,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#setCurrentPowerLevel(double)
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#setCurrentPowerLevel(double)
 	 */
 	@Override
 	public void			setCurrentPowerLevel(double powerLevel) throws Exception
@@ -93,7 +93,7 @@ implements ChauffeEauUserCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e1.equipments.PanneauSolaireCI.ChauffeEauUserCI#getCurrentPowerLevel()
+	 * @see fr.sorbonne_u.components.hem2024e1.equipments.GeneratriceGazCI.ChauffeEauUserCI#getCurrentPowerLevel()
 	 */
 	@Override
 	public double		getCurrentPowerLevel() throws Exception

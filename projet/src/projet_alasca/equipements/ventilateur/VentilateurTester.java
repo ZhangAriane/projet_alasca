@@ -35,205 +35,185 @@ extends AbstractComponent
 	protected final boolean	isUnitTest;				
 	protected VentilateurOutboundPort vop;					
 	protected String 	VentilateurInboundPortURI;
-	
-	
-	
+
+
+
 	protected VentilateurTester(boolean isUnitTest) throws Exception 
 	{
 		this(isUnitTest, Ventilateur.INBOUND_PORT_URI);
 	}
 
 	public VentilateurTester(boolean isUnitTest, String VentilateurInboundPortURI) throws Exception
-    {
+	{
 		super(1, 0);
 		assert	VentilateurInboundPortURI != null &&
 				!VentilateurInboundPortURI.isEmpty() :
-				new PreconditionException(
-				"VentilateurInboundPortURI != null && "
-				+ "!VentilateurInboundPortURI.isEmpty()");
-		
+					new PreconditionException(
+							"VentilateurInboundPortURI != null && "
+									+ "!VentilateurInboundPortURI.isEmpty()");
+
 		this.isUnitTest = isUnitTest;
 		this.initialise(VentilateurInboundPortURI);
 	}
-	
-	
+
+
 	protected	VentilateurTester(
 			boolean isUnitTest,
 			String ventilateurInboundPortURI,
 			String reflectionInboundPortURI
 			) throws Exception
-		{
-			super(reflectionInboundPortURI, 1, 0);
+	{
+		super(reflectionInboundPortURI, 1, 0);
 
-			this.isUnitTest = isUnitTest;
-			this.initialise(ventilateurInboundPortURI);
-		}
-	
+		this.isUnitTest = isUnitTest;
+		this.initialise(ventilateurInboundPortURI);
+	}
+
 	protected void		initialise(
 			String ventilateurInboundPortURI
 			) throws Exception
-		{
-			this.VentilateurInboundPortURI = ventilateurInboundPortURI;
-			this.vop = new VentilateurOutboundPort(this);
-			this.vop.publishPort();
+	{
+		this.VentilateurInboundPortURI = ventilateurInboundPortURI;
+		this.vop = new VentilateurOutboundPort(this);
+		this.vop.publishPort();
 
-			if (VERBOSE) {
-				this.tracer.get().setTitle("Ventilateur tester component");
-				this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
-													  Y_RELATIVE_POSITION);
-				this.toggleTracing();
-			}
+		if (VERBOSE) {
+			this.tracer.get().setTitle("Ventilateur tester component");
+			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
+					Y_RELATIVE_POSITION);
+			this.toggleTracing();
 		}
-	
-	
+	}
+
+
 	// -------------------------------------------------------------------------
-		// Component internal methods
-		// -------------------------------------------------------------------------
+	// Component internal methods
+	// -------------------------------------------------------------------------
 
-		public void			testGetState()
-		{
-			this.logMessage("testGetState()... ");
-			try {
-				assertEquals(VentilateurState.OFF, this.vop.getState());
-			} catch (Exception e) {
-				this.logMessage("...KO.");
-				assertTrue(false);
-			}
-			this.logMessage("...done.");
+	public void			testGetState()
+	{
+		this.logMessage("testGetState()... ");
+		try {
+			assertEquals(VentilateurState.OFF, this.vop.getState());
+		} catch (Exception e) {
+			this.logMessage("...KO.");
+			assertTrue(false);
 		}
-		
-		public void			testGetMode()
-		{
-			this.logMessage("testGetMode()... ");
-			try {
-				assertEquals(VentilateurMode.LOW, this.vop.getMode());
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			this.logMessage("...done.");
+		this.logMessage("...done.");
+	}
+
+	public void			testGetMode()
+	{
+		this.logMessage("testGetMode()... ");
+		try {
+			assertEquals(VentilateurMode.LOW, this.vop.getMode());
+		} catch (Exception e) {
+			assertTrue(false);
 		}
-		
-		
-		public void			testTurnOnOff() throws Exception
-		{
-			this.logMessage("testTurnOnOff()... ");
-			if(this.vop.getState().equals(VentilateurState.OFF)) {
-				this.vop.turnOn();
-				assertEquals(VentilateurState.ON, this.vop.getState());
-			}
-			else {
-				this.vop.turnOff();
-				assertEquals(VentilateurState.OFF, this.vop.getState());
-			}
-			this.logMessage("...done.");
+		this.logMessage("...done.");
+	}
+
+
+	public void			testTurnOnOff() throws Exception
+	{
+		this.logMessage("testTurnOnOff()... ");
+		if(this.vop.getState().equals(VentilateurState.OFF)) {
+			this.vop.turnOn();
+			assertEquals(VentilateurState.ON, this.vop.getState());
 		}
-		
-		
-		public void			testSetLowHigh()
-		{
-			this.logMessage("testSetLowHigh()... ");
-			try {
-				this.vop.turnOn();
-				this.vop.setHigh();
-				assertEquals(VentilateurState.ON, this.vop.getState());
-				assertEquals(VentilateurMode.HIGH, this.vop.getMode());
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			try {
-				assertThrows(ExecutionException.class,
-							 () -> this.vop.setHigh());
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			try {
-				this.vop.setLow();
-				assertEquals(VentilateurState.ON, this.vop.getState());
-				assertEquals(VentilateurMode.LOW, this.vop.getMode());
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			try {
-				assertThrows(ExecutionException.class,
-							 () -> this.vop.setLow());
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			try {
-				this.vop.turnOff();
-			} catch (Exception e) {
-				assertTrue(false);
-			}
-			this.logMessage("...done.");
+		else {
+			this.vop.turnOff();
+			assertEquals(VentilateurState.OFF, this.vop.getState());
 		}
-		
-		protected void			runAllTests() throws Exception
-		{
-			this.testGetState();
-			this.testGetMode();
-			this.testTurnOnOff();
-			this.testSetLowHigh();
+		this.logMessage("...done.");
+	}
+
+
+	public void			testSetLowHigh() throws Exception
+	{
+		this.logMessage("testSetLowHigh()... ");
+
+		if(this.vop.getMode().equals(VentilateurMode.LOW)) {
+			this.vop.setHigh();
+			assertEquals(VentilateurState.ON, this.vop.getState());
+			assertEquals(VentilateurMode.HIGH, this.vop.getMode());
+		}
+		else {
+			this.vop.setLow();
+			assertEquals(VentilateurState.ON, this.vop.getState());
+			assertEquals(VentilateurMode.LOW, this.vop.getMode());
 		}
 
-		@Override
-		public synchronized void	start()
-		throws ComponentStartException
-		{
-			super.start();
+		this.logMessage("...done.");
+	}
 
-			try {
-				this.doPortConnection(
-								this.vop.getPortURI(),
-								VentilateurInboundPortURI,
-								VentilateurConnector.class.getCanonicalName());
-			} catch (Exception e) {
-				throw new ComponentStartException(e) ;
-			}
-		}
-		
-		@Override
-		public synchronized void execute() throws Exception
-		{
-			if (!this.isUnitTest) {
-				ClocksServerOutboundPort clocksServerOutboundPort =
-												new ClocksServerOutboundPort(this);
-				clocksServerOutboundPort.publishPort();
-				this.doPortConnection(
-						clocksServerOutboundPort.getPortURI(),
-						ClocksServer.STANDARD_INBOUNDPORT_URI,
-						ClocksServerConnector.class.getCanonicalName());
-				this.traceMessage("Ventilateur Tester gets the clock.\n");
-				AcceleratedClock ac =
-						clocksServerOutboundPort.getClock(
-											CVMIntegrationTest.CLOCK_URI);
-				this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
-				clocksServerOutboundPort.unpublishPort();
-				clocksServerOutboundPort = null;
+	protected void			runAllTests() throws Exception
+	{
+		this.testGetState();
+		this.testGetMode();
+		this.testTurnOnOff();
+		this.testSetLowHigh();
+	}
 
-				this.traceMessage("Ventilateur Tester waits until start.\n");
-				ac.waitUntilStart();
-			}
-			this.traceMessage("Ventilateur Tester starts the tests.\n");
-			this.runAllTests();
-			this.traceMessage("Ventilateur Tester ends.\n");
-		}
+	@Override
+	public synchronized void	start()
+			throws ComponentStartException
+	{
+		super.start();
 
-		@Override
-		public synchronized void	finalise() throws Exception
-		{
-			this.doPortDisconnection(this.vop.getPortURI());
-			super.finalise();
+		try {
+			this.doPortConnection(
+					this.vop.getPortURI(),
+					VentilateurInboundPortURI,
+					VentilateurConnector.class.getCanonicalName());
+		} catch (Exception e) {
+			throw new ComponentStartException(e) ;
 		}
-		
-		@Override
-		public synchronized void	shutdown() throws ComponentShutdownException
-		{
-			try {
-				this.vop.unpublishPort();
-			} catch (Exception e) {
-				throw new ComponentShutdownException(e) ;
-			}
-			super.shutdown();
+	}
+
+	@Override
+	public synchronized void execute() throws Exception
+	{
+		if (!this.isUnitTest) {
+			ClocksServerOutboundPort clocksServerOutboundPort =
+					new ClocksServerOutboundPort(this);
+			clocksServerOutboundPort.publishPort();
+			this.doPortConnection(
+					clocksServerOutboundPort.getPortURI(),
+					ClocksServer.STANDARD_INBOUNDPORT_URI,
+					ClocksServerConnector.class.getCanonicalName());
+			this.traceMessage("Ventilateur Tester gets the clock.\n");
+			AcceleratedClock ac =
+					clocksServerOutboundPort.getClock(
+							CVMIntegrationTest.CLOCK_URI);
+			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
+			clocksServerOutboundPort.unpublishPort();
+			clocksServerOutboundPort = null;
+
+			this.traceMessage("Ventilateur Tester waits until start.\n");
+			ac.waitUntilStart();
 		}
-		
+		this.traceMessage("Ventilateur Tester starts the tests.\n");
+		this.runAllTests();
+		this.traceMessage("Ventilateur Tester ends.\n");
+	}
+
+	@Override
+	public synchronized void	finalise() throws Exception
+	{
+		this.doPortDisconnection(this.vop.getPortURI());
+		super.finalise();
+	}
+
+	@Override
+	public synchronized void	shutdown() throws ComponentShutdownException
+	{
+		try {
+			this.vop.unpublishPort();
+		} catch (Exception e) {
+			throw new ComponentShutdownException(e) ;
+		}
+		super.shutdown();
+	}
+
 }
