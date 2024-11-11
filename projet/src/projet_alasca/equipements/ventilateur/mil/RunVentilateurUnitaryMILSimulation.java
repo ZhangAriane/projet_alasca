@@ -53,13 +53,14 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetLowVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SetMediumVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOffVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOnVentilateur;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>RunHairDryerUnitarySimulation</code> is the main class used
- * to run simulations on the example models of the hair dryer in isolation.
+ * The class <code>RunVentilateurUnitarySimulation</code> is the main class used
+ * to run simulations on the example models of the ventilateur in isolation.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -117,7 +118,7 @@ public class			RunVentilateurUnitaryMILSimulation
 			Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
 																new HashMap<>();
 
-			// the hair dyer model simulating its electricity consumption, an
+			// the ventilateur model simulating its electricity consumption, an
 			// atomic HIOA model hence we use an AtomicHIOA_Descriptor
 			atomicModelDescriptors.put(
 					VentilateurElectricityModel.URI,
@@ -169,6 +170,12 @@ public class			RunVentilateurUnitaryMILSimulation
 										  SetHighVentilateur.class)
 					});
 			connections.put(
+					new EventSource(VentilateurUserModel.URI, SetMediumVentilateur.class),
+					new EventSink[] {
+							new EventSink(VentilateurElectricityModel.URI,
+										  SetMediumVentilateur.class)
+					});
+			connections.put(
 					new EventSource(VentilateurUserModel.URI, SetLowVentilateur.class),
 					new EventSink[] {
 							new EventSink(VentilateurElectricityModel.URI,
@@ -202,7 +209,7 @@ public class			RunVentilateurUnitaryMILSimulation
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 			// run a simulation with the simulation beginning at 0.0 and
 			// ending at 24.0
-			se.doStandAloneSimulation(0.0, 24.0);
+			se.doStandAloneSimulation(0.0, 1.0);
 			SimulationReportI sr = se.getSimulatedModel().getFinalReport();
 			System.out.println(sr);
 			System.exit(0);

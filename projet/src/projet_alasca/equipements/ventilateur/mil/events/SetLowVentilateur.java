@@ -40,8 +40,8 @@ import projet_alasca.equipements.ventilateur.mil.VentilateurElectricityModel;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>SetLowHairDryer</code> defines the simulation event of the
- * hair dryer being set to low temperature mode.
+ * The class <code>SetLowVentilateur</code> defines the simulation event of the
+ * ventilateur being set to low temperature mode.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -75,7 +75,7 @@ extends		AbstractVentilateurEvent
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>SetLowHairDryer</code> event.
+	 * create a <code>SetLowVentilateur</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -102,9 +102,9 @@ extends		AbstractVentilateurEvent
 	@Override
 	public boolean			hasPriorityOver(EventI e)
 	{
-		// if many hair dryer events occur at the same time, the
-		// SetLowHairDryer one will be executed first except for
-		// SwitchOnHairDryer ones.
+		// if many ventilateur events occur at the same time, the
+		// SetLowVentilateur one will be executed first except for
+		// SwitchOnVentilateur ones.
 		if (e instanceof SwitchOnVentilateur) {
 			return false;
 		} else {
@@ -121,11 +121,11 @@ extends		AbstractVentilateurEvent
 		assert	model instanceof VentilateurElectricityModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HairDryerElectricityModel");
+						+ "VentilateurElectricityModel");
 
 		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
-		// a SetLow event can only be executed when the state of the hair
-		// dryer model is in the state HIGH
+		// a SetLow event can only be executed when the state of the ventilateur
+		//  model is in the state HIGH
 		if (m.getState() == VentilateurElectricityModel.State.HIGH) {
 			// then put it in the state LOW
 			m.setState(VentilateurElectricityModel.State.LOW);

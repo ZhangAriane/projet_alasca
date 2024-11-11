@@ -52,12 +52,13 @@ import fr.sorbonne_u.exceptions.InvariantChecking;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOnVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOffVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetLowVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SetMediumVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
 
 // -----------------------------------------------------------------------------
 /**
  * The class <code>HairDryerUserModel</code> defines a very simple user
- * model for the hair dryer.
+ * model for the ventilateur.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -68,7 +69,7 @@ import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
  * <p>
  * Here, we use an event scheduling atomic model to output events at random
  * time intervals in a predefined cycle to test all of the different modes in
- * the hair dryer. Note that the exported events are indeed subclasses of
+ * the ventilateur. Note that the exported events are indeed subclasses of
  * event scheduling events {@code ES_Event}. Hence, this example also shows
  * how to program this type of event scheduling simulation models.
  * </p>
@@ -115,6 +116,7 @@ import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
 @ModelExternalEvents(exported = {SwitchOnVentilateur.class,
 								 SwitchOffVentilateur.class,
 								 SetLowVentilateur.class,
+								 SetMediumVentilateur.class,
 								 SetHighVentilateur.class})
 // -----------------------------------------------------------------------------
 public class			VentilateurUserModel
@@ -131,7 +133,7 @@ extends		AtomicES_Model
 
 	/** time interval between event outputs in hours.						*/
 	protected static double		STEP_MEAN_DURATION = 5.0/60.0; // 5 minutes
-	/** time interval between hair dryer usages in hours.					*/
+	/** time interval between ventilateur usages in hours.					*/
 	protected static double		DELAY_MEAN_DURATION = 4.0;
 
 	/**	the random number generator from common math library.				*/
@@ -220,7 +222,7 @@ extends		AtomicES_Model
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a hair dryer user MIL model instance.
+	 * create a ventilateur user MIL model instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -284,23 +286,31 @@ extends		AtomicES_Model
 		// compute the next event type given the current event
 		ES_EventI nextEvent = null;
 		if (current instanceof SwitchOffVentilateur) {
-			// compute the time of occurrence for the next hair dryer usage
+			// compute the time of occurrence for the next ventilateur usage
 			Time t2 = this.computeTimeOfNextUsage(current.getTimeOfOccurrence());
-			// after switching off the hair dryer, the next event must be a
+			// after switching off the ventilateur, the next event must be a
 			// switch on
 			nextEvent = new SwitchOnVentilateur(t2);
 		} else {
 			// compute the time of occurrence for the next event
 			Time t = this.computeTimeOfNextEvent(current.getTimeOfOccurrence());
 			// establish a sequence of actions i.e., events, that tests all
-			// states and modes of the hair dryer
+			// states and modes of the ventilateur
 			if (current instanceof SwitchOnVentilateur) {
-				nextEvent = new SetHighVentilateur(t);
-			} else if (current instanceof SetHighVentilateur) {
-				nextEvent = new SetLowVentilateur(t);
+			    nextEvent = new SetLowVentilateur(t); // Start in LOW mode
 			} else if (current instanceof SetLowVentilateur) {
-				nextEvent = new SwitchOffVentilateur(t);
+			    nextEvent = new SetMediumVentilateur(t);
+			} else if (current instanceof SetMediumVentilateur) {
+			    nextEvent = new SetHighVentilateur(t);
+			} else if (current instanceof SetHighVentilateur) {
+			    nextEvent = new SetMediumVentilateur(t); // Step down to MEDIUM
+			} else if (current instanceof SetMediumVentilateur) {
+			    nextEvent = new SetLowVentilateur(t); // Step down to LOW
+			} else if (current instanceof SetLowVentilateur) {
+			    nextEvent = new SwitchOffVentilateur(t); // Finally, turn off
 			}
+
+			
 		}
 		// schedule the event to be executed by this model
 		this.scheduleEvent(nextEvent);
@@ -335,7 +345,7 @@ extends		AtomicES_Model
 	}
 
 	/**
-	 * compute the time of the next hair dryer usage, adding a random delay to
+	 * compute the time of the next ventilateur usage, adding a random delay to
 	 * {@code from}.
 	 * 
 	 * <p><strong>Contract</strong></p>

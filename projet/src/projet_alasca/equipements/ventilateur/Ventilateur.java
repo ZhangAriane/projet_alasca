@@ -178,6 +178,7 @@ protected VentilateurInboundPort	vip;
 		assert	this.getMode() == VentilateurMode.HIGH  || this.getMode() == VentilateurMode.LOW:
 			new PreconditionException("getMode() == VentilateurMode.HIGH or getMode() == VentilateurMode.LOW");
 		
+		this.currentMode = VentilateurMode.MEDIUM;
 		
 	}
 

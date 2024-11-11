@@ -39,7 +39,7 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 // -----------------------------------------------------------------------------
 /**
  * The abstract class <code>AbstractHairDryerEvent</code> enforces a common
- * type for all hair dryer simulation events.
+ * type for all ventilateur simulation events.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -73,7 +73,7 @@ extends		ES_Event
 	// -------------------------------------------------------------------------
 
 	/**
-	 * used to create an event used by the hair dryer simulation model.
+	 * used to create an event used by the ventilateur simulation model.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 

@@ -56,17 +56,18 @@ import projet_alasca.equipements.ventilateur.mil.events.AbstractVentilateurEvent
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOnVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOffVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetLowVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SetMediumVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>HairDryerElectricity_MILModel</code> defines a MIL model
- * of the electricity consumption of a hair dryer.
+ * The class <code>ventilateurElectricity_MILModel</code> defines a MIL model
+ * of the electricity consumption of a ventilateur.
  *
  * <p><strong>Description</strong></p>
  * 
  * <p>
- * The hair dryer can be switched on and off, and when switched on, it can be
+ * The ventilateur can be switched on and off, and when switched on, it can be
  * either in a low mode, with lower electricity consumption, or a high mode,
  * with a higher electricity consumption.
  * </p>
@@ -84,10 +85,10 @@ import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
  * 
  * <ul>
  * <li>Imported events:
- *   {@code SwitchOnHairDryer},
- *   {@code SwitchOffHairDryer},
- *   {@code SetLowHairDryer},
- *   {@code SetHighHairDryer}</li>
+ *   {@code SwitchOnventilateur},
+ *   {@code SwitchOffventilateur},
+ *   {@code SetLowventilateur},
+ *   {@code SetHighventilateur}</li>
  * <li>Exported events: none</li>
  * <li>Imported variables: none</li>
  * <li>Exported variables:
@@ -121,6 +122,7 @@ import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
 @ModelExternalEvents(imported = {SwitchOnVentilateur.class,
 								 SwitchOffVentilateur.class,
 								 SetLowVentilateur.class,
+								 SetMediumVentilateur.class,
 								 SetHighVentilateur.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
 // -----------------------------------------------------------------------------
@@ -133,11 +135,11 @@ extends		AtomicHIOA
 
 	/**
 	 * The enumeration <code>State</code> describes the discrete states or
-	 * modes of the hair dryer.
+	 * modes of the ventilateur.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
-	 * The hair dryer can be <code>OFF</code> or on, and then it is either in
+	 * The ventilateur can be <code>OFF</code> or on, and then it is either in
 	 * <code>LOW</code> mode (less hot and less consuming) or in
 	 * <code>HIGH</code> mode (hotter and more consuming).
 	 * 
@@ -147,9 +149,12 @@ extends		AtomicHIOA
 	 */
 	public static enum State {
 		OFF,
-		/** low mode is less hot and less consuming.						*/
+		/** low mode is less cold and less consuming.						*/
 		LOW,			
-		/** high mode is hotter and more consuming.							*/
+		
+		/** medium mode is medium  cold and medium consuming       */
+		MEDIUM,
+		/** high mode is colder and more consuming.							*/
 		HIGH
 	}
 
@@ -164,23 +169,28 @@ extends		AtomicHIOA
 	public static final String		URI = VentilateurElectricityModel.class.
 																getSimpleName();
 
-	/** energy consumption (in Watts) of the hair dryer in LOW mode.		*/
-	protected static double			LOW_MODE_CONSUMPTION = 660.0; // Watts
-	/** energy consumption (in Watts) of the hair dryer in HIGH mode.		*/
-	protected static double			HIGH_MODE_CONSUMPTION = 1100.0; // Watts
-	/** nominal tension (in Volts) of the hair dryer.						*/
-	protected static double			TENSION = 220.0; // Volts
+	/** energy consumption (in Watts) of the ventilateur in LOW mode.		*/
+	protected static double			LOW_MODE_CONSUMPTION = 30.0; // Watts
+	
+	/** energy consumption (in Watts) of the ventilateur in MEDIUM mode.		*/
+	protected static double			MEDIUM_MODE_CONSUMPTION = 60.0; // Watts
+	
+	
+	/** energy consumption (in Watts) of the ventilateur in HIGH mode.		*/
+	protected static double			HIGH_MODE_CONSUMPTION = 100.0; // Watts
+	/** nominal tension (in Volts) of the ventilateur.						*/
+	protected static double			TENSION = 12.0; // Volts
 
-	/** current state (OFF, LOW, HIGH) of the hair dryer.					*/
+	/** current state (OFF, LOW, HIGH) of the ventilateur.					*/
 	protected State					currentState = State.OFF;
-	/** true when the electricity consumption of the dryer has changed
+	/** true when the electricity consumption of the ventilateur has changed
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
 	 *  will be triggered by putting through in this variable which will
 	 *  update the variable <code>currentIntensity</code>.					*/
 	protected boolean				consumptionHasChanged = false;
 
-	/** total consumption of the hair dryer during the simulation in kwh.	*/
+	/** total consumption of the ventilateur during the simulation in kwh.	*/
 	protected double				totalConsumption;
 
 	// -------------------------------------------------------------------------
@@ -222,10 +232,15 @@ extends		AtomicHIOA
 				instance,
 				"LOW_MODE_CONSUMPTION > 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				LOW_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION,
+				LOW_MODE_CONSUMPTION <= MEDIUM_MODE_CONSUMPTION,
 				VentilateurElectricityModel.class,
 				instance,
-				"LOW_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION");
+				"LOW_MODE_CONSUMPTION <= MEDIUM_MODE_CONSUMPTION");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+	            MEDIUM_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION,
+	            VentilateurElectricityModel.class,
+	            instance,
+	            "MEDIUM_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				TENSION > 0.0,
 				VentilateurElectricityModel.class,
@@ -284,6 +299,11 @@ extends		AtomicHIOA
 				instance,
 				"LOW_MODE_CONSUMPTION_RPNAME != null && "
 								+ "!LOW_MODE_CONSUMPTION_RPNAME.isEmpty()");
+		 ret &= InvariantChecking.checkBlackBoxInvariant(
+		            MEDIUM_MODE_CONSUMPTION_RPNAME != null && !MEDIUM_MODE_CONSUMPTION_RPNAME.isEmpty(),
+		            VentilateurElectricityModel.class,
+		            instance,
+		            "MEDIUM_MODE_CONSUMPTION_RPNAME != null && !MEDIUM_MODE_CONSUMPTION_RPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				HIGH_MODE_CONSUMPTION_RPNAME != null &&
 									!HIGH_MODE_CONSUMPTION_RPNAME.isEmpty(),
@@ -304,7 +324,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a hair dryer MIL model instance.
+	 * create a ventilateur MIL model instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -345,7 +365,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * set the state of the hair dryer.
+	 * set the state of the ventilateur.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -362,7 +382,7 @@ extends		AtomicHIOA
 	}
 
 	/**
-	 * return the state of the hair dryer.
+	 * return the state of the ventilateur.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -371,7 +391,7 @@ extends		AtomicHIOA
 	 * post	{@code ret != null}
 	 * </pre>
 	 *
-	 * @return	the state of the hair dryer.
+	 * @return	the state of the ventilateur.
 	 */
 	public State		getState()
 	{
@@ -413,7 +433,7 @@ extends		AtomicHIOA
 	{
 		super.initialiseState(startTime);
 
-		// initially the hair dryer is off and its electricity consumption is
+		// initially the ventilateur is off and its electricity consumption is
 		// not about to change.
 		this.currentState = State.OFF;
 		this.consumptionHasChanged = false;
@@ -436,7 +456,7 @@ extends		AtomicHIOA
 	{
 		super.initialiseVariables();
 
-		// initially, the hair dryer is off, so its consumption is zero.
+		// initially, the ventilateur is off, so its consumption is zero.
 		this.currentIntensity.initialise(0.0);
 
 		assert	glassBoxInvariants(this) :
@@ -500,6 +520,9 @@ extends		AtomicHIOA
 				this.currentIntensity.
 							setNewValue(LOW_MODE_CONSUMPTION/TENSION, t);
 				break;
+			case MEDIUM:
+				this.currentIntensity.setNewValue(MEDIUM_MODE_CONSUMPTION / TENSION, t);
+				break;
 			case HIGH :
 				this.currentIntensity.
 							setNewValue(HIGH_MODE_CONSUMPTION/TENSION, t);
@@ -532,7 +555,7 @@ extends		AtomicHIOA
 		// get the vector of currently received external events
 		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		// when this method is called, there is at least one external event,
-		// and for the current hair dryer model, there must be exactly one by
+		// and for the current ventilateur model, there must be exactly one by
 		// construction.
 		assert	currentEvents != null && currentEvents.size() == 1;
 
@@ -554,7 +577,7 @@ extends		AtomicHIOA
 
 		assert	ce instanceof AbstractVentilateurEvent :
 				new RuntimeException(
-						ce + " is not an event that an HairDryerElectricityModel"
+						ce + " is not an event that an VentilateurElectricityModel"
 						+ " can receive and process.");
 		// events have a method execute on to perform their effect on this
 		// model
@@ -589,6 +612,9 @@ extends		AtomicHIOA
 	/** run parameter name for {@code LOW_MODE_CONSUMPTION}.				*/
 	public static final String		LOW_MODE_CONSUMPTION_RPNAME =
 												URI + ":LOW_MODE_CONSUMPTION";
+	/** run parameter name for {@code MEDIUM_MODE_CONSUMPTION}.				*/
+	public static final String		MEDIUM_MODE_CONSUMPTION_RPNAME =
+												URI + ":MEDIUM_MODE_CONSUMPTION";
 	/** run parameter name for {@code HIGH_MODE_CONSUMPTION}.				*/
 	public static final String		HIGH_MODE_CONSUMPTION_RPNAME =
 												URI + ":HIGH_MODE_CONSUMPTION";
@@ -611,6 +637,12 @@ extends		AtomicHIOA
 		if (simParams.containsKey(lowName)) {
 			LOW_MODE_CONSUMPTION = (double) simParams.get(lowName);
 		}
+		String mediumName =
+				ModelI.createRunParameterName(getURI(),
+											  MEDIUM_MODE_CONSUMPTION_RPNAME);
+			if (simParams.containsKey(mediumName)) {
+				MEDIUM_MODE_CONSUMPTION = (double) simParams.get(mediumName);
+			}
 		String highName =
 			ModelI.createRunParameterName(getURI(),
 										  HIGH_MODE_CONSUMPTION_RPNAME);
@@ -634,8 +666,8 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The class <code>HairDryerElectricityReport</code> implements the
-	 * simulation report for the <code>HairDryerElectricityModel</code>.
+	 * The class <code>ventilateurElectricityReport</code> implements the
+	 * simulation report for the <code>ventilateurElectricityModel</code>.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
@@ -655,14 +687,14 @@ extends		AtomicHIOA
 	 * 
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
-	public static class		HairDryerElectricityReport
+	public static class		ventilateurElectricityReport
 	implements	SimulationReportI, HEM_ReportI
 	{
 		private static final long serialVersionUID = 1L;
 		protected String	modelURI;
 		protected double	totalConsumption; // in kwh
 
-		public				HairDryerElectricityReport(
+		public				ventilateurElectricityReport(
 			String modelURI,
 			double totalConsumption
 			)
@@ -714,7 +746,7 @@ extends		AtomicHIOA
 	@Override
 	public SimulationReportI	getFinalReport()
 	{
-		return new HairDryerElectricityReport(this.getURI(),
+		return new ventilateurElectricityReport(this.getURI(),
 											  this.totalConsumption);
 	}
 }

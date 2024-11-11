@@ -40,8 +40,8 @@ import projet_alasca.equipements.ventilateur.mil.VentilateurElectricityModel;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>SetHighHairDryer</code> defines the simulation event of the
- * hair dryer being set to high temperature mode.
+ * The class <code>SetHighVentilateur</code> defines the simulation event of the
+ * ventilateur being set to high temperature mode.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -75,7 +75,7 @@ extends		AbstractVentilateurEvent
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>SetHighHairDryer</code> event.
+	 * create a <code>SetHighVentilateur</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -102,10 +102,10 @@ extends		AbstractVentilateurEvent
 	@Override
 	public boolean			hasPriorityOver(EventI e)
 	{
-		// if many hair dryer events occur at the same time, the
-		// SetHighHairDryer one will be executed after SwitchOnHairDryer
-		// and SetLowHairDryer ones but before SwitchOffHairDryer.
-		if (e instanceof SwitchOnVentilateur || e instanceof SetLowVentilateur) {
+		// if many ventilateur events occur at the same time, the
+		// SetHighVentilateur one will be executed after SwitchOnVentilateur
+		// and SetLowVentilateur ones but before SwitchOffVentilateur.
+		if (e instanceof SwitchOnVentilateur || e instanceof SetLowVentilateur || e instanceof SetMediumVentilateur) {
 			return false;
 		} else {
 			return true;
@@ -121,13 +121,13 @@ extends		AbstractVentilateurEvent
 		assert	model instanceof VentilateurElectricityModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HairDryerElectricityModel");
+						+ "VentilateurElectricityModel");
 
 		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
 
-		// a SetHigh event can only be executed when the state of the hair
-		// dryer model is in the state LOW
-		if (m.getState() == VentilateurElectricityModel.State.LOW) {
+		// a SetHigh event can only be executed when the state of the ventilateur
+		//  model is in the state Low or Medium
+		if (m.getState() == VentilateurElectricityModel.State.LOW || m.getState() == VentilateurElectricityModel.State.MEDIUM) {
 			// then put it in the state HIGH
 			m.setState(VentilateurElectricityModel.State.HIGH);
 			// trigger an internal transition by toggling the electricity
