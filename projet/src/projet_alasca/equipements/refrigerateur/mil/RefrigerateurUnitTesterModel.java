@@ -47,8 +47,8 @@ import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur.PowerValue;
-import projet_alasca.equipements.refrigerateur.mil.events.Heat;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotHeat;
+import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
 
 // -----------------------------------------------------------------------------
 /**
@@ -85,8 +85,8 @@ import projet_alasca.equipements.refrigerateur.mil.events.DoNotHeat;
  */
 @ModelExternalEvents(exported = {SwitchOnRefrigerateur.class,
 								 SwitchOffRefrigerateur.class,
-								 Heat.class,
-								 DoNotHeat.class,
+								 Cooling.class,
+								 DoNotCooling.class,
 								 SetPowerRefrigerateur.class})
 // -----------------------------------------------------------------------------
 public class			RefrigerateurUnitTesterModel
@@ -171,13 +171,13 @@ extends		AtomicModel
 				ret.add(new SwitchOnRefrigerateur(this.getTimeOfNextEvent()));
 				break;
 			case 2:
-				ret.add(new Heat(this.getTimeOfNextEvent()));
+				ret.add(new Cooling(this.getTimeOfNextEvent()));
 				break;
 			case 3:
-				ret.add(new DoNotHeat(this.getTimeOfNextEvent()));
+				ret.add(new DoNotCooling(this.getTimeOfNextEvent()));
 				break;
 			case 4:
-				ret.add(new Heat(this.getTimeOfNextEvent()));
+				ret.add(new Cooling(this.getTimeOfNextEvent()));
 				break;
 			case 5:
 				ret.add(new SetPowerRefrigerateur(this.getTimeOfNextEvent(),

@@ -56,66 +56,7 @@ import projet_alasca.equipements.machineCafe.mil.events.AbstractMachineCafeEvent
 import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
 import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
 
-// -----------------------------------------------------------------------------
-/**
- * The class <code>HairDryerElectricity_MILModel</code> defines a MIL model
- * of the electricity consumption of a hair dryer.
- *
- * <p><strong>Description</strong></p>
- * 
- * <p>
- * The hair dryer can be switched on and off, and when switched on, it can be
- * either in a low mode, with lower electricity consumption, or a high mode,
- * with a higher electricity consumption.
- * </p>
- * <p>
- * The electricity consumption is represented as a variable of type double that
- * has to be exported towards the electric meter MIL model in order to be summed
- * up to get the global electricity consumption of the house.
- * </p>
- * <p>
- * To model the user actions, four events are defined to be imported and the
- * external transitions upon the reception of these events force the hair
- * dryer electricity model in the corresponding mode with the corresponding
- * electricity consumption.
- * </p>
- * 
- * <ul>
- * <li>Imported events:
- *   {@code SwitchOnHairDryer},
- *   {@code SwitchOffHairDryer},
- *   {@code SetLowHairDryer},
- *   {@code SetHighHairDryer}</li>
- * <li>Exported events: none</li>
- * <li>Imported variables: none</li>
- * <li>Exported variables:
- *   name = {@code currentIntensity}, type = {@code Double}</li>
- * </ul>
- * 
- * <p><strong>Glass-box Invariants</strong></p>
- * 
- * <pre>
- * invariant	{@code LOW_MODE_CONSUMPTION > 0.0}
- * invariant	{@code LOW_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION}
- * invariant	{@code TENSION > 0.0}
- * invariant	{@code totalConsumption >= 0.0}
- * invariant	{@code currentState != null}
- * invariant	{@code !currentIntensity.isInitialised() || currentIntensity.getValue() >= 0.0}
- * </pre>
- * 
- * <p><strong>Black-box Invariants</strong></p>
- * 
- * <pre>
- * invariant	{@code URI != null && !URI.isEmpty()}
- * invariant	{@code LOW_MODE_CONSUMPTION_RPNAME != null && !LOW_MODE_CONSUMPTION_RPNAME.isEmpty()}
- * invariant	{@code HIGH_MODE_CONSUMPTION_RPNAME != null && !HIGH_MODE_CONSUMPTION_RPNAME.isEmpty()}
- * invariant	{@code TENSION_RPNAME != null && !TENSION_RPNAME.isEmpty()}
- * </pre>
- * 
- * <p>Created on : 2023-09-29</p>
- * 
- * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
- */
+
 @ModelExternalEvents(imported = {SwitchOnMachineCafe.class,
 								 SwitchOffMachineCafe.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
@@ -127,26 +68,10 @@ extends		AtomicHIOA
 	// Inner classes and types
 	// -------------------------------------------------------------------------
 
-	/**
-	 * The enumeration <code>State</code> describes the discrete states or
-	 * modes of the hair dryer.
-	 *
-	 * <p><strong>Description</strong></p>
-	 * 
-	 * The hair dryer can be <code>OFF</code> or on, and then it is either in
-	 * <code>LOW</code> mode (less hot and less consuming) or in
-	 * <code>HIGH</code> mode (hotter and more consuming).
-	 * 
-	 * <p>Created on : 2019-10-10</p>
-	 * 
-	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
-	 */
+
 	public static enum State {
 		OFF,
-		/** low mode is less hot and less consuming.						*/
-		LOW,			
-		/** high mode is hotter and more consuming.							*/
-		HIGH
+		ON
 	}
 
 	// -------------------------------------------------------------------------
@@ -155,28 +80,20 @@ extends		AtomicHIOA
 
 	private static final long		serialVersionUID = 1L;
 
-	/** URI for an instance model; works as long as only one instance is
-	 *  created.															*/
+														
 	public static final String		URI = MachineCafeElectricityModel.class.
 																getSimpleName();
 
-	/** energy consumption (in Watts) of the hair dryer in LOW mode.		*/
-	protected static double			LOW_MODE_CONSUMPTION = 660.0; // Watts
-	/** energy consumption (in Watts) of the hair dryer in HIGH mode.		*/
-	protected static double			HIGH_MODE_CONSUMPTION = 1100.0; // Watts
-	/** nominal tension (in Volts) of the hair dryer.						*/
+
+	protected static double			CONSUMPTION = 660.0; // Watts
+
 	protected static double			TENSION = 220.0; // Volts
 
-	/** current state (OFF, LOW, HIGH) of the hair dryer.					*/
+
 	protected State					currentState = State.OFF;
-	/** true when the electricity consumption of the dryer has changed
-	 *  after executing an external event; the external event changes the
-	 *  value of <code>currentState</code> and then an internal transition
-	 *  will be triggered by putting through in this variable which will
-	 *  update the variable <code>currentIntensity</code>.					*/
+	
 	protected boolean				consumptionHasChanged = false;
 
-	/** total consumption of the hair dryer during the simulation in kwh.	*/
 	protected double				totalConsumption;
 
 	// -------------------------------------------------------------------------
@@ -213,15 +130,10 @@ extends		AtomicHIOA
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				LOW_MODE_CONSUMPTION > 0.0,
+				CONSUMPTION > 0.0,
 				MachineCafeElectricityModel.class,
 				instance,
-				"LOW_MODE_CONSUMPTION > 0.0");
-		ret &= InvariantChecking.checkGlassBoxInvariant(
-				LOW_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION,
-				MachineCafeElectricityModel.class,
-				instance,
-				"LOW_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION");
+				"CONSUMPTION > 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				TENSION > 0.0,
 				MachineCafeElectricityModel.class,
@@ -274,19 +186,12 @@ extends		AtomicHIOA
 				instance,
 				"URI != null && !URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				LOW_MODE_CONSUMPTION_RPNAME != null &&
-										!LOW_MODE_CONSUMPTION_RPNAME.isEmpty(),
+				CONSUMPTION_RPNAME != null &&
+										!CONSUMPTION_RPNAME.isEmpty(),
 				MachineCafeElectricityModel.class,
 				instance,
-				"LOW_MODE_CONSUMPTION_RPNAME != null && "
-								+ "!LOW_MODE_CONSUMPTION_RPNAME.isEmpty()");
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-				HIGH_MODE_CONSUMPTION_RPNAME != null &&
-									!HIGH_MODE_CONSUMPTION_RPNAME.isEmpty(),
-				MachineCafeElectricityModel.class,
-				instance,
-				"HIGH_MODE_CONSUMPTION_RPNAME != null && "
-							+ "!HIGH_MODE_CONSUMPTION_RPNAME.isEmpty()");
+				"CONSUMPTION_RPNAME != null && "
+								+ "!CONSUMPTION_RPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				TENSION_RPNAME != null && !TENSION_RPNAME.isEmpty(),
 				MachineCafeElectricityModel.class,
@@ -492,13 +397,11 @@ extends		AtomicHIOA
 		switch (this.currentState)
 		{
 			case OFF : this.currentIntensity.setNewValue(0.0, t); break;
-			case LOW :
+			case ON :
 				this.currentIntensity.
-							setNewValue(LOW_MODE_CONSUMPTION/TENSION, t);
+							setNewValue(CONSUMPTION/TENSION, t);
 				break;
-			case HIGH :
-				this.currentIntensity.
-							setNewValue(HIGH_MODE_CONSUMPTION/TENSION, t);
+			
 		}
 
 		// Tracing
@@ -583,11 +486,9 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/** run parameter name for {@code LOW_MODE_CONSUMPTION}.				*/
-	public static final String		LOW_MODE_CONSUMPTION_RPNAME =
-												URI + ":LOW_MODE_CONSUMPTION";
-	/** run parameter name for {@code HIGH_MODE_CONSUMPTION}.				*/
-	public static final String		HIGH_MODE_CONSUMPTION_RPNAME =
-												URI + ":HIGH_MODE_CONSUMPTION";
+	public static final String		CONSUMPTION_RPNAME =
+												URI + ":CONSUMPTION";
+
 	/** run parameter name for {@code TENSION}.								*/
 	public static final String		TENSION_RPNAME = URI + ":TENSION";
 
@@ -601,17 +502,11 @@ extends		AtomicHIOA
 	{
 		super.setSimulationRunParameters(simParams);
 
-		String lowName =
+		String consumptionName =
 			ModelI.createRunParameterName(getURI(),
-										  LOW_MODE_CONSUMPTION_RPNAME);
-		if (simParams.containsKey(lowName)) {
-			LOW_MODE_CONSUMPTION = (double) simParams.get(lowName);
-		}
-		String highName =
-			ModelI.createRunParameterName(getURI(),
-										  HIGH_MODE_CONSUMPTION_RPNAME);
-		if (simParams.containsKey(highName)) {
-			HIGH_MODE_CONSUMPTION = (double) simParams.get(highName);
+					CONSUMPTION_RPNAME);
+		if (simParams.containsKey(consumptionName)) {
+			CONSUMPTION = (double) simParams.get(consumptionName);
 		}
 		String tensionName =
 				ModelI.createRunParameterName(getURI(), TENSION_RPNAME);

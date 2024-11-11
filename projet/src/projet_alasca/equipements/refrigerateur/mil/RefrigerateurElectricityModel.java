@@ -57,8 +57,10 @@ import projet_alasca.equipements.refrigerateur.mil.events.RefrigerateurEventI;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.Heat;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotHeat;
+import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
+import projet_alasca.equipements.refrigerateur.mil.events.Freezing;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotFreezing;
 
 // -----------------------------------------------------------------------------
 /**
@@ -125,8 +127,10 @@ import projet_alasca.equipements.refrigerateur.mil.events.DoNotHeat;
 @ModelExternalEvents(imported = {SwitchOnRefrigerateur.class,
 								 SwitchOffRefrigerateur.class,
 								 SetPowerRefrigerateur.class,
-								 Heat.class,
-								 DoNotHeat.class})
+								 Cooling.class,
+								 Freezing.class,
+								 DoNotCooling.class,
+								 DoNotFreezing.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
 @ModelExportedVariable(name = "currentHeatingPower", type = Double.class)
 //-----------------------------------------------------------------------------

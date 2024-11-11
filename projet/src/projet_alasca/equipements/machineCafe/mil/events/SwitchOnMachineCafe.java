@@ -115,14 +115,14 @@ extends		AbstractMachineCafeEvent
 		assert	model instanceof MachineCafeElectricityModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HairDryerElectricityModel");
+						+ "MachineCafeElectricityModel");
 
 		// a SwitchOnHairDryer event can be executed when the state of the hair
 		// dryer model is in the state OFF
 		MachineCafeElectricityModel m = (MachineCafeElectricityModel)model;
 		if (m.getState() == MachineCafeElectricityModel.State.OFF) {
 			// then put it in the state LOW
-			m.setState(MachineCafeElectricityModel.State.LOW);
+			m.setState(MachineCafeElectricityModel.State.ON);
 			// trigger an internal transition by toggling the electricity
 			// consumption changed boolean to true
 			m.toggleConsumptionHasChanged();

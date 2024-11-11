@@ -54,8 +54,8 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.Heat;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotHeat;
+import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
 
 // -----------------------------------------------------------------------------
 /**
@@ -191,20 +191,20 @@ public class			RunRefrigerateurUnitaryMILSimulation
 										  SwitchOffRefrigerateur.class)
 					});
 			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI, Heat.class),
+					new EventSource(RefrigerateurUnitTesterModel.URI, Cooling.class),
 					new EventSink[] {
 							new EventSink(RefrigerateurElectricityModel.URI,
-										  Heat.class),
+										  Cooling.class),
 							new EventSink(RefrigerateurTemperatureModel.URI,
-										  Heat.class)
+										  Cooling.class)
 					});
 			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI, DoNotHeat.class),
+					new EventSource(RefrigerateurUnitTesterModel.URI, DoNotCooling.class),
 					new EventSink[] {
 							new EventSink(RefrigerateurElectricityModel.URI,
-										  DoNotHeat.class),
+										  DoNotCooling.class),
 							new EventSink(RefrigerateurTemperatureModel.URI,
-										  DoNotHeat.class)
+										  DoNotCooling.class)
 					});
 
 			// variable bindings between exporting and importing models

@@ -62,7 +62,7 @@ import projet_alasca.equipements.refrigerateur.mil.RefrigerateurTemperatureModel
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-public class			DoNotHeat
+public class			DoNotCooling
 extends		Event
 implements	RefrigerateurEventI
 {
@@ -89,7 +89,7 @@ implements	RefrigerateurEventI
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
-	public				DoNotHeat(
+	public				DoNotCooling(
 		Time timeOfOccurrence
 		)
 	{

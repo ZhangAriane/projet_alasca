@@ -63,7 +63,7 @@ import projet_alasca.equipements.refrigerateur.mil.RefrigerateurTemperatureModel
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-public class			Heat
+public class			Freezing
 extends		Event
 implements	RefrigerateurEventI
 {
@@ -90,7 +90,7 @@ implements	RefrigerateurEventI
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
-	public				Heat(
+	public				Freezing(
 		Time timeOfOccurrence
 		)
 	{
@@ -110,7 +110,7 @@ implements	RefrigerateurEventI
 		// if many heater events occur at the same time, the Heat one will be
 		// executed after SwitchOnHeater and DoNotHeat ones but before
 		// SwitchOffHeater.
-		if (e instanceof SwitchOnRefrigerateur || e instanceof DoNotHeat) {
+		if (e instanceof SwitchOnRefrigerateur || e instanceof DoNotCooling) {
 			return false;
 		} else {
 			return true;

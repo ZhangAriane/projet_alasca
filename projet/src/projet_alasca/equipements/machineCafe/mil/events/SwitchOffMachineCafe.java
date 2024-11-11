@@ -115,7 +115,7 @@ extends		AbstractMachineCafeEvent
 		assert	model instanceof MachineCafeElectricityModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HairDryerElectricityModel");
+						+ "MachineCafeElectricityModel");
 
 		MachineCafeElectricityModel m = ((MachineCafeElectricityModel)model);
 		// a SwitchOff event can be executed when the state of the hair

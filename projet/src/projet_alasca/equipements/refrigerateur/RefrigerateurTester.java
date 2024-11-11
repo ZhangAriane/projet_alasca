@@ -24,8 +24,7 @@ import projet_alasca.equipements.refrigerateur.connections.RefrigerateurInternal
 import projet_alasca.equipements.refrigerateur.connections.RefrigerateurInternalControlOutboundPort;
 import projet_alasca.equipements.refrigerateur.connections.RefrigerateurUserConnector;
 import projet_alasca.equipements.refrigerateur.connections.RefrigerateurUserOutboundPort;
-import projet_alasca.equipements.generateurConnecteur.GenerateurConnecteur;
-import projet_alasca.equipements.generateurConnecteur.GenereRefrigerateurConnecteur;
+
 
 @RequiredInterfaces(required={RefrigerateurUserCI.class,
 		RefrigerateurInternalControlCI.class,
@@ -312,19 +311,16 @@ public class RefrigerateurTester extends AbstractComponent {
 					this.refrigerateurUserOutboundPort.getPortURI(),
 					this.refrigerateurUserInboundPortURI,
 					RefrigerateurUserConnector.class.getCanonicalName()
-//					GenereRefrigerateurConnecteur.genereRefrigeratorUserConnector().getCanonicalName()
 					);
 			this.doPortConnection(
 					this.refrigerateurInternalControlOutboundPort.getPortURI(),
 					this.refrigerateurInternalControlInboundPortURI,
 					RefrigerateurInternalControlConnector.class.getCanonicalName()
-//					GenereRefrigerateurConnecteur.genereRefrigeratorInternalControlConnector().getCanonicalName()
 					);
 			this.doPortConnection(
 					this.refrigerateurExternalControlOutboundPort.getPortURI(),
 					this.refrigerateurExternalControlInboundPortURI,
 					RefrigerateurExternalControlConnector.class.getCanonicalName()
-//					GenereRefrigerateurConnecteur.genereRefrigeratorExternalControlConnector().getCanonicalName()
 					);
 			
 			

@@ -53,8 +53,8 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
 import projet_alasca.equipements.refrigerateur.mil.events.RefrigerateurEventI;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.Heat;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotHeat;
+import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
 
 // -----------------------------------------------------------------------------
 /**
@@ -135,8 +135,8 @@ import projet_alasca.equipements.refrigerateur.mil.events.DoNotHeat;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 @ModelExternalEvents(imported = {SwitchOffRefrigerateur.class,
-		 						 Heat.class,
-		 						 DoNotHeat.class})
+		 						 Cooling.class,
+		 						 DoNotCooling.class})
 @ModelImportedVariable(name = "externalTemperature", type = Double.class)
 @ModelImportedVariable(name = "currentHeatingPower", type = Double.class)
 // -----------------------------------------------------------------------------

@@ -118,16 +118,16 @@ implements	RefrigerateurEventI
 				new AssertionError(
 						"Precondition violation: model instanceof "
 						+ "HeaterElectricityModel || "
-						+ "model instanceof HeaterTemperatureModel");
+						+ "model instanceof RefrigerateurElectricityModel");
 
 		if (model instanceof RefrigerateurElectricityModel) {
-			RefrigerateurElectricityModel heater = (RefrigerateurElectricityModel)model;
-			assert	heater.getState() != RefrigerateurElectricityModel.State.ON :
+			RefrigerateurElectricityModel refrigerator = (RefrigerateurElectricityModel)model;
+			assert	refrigerator.getState() != RefrigerateurElectricityModel.State.ON :
 				new AssertionError(
 						"model not in the right state, should not be "
-								+ "HeaterElectricityModel.State.ON but is "
-								+ heater.getState());
-			heater.setState(RefrigerateurElectricityModel.State.OFF,
+								+ "RefrigerateurElectricityModel.State.ON but is "
+								+ refrigerator.getState());
+			refrigerator.setState(RefrigerateurElectricityModel.State.OFF,
 							this.getTimeOfOccurrence());
 		} else {
 			RefrigerateurTemperatureModel heater = (RefrigerateurTemperatureModel)model;
