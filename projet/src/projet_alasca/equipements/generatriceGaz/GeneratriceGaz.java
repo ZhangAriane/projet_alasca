@@ -12,6 +12,9 @@ public class GeneratriceGaz extends AbstractComponent implements GeneratriceGazC
 	public static int X_RELATIVE_POSITION = 2;
 	public static int Y_RELATIVE_POSITION = 1;
 	public static boolean VERBOSE = false;
+	
+	protected State state = State.OFF;
+	protected Mode mode = Mode.LOW;
 
 
 	protected GeneratriceGaz() {
@@ -41,6 +44,39 @@ public class GeneratriceGaz extends AbstractComponent implements GeneratriceGazC
 			throw new ComponentShutdownException(e) ;
 		}
 		super.shutdown();
+	}
+	@Override
+	public State getState() throws Exception {
+		return this.state;
+	}
+	@Override
+	public Mode getMode() throws Exception {
+		return this.mode;
+	}
+	@Override
+	public void turnOn() throws Exception {
+		this.state = State.ON;
+		
+	}
+	@Override
+	public void turnOff() throws Exception {
+		this.state = State.OFF;
+		
+	}
+	@Override
+	public void setHigh() throws Exception {
+		this.mode = Mode.HIGH;
+		
+	}
+	@Override
+	public void setLow() throws Exception {
+		this.mode = Mode.LOW;
+		
+	}
+	@Override
+	public void setMeddium() throws Exception {
+		this.mode = Mode.MEDDIUM;
+		
 	}
 
 

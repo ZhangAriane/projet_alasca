@@ -11,5 +11,19 @@ extends OfferedCI,
 		 PanneauSolaireI
 {
 
+	@Override
+	public void startProduce() throws Exception; 
+
+	@Override
+	public void stopProduce() throws Exception;
+
+	@Override
+	public double getEnergyProduction() throws Exception;
+
+	@Override
+	public void setEnergyProduction(double energy) throws Exception;
+
+	@Override
+	public boolean isOn() throws Exception;
 	
 }
