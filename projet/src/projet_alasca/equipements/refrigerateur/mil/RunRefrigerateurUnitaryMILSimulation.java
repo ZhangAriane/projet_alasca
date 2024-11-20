@@ -38,6 +38,7 @@ import java.util.Map;
 import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
+
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
 import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
@@ -51,11 +52,11 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
+import projet_alasca.equipements.refrigerateur.mil.events.Cool;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotCool;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
 
 // -----------------------------------------------------------------------------
 /**
@@ -186,25 +187,25 @@ public class			RunRefrigerateurUnitaryMILSimulation
 									SwitchOffRefrigerateur.class),
 					new EventSink[] {
 							new EventSink(RefrigerateurElectricityModel.URI,
-										  SwitchOffRefrigerateur.class),
+									SwitchOffRefrigerateur.class),
 							new EventSink(RefrigerateurTemperatureModel.URI,
-										  SwitchOffRefrigerateur.class)
+									SwitchOffRefrigerateur.class)
 					});
 			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI, Cooling.class),
+					new EventSource(RefrigerateurUnitTesterModel.URI, Cool.class),
 					new EventSink[] {
 							new EventSink(RefrigerateurElectricityModel.URI,
-										  Cooling.class),
+										  Cool.class),
 							new EventSink(RefrigerateurTemperatureModel.URI,
-										  Cooling.class)
+									Cool.class)
 					});
 			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI, DoNotCooling.class),
+					new EventSource(RefrigerateurUnitTesterModel.URI, DoNotCool.class),
 					new EventSink[] {
 							new EventSink(RefrigerateurElectricityModel.URI,
-										  DoNotCooling.class),
+									DoNotCool.class),
 							new EventSink(RefrigerateurTemperatureModel.URI,
-										  DoNotCooling.class)
+									DoNotCool.class)
 					});
 
 			// variable bindings between exporting and importing models
@@ -219,11 +220,11 @@ public class			RunRefrigerateurUnitaryMILSimulation
 										 		  Double.class,
 										 		  RefrigerateurTemperatureModel.URI)
 						 });
-			bindings.put(new VariableSource("currentHeatingPower",
+			bindings.put(new VariableSource("currentCoolingPower",
 											Double.class,
 											RefrigerateurElectricityModel.URI),
 						 new VariableSink[] {
-								 new VariableSink("currentHeatingPower",
+								 new VariableSink("currentCoolingPower",
 										 		  Double.class,
 										 		  RefrigerateurTemperatureModel.URI)
 						 });

@@ -60,10 +60,7 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 	/** max power level of the refrigerator, in watts.							*/
 	protected static final double	MAX_POWER_LEVEL = 800.0;
 	/** standard target temperature for the refrigerator.							*/
-	protected static final double	STANDARD_REFRIGERATOR_TARGET_TEMPERATURE = 1.0;
-	
-	/** standard target temperature for the freezer.							*/
-	protected static final double	STANDARD_FREEZER_TARGET_TEMPERATURE = -20.0;
+	protected static final double	STANDARD_TARGET_TEMPERATURE = 1.0;
 
 	/** URI of the refrigerator port for user interactions.						*/
 	public static final String		USER_INBOUND_PORT_URI =
@@ -86,17 +83,12 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 	public static int				Y_RELATIVE_POSITION = 0;
 
 	/** fake current 	*/
-	public static final double		FAKE_REFRIGERATOR_CURRENT_TEMPERATURE = 5.0;
-	
-	/** fake freezer current 	*/
-	public static final double		FAKE_FREEZER_CURRENT_TEMPERATURE = -20.0;
+	public static final double		FAKE_CURRENT_TEMPERATURE = 5.0;
 
 	/** current state (on, off) of the refrigerator.								*/
-	protected RefrigeratorState						currentRefrigeratorState;
+	protected RefrigeratorState						currentState;
 	/** target temperature for the cooling.									*/
-	protected double							targetRefrigeratorTemperature;
-	/** target temperature for the freezing.									*/
-	protected double							targetFreezerTemperature;
+	protected double							targetTemperature;
 	/**	current power level of the refrigerator.									*/
 	protected double							currentPowerLevel;
 	/** current state (on, off) of the refrigerator compressor.								*/
@@ -169,10 +161,9 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 		assert	refrigerateurInternalControlInboundPortURI != null && !refrigerateurInternalControlInboundPortURI.isEmpty();
 		assert	refrigerateurExternalControlInboundPortURI != null && !refrigerateurExternalControlInboundPortURI.isEmpty();
 
-		this.currentRefrigeratorState = RefrigeratorState.OFF;
+		this.currentState = RefrigeratorState.OFF;
 		this.currentPowerLevel = MAX_POWER_LEVEL;
-		this.targetRefrigeratorTemperature = STANDARD_REFRIGERATOR_TARGET_TEMPERATURE;
-		this.targetFreezerTemperature = STANDARD_FREEZER_TARGET_TEMPERATURE;
+		this.targetTemperature = STANDARD_TARGET_TEMPERATURE;
 
 		this.refrigerateurUserInboundPort = new RefrigerateurUserInboundPort(refrigerateurUserInboundPortURI, this);
 		this.refrigerateurUserInboundPort.publishPort();
@@ -248,10 +239,10 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 	public boolean on() throws Exception {
 		if (Refrigerateur.VERBOSE) {
 			this.traceMessage("Refrigerator returns its state: " +
-											this.currentRefrigeratorState + ".\n");
+											this.currentState + ".\n");
 		}
 		
-		return this.currentRefrigeratorState == RefrigeratorState.ON;
+		return this.currentState == RefrigeratorState.ON;
 									
 	}
 
@@ -263,7 +254,7 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 
 		assert	!this.on() : new PreconditionException("!on()");
 
-		this.currentRefrigeratorState = RefrigeratorState.ON;
+		this.currentState = RefrigeratorState.ON;
 		
 		
 
@@ -281,7 +272,7 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 
 		assert	this.on() : new PreconditionException("on()");
 
-		this.currentRefrigeratorState = RefrigeratorState.OFF;
+		this.currentState = RefrigeratorState.OFF;
 		
 		this.registrationOutboundPort.unregister(REFRIGERATEUR_ID);
 
@@ -290,7 +281,7 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 	}
 
 	@Override
-	public void setRefrigeratorTargetTemperature(double target) throws Exception {
+	public void setTargetTemperature(double target) throws Exception {
 		if (Refrigerateur.VERBOSE) {
 			this.traceMessage("Refrigerator sets a new target "
 										+ "temperature: " + target + ".\n");
@@ -299,38 +290,22 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 		assert	target >= 1.0 && target <= 7.0 :
 				new PreconditionException("target >= 1.0 && target <= 7.0");
 
-		this.targetRefrigeratorTemperature = target;
+		this.targetTemperature = target;
 
-		assert	this.getRefrigeratorTargetTemperature() == target :
+		assert	this.getTargetTemperature() == target :
 				new PostconditionException("getTargetTemperature() == target");
 
 	}
 
-	@Override
-	public void setFreezerTargetTemperature(double target) throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer sets a new target "
-										+ "temperature: " + target + ".\n");
-		}
-
-		assert	target >= -23.0 && target <= -15.0 :
-				new PreconditionException("target >= -23.0 && target <= -15.0");
-
-		this.targetFreezerTemperature = target;
-
-		assert	this.getFreezerTargetTemperature() == target :
-				new PostconditionException("getFreezerTargetTemperature() == target");
-
-	}
 	
 	@Override
-	public double getRefrigeratorTargetTemperature() throws Exception {
+	public double getTargetTemperature() throws Exception {
 		if (Refrigerateur.VERBOSE) {
 			this.traceMessage("Refrigerator returns its target"
-							+ " temperature " + this.targetRefrigeratorTemperature + ".\n");
+							+ " temperature " + this.targetTemperature + ".\n");
 		}
 
-		double ret = this.targetRefrigeratorTemperature;
+		double ret = this.targetTemperature;
 
 		assert	ret >= 1.0 && ret <= 7.0 :
 				new PostconditionException("return >= 1.0 && return <= 7.0");
@@ -338,27 +313,13 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 		return ret;
 	}
 
-	@Override
-	public double getFreezerTargetTemperature() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer returns its target"
-							+ " temperature " + this.targetFreezerTemperature + ".\n");
-		}
-
-		double ret = this.targetFreezerTemperature;
-
-		assert	ret >= -23.0 && ret <= -15.0 :
-				new PostconditionException("return >= -23.0 && return <= -15.0");
-
-		return ret;
-	}
 
 	@Override
-	public double getRefrigeratorCurrentTemperature() throws Exception {
+	public double getCurrentTemperature() throws Exception {
 		assert	this.on() : new PreconditionException("on()");
 
 		// Temporary implementation; would need a temperature sensor.
-		double currentTemperature = FAKE_REFRIGERATOR_CURRENT_TEMPERATURE;
+		double currentTemperature = FAKE_CURRENT_TEMPERATURE;
 		if (Refrigerateur.VERBOSE) {
 			this.traceMessage("Refrigerator returns the current"
 							+ " temperature " + currentTemperature + ".\n");
@@ -367,25 +328,12 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 		return  currentTemperature;
 	}
 
-	@Override
-	public double getFreezerCurrentTemperature() throws Exception {
-		assert	this.on() : new PreconditionException("on()");
-
-		// Temporary implementation; would need a temperature sensor.
-		double currentFreezerTemperature = FAKE_FREEZER_CURRENT_TEMPERATURE;
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer returns the current"
-							+ " temperature " + currentFreezerTemperature + ".\n");
-		}
-
-		return  currentFreezerTemperature;
-	}
 
 	@Override
 	public boolean cooling() throws Exception {
 		if (Refrigerateur.VERBOSE) {
 			this.traceMessage("Refrigerator returns its cooling status " + 
-					(this.currentRefrigeratorState == RefrigeratorState.ON) + ".\n");
+					(this.currentState == RefrigeratorState.ON) + ".\n");
 		}
 
 		assert	this.on() : new PreconditionException("on()");
@@ -418,46 +366,6 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 		this.refrigeratorCompressor = CompressorState.OFF;
 
 		assert	this.cooling() : new PostconditionException("!cooling()");
-
-	}
-
-	@Override
-	public boolean freezing() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer returns its freezing status " + 
-					(this.currentRefrigeratorState == RefrigeratorState.ON) + ".\n");
-		}
-
-		assert	this.on() : new PreconditionException("on()");
-
-		return this.freezerCompressor == CompressorState.ON;
-	}
-
-	@Override
-	public void startFreezing() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer starts freezing.\n");
-		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	!this.freezing() : new PreconditionException("!freezing()");
-
-		this.freezerCompressor = CompressorState.ON;
-
-		assert	this.freezing() : new PostconditionException("freezing()");
-
-	}
-
-	@Override
-	public void stopFreezing() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer stops freezing.\n");
-		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.freezing() : new PreconditionException("freezing()");
-
-		this.freezerCompressor = CompressorState.OFF;
-
-		assert	this.freezing() : new PostconditionException("!freezing()");
 
 	}
 
@@ -514,84 +422,7 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 		return this.currentPowerLevel;
 	}
 
-	@Override
-	public void switchOnRefrigeratorCompressor() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Refrigerator starts cooling.\n");
-		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	!this.cooling() : new PreconditionException("!cooling()");
 
-		this.refrigeratorCompressor = CompressorState.ON;
-
-		assert	this.cooling() : new PostconditionException("cooling()");
-
-	}
-
-	@Override
-	public void switchOffRefrigeratorCompressor() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Refrigerator stops cooling.\n");
-		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.cooling() : new PreconditionException("cooling()");
-
-		this.refrigeratorCompressor = CompressorState.OFF;
-
-		assert	this.cooling() : new PostconditionException("!cooling()");
-
-	}
-
-	@Override
-	public void switchOnFreezerCompressor() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer starts freezing.\n");
-		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	!this.freezing() : new PreconditionException("!freezing()");
-
-		this.freezerCompressor = CompressorState.ON;
-
-		assert	this.freezing() : new PostconditionException("freezing()");
-
-	}
-
-	@Override
-	public void switchOffFreezerCompressor() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer stops freezing.\n");
-		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.freezing() : new PreconditionException("freezing()");
-
-		this.freezerCompressor = CompressorState.OFF;
-
-		assert	this.freezing() : new PostconditionException("!freezing()");
-
-	}
-
-	@Override
-	public boolean onRegrigeratorCompressor() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Refrigerator returns its cooling status " + 
-					(this.currentRefrigeratorState == RefrigeratorState.ON) + ".\n");
-		}
-
-		assert	this.on() : new PreconditionException("on()");
-
-		return this.refrigeratorCompressor == CompressorState.ON;
-	}
-
-	@Override
-	public boolean onFreezerCompressor() throws Exception {
-		if (Refrigerateur.VERBOSE) {
-			this.traceMessage("Freezer returns its freezing status " + 
-					(this.currentRefrigeratorState == RefrigeratorState.ON) + ".\n");
-		}
-
-		assert	this.on() : new PreconditionException("on()");
-
-		return this.freezerCompressor == CompressorState.ON;
-	}
+	
 	
 }

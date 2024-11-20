@@ -228,14 +228,14 @@ implements	ChauffeEauEventI
 		assert	model instanceof ChauffeEauElectricityModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HeaterElectricityModel");
+						+ "ChauffeEauElectricityModel");
 
-		ChauffeEauElectricityModel heater = (ChauffeEauElectricityModel)model;
-		assert	heater.getState() == State.HEATING :
+		ChauffeEauElectricityModel chauffeEau = (ChauffeEauElectricityModel)model;
+		assert	chauffeEau.getState() == State.HEATING :
 				new AssertionError(
 						"model not in the right state, should be "
-						+ "State.HEATING but is " + heater.getState());
-		heater.setCurrentHeatingPower(this.powerValue.getPower(),
+						+ "State.HEATING but is " + chauffeEau.getState());
+		chauffeEau.setCurrentHeatingPower(this.powerValue.getPower(),
 									  this.getTimeOfOccurrence());
 	}
 }

@@ -1,6 +1,7 @@
 package projet_alasca.equipements.refrigerateur.mil.events;
 
 
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -122,13 +123,13 @@ implements	RefrigerateurEventI
 						"Precondition violation: model instanceof "
 						+ "RefrigerateurElectricityModel");
 
-		RefrigerateurElectricityModel heater = (RefrigerateurElectricityModel)model;
-		assert	heater.getState() == RefrigerateurElectricityModel.State.OFF :
+		RefrigerateurElectricityModel refrigerator = (RefrigerateurElectricityModel)model;
+		assert	refrigerator.getState() == RefrigerateurElectricityModel.State.OFF :
 				new AssertionError(
 						"model not in the right state, should be "
 						+ "RefrigerateurElectricityModel.State.OFF but is "
-						+ heater.getState());
-		heater.setState(RefrigerateurElectricityModel.State.ON,
+						+ refrigerator.getState());
+		refrigerator.setState(RefrigerateurElectricityModel.State.ON,
 						this.getTimeOfOccurrence());
 	}
 }

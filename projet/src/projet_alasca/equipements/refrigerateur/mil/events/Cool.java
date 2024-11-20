@@ -1,5 +1,6 @@
 package projet_alasca.equipements.refrigerateur.mil.events;
 
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -41,8 +42,8 @@ import projet_alasca.equipements.refrigerateur.mil.RefrigerateurTemperatureModel
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>DoNotHeat</code> defines the simulation event of the
- * heater stopping to heat.
+ * The class <code>Heat</code> defines the simulation event of the heater
+ * starting to heat.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -62,7 +63,7 @@ import projet_alasca.equipements.refrigerateur.mil.RefrigerateurTemperatureModel
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-public class			DoNotCooling
+public class			Cool
 extends		Event
 implements	RefrigerateurEventI
 {
@@ -77,7 +78,7 @@ implements	RefrigerateurEventI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>DoNotHeat</code> event.
+	 * create a <code>Heat</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -89,7 +90,7 @@ implements	RefrigerateurEventI
 	 *
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
-	public				DoNotCooling(
+	public				Cool(
 		Time timeOfOccurrence
 		)
 	{
@@ -106,9 +107,10 @@ implements	RefrigerateurEventI
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		// if many heater events occur at the same time, the DoNotHeat one
-		// will be executed first except for SwitchOnHeater ones.
-		if (e instanceof SwitchOnRefrigerateur) {
+		// if many heater events occur at the same time, the Heat one will be
+		// executed after SwitchOnHeater and DoNotHeat ones but before
+		// SwitchOffHeater.
+		if (e instanceof SwitchOnRefrigerateur || e instanceof DoNotCool) {
 			return false;
 		} else {
 			return true;
@@ -125,26 +127,26 @@ implements	RefrigerateurEventI
 									model instanceof RefrigerateurTemperatureModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HeaterElectricityModel || "
-						+ "model instanceof HeaterTemperatureModel");
+						+ "RefrigerateurElectricityModel || "
+						+ "model instanceof RefrigerateurTemperatureModel");
 
 		if (model instanceof RefrigerateurElectricityModel) {
-			RefrigerateurElectricityModel heater = (RefrigerateurElectricityModel)model;
-			assert	heater.getState() == RefrigerateurElectricityModel.State.HEATING:
-				new AssertionError(
-						"model not in the right state, should be "
-								+ "HeaterElectricityModel.State.HEATING but is "
-								+ heater.getState());
-			heater.setState(RefrigerateurElectricityModel.State.ON,
+			RefrigerateurElectricityModel refrigerator = (RefrigerateurElectricityModel)model;
+			assert	refrigerator.getState() == RefrigerateurElectricityModel.State.ON:
+					new AssertionError(
+							"model not in the right state, should be "
+							+ "RefrigerateurElectricityModel.State.ON but is "
+							+ refrigerator.getState());
+			refrigerator.setState(RefrigerateurElectricityModel.State.COOLING,
 							this.getTimeOfOccurrence());
 		} else {
-			RefrigerateurTemperatureModel heater = (RefrigerateurTemperatureModel)model;
-			assert	heater.getState() == RefrigerateurTemperatureModel.State.HEATING:
-				new AssertionError(
-						"model not in the right state, should be "
-								+ "HeaterTemperatureModel.State.HEATING but is "
-								+ heater.getState());
-			heater.setState(RefrigerateurTemperatureModel.State.NOT_HEATING);
+			RefrigerateurTemperatureModel refrigerator = (RefrigerateurTemperatureModel)model;
+			assert	refrigerator.getState() == RefrigerateurTemperatureModel.State.NOT_COOLING:
+					new AssertionError(
+							"model not in the right state, should be "
+							+ "RefrigerateurTemperatureModel.State.NOT_COOLING but is "
+							+ refrigerator.getState());
+			refrigerator.setState(RefrigerateurTemperatureModel.State.COOLING);
 		}
 	}
 }

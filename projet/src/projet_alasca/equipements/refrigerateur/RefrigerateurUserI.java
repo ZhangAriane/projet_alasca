@@ -11,9 +11,7 @@ public interface RefrigerateurUserI extends RefrigerateurExternalControlI{
 	public void			switchOff() throws Exception;
 
 
-	public void			setRefrigeratorTargetTemperature(double target)
+	public void			setTargetTemperature(double target)
 	throws Exception;
 	
-	public void			setFreezerTargetTemperature(double target)
-			throws Exception;
 }

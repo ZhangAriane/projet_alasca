@@ -6,16 +6,11 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
 public interface RefrigerateurExternalControlCI extends OfferedCI, RequiredCI, RefrigerateurExternalControlI {
 
 	@Override
-	public double		getRefrigeratorTargetTemperature() throws Exception;
+	public double		getTargetTemperature() throws Exception;
+
 	
 	@Override
-	public double		getFreezerTargetTemperature() throws Exception;
-	
-	@Override
-	public double		getRefrigeratorCurrentTemperature() throws Exception;
-	
-	@Override
-	public double		getFreezerCurrentTemperature() throws Exception;
+	public double		getCurrentTemperature() throws Exception;
 	
 	@Override
 	public double		getMaxPowerLevel() throws Exception;

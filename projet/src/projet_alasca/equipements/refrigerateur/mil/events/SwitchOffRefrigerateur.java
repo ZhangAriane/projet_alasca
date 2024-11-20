@@ -1,5 +1,7 @@
 package projet_alasca.equipements.refrigerateur.mil.events;
 
+
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -117,8 +119,8 @@ implements	RefrigerateurEventI
 									model instanceof RefrigerateurTemperatureModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HeaterElectricityModel || "
-						+ "model instanceof RefrigerateurElectricityModel");
+						+ "RefrigerateurElectricityModel || "
+						+ "model instanceof RefrigerateurTemperatureModel");
 
 		if (model instanceof RefrigerateurElectricityModel) {
 			RefrigerateurElectricityModel refrigerator = (RefrigerateurElectricityModel)model;
@@ -131,7 +133,7 @@ implements	RefrigerateurEventI
 							this.getTimeOfOccurrence());
 		} else {
 			RefrigerateurTemperatureModel heater = (RefrigerateurTemperatureModel)model;
-			heater.setState(RefrigerateurTemperatureModel.State.NOT_HEATING);
+			heater.setState(RefrigerateurTemperatureModel.State.NOT_COOLING);
 		}
 	}
 }

@@ -20,26 +20,17 @@ public class RefrigerateurInternalControlOutboundPort extends		AbstractOutboundP
 
 
 	@Override
-	public double getRefrigeratorTargetTemperature() throws Exception {
+	public double getTargetTemperature() throws Exception {
 
-		return ((RefrigerateurInternalControlCI)this.getConnector()).getRefrigeratorTargetTemperature();
+		return ((RefrigerateurInternalControlCI)this.getConnector()).getTargetTemperature();
 	}
+
 
 	@Override
-	public double getFreezerTargetTemperature() throws Exception {
-
-		return ((RefrigerateurInternalControlCI)this.getConnector()).getFreezerTargetTemperature();
+	public double getCurrentTemperature() throws Exception {
+		return ((RefrigerateurInternalControlCI)this.getConnector()).getCurrentTemperature();
 	}
 
-	@Override
-	public double getRefrigeratorCurrentTemperature() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.getConnector()).getRefrigeratorCurrentTemperature();
-	}
-
-	@Override
-	public double getFreezerCurrentTemperature() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.getConnector()).getFreezerCurrentTemperature();
-	}
 
 	@Override
 	public boolean cooling() throws Exception {
@@ -57,21 +48,6 @@ public class RefrigerateurInternalControlOutboundPort extends		AbstractOutboundP
 		
 	}
 
-	@Override
-	public boolean freezing() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.getConnector()).freezing();
-	}
 
-	@Override
-	public void startFreezing() throws Exception {
-		((RefrigerateurInternalControlCI)this.getConnector()).startFreezing();
-		
-	}
-
-	@Override
-	public void stopFreezing() throws Exception {
-		((RefrigerateurInternalControlCI)this.getConnector()).stopFreezing();
-		
-	}
 
 }

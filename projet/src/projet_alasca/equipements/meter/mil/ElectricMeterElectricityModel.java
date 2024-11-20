@@ -100,6 +100,11 @@ import fr.sorbonne_u.exceptions.InvariantChecking;
 type = Double.class)
 @ModelImportedVariable(name = "currentMachineCafeIntensity",
 type = Double.class)
+@ModelImportedVariable(name = "currentRefrigerateurIntensity",
+type = Double.class)
+@ModelImportedVariable(name = "currentChauffeEauIntensity",
+type = Double.class)
+
 //-----------------------------------------------------------------------------
 public class			ElectricMeterElectricityModel
 extends		AtomicHIOA
@@ -140,7 +145,11 @@ extends		AtomicHIOA
 	protected Value<Double>			currentVentilateurIntensity;
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>			currentMachineCafeIntensity;
-
+	@ImportedVariable(type = Double.class)
+	protected Value<Double>			currentRefrigerateurIntensity;
+	@ImportedVariable(type = Double.class)
+	protected Value<Double>			currentChauffeEauIntensity;
+	
 	/** current total intensity of the house in amperes.					*/
 	@InternalVariable(type = Double.class)
 	protected final Value<Double>	currentIntensity =
@@ -241,6 +250,24 @@ extends		AtomicHIOA
 				"currentMachineCafeIntensity == null || !i "
 				+ "currentMachineCafeIntensity.isInitialised() || "
 				+ "currentMachineCafeIntensity.getValue() >= 0.0");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+				instance.currentRefrigerateurIntensity == null ||
+					!instance.currentRefrigerateurIntensity.isInitialised() ||
+							instance.currentRefrigerateurIntensity.getValue() >= 0.0,
+				ElectricMeterElectricityModel.class,
+				instance,
+				"currentRefrigerateurIntensity == null || "
+				+ "!currentRefrigerateurIntensity.isInitialised() || "
+				+ "currentRefrigerateurIntensity.getValue() >= 0.0");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+				instance.currentChauffeEauIntensity == null ||
+					!instance.currentChauffeEauIntensity.isInitialised() ||
+							instance.currentChauffeEauIntensity.getValue() >= 0.0,
+				ElectricMeterElectricityModel.class,
+				instance,
+				"currentChauffeEauIntensity == null || "
+				+ "!currentChauffeEauIntensity.isInitialised() || "
+				+ "currentChauffeEauIntensity.getValue() >= 0.0");
 		return ret;
 	}
 
@@ -401,7 +428,9 @@ extends		AtomicHIOA
 							this.currentHairDryerIntensity.isInitialised() &&
 							this.currentHeaterIntensity.isInitialised()&&
 							this.currentVentilateurIntensity.isInitialised() &&
-							this.currentMachineCafeIntensity.isInitialised()) {
+							this.currentMachineCafeIntensity.isInitialised()&&
+							this.currentRefrigerateurIntensity.isInitialised() &&
+							this.currentChauffeEauIntensity.isInitialised()) {
 			double i = this.computeTotalIntensity();
 			this.currentIntensity.initialise(i);
 			this.currentConsumption.initialise(0.0);

@@ -34,6 +34,8 @@ package projet_alasca.equipements;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import fr.sorbonne_u.components.hem2024e2.HEM_ReportI;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.StaticVariableDescriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSink;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSource;

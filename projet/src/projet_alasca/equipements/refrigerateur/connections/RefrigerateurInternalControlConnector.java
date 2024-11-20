@@ -7,24 +7,15 @@ public class RefrigerateurInternalControlConnector extends		AbstractConnector im
 
 
 	@Override
-	public double getRefrigeratorTargetTemperature() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.offering).getRefrigeratorTargetTemperature();
+	public double getTargetTemperature() throws Exception {
+		return ((RefrigerateurInternalControlCI)this.offering).getTargetTemperature();
 	}
 
 	@Override
-	public double getFreezerTargetTemperature() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.offering).getFreezerTargetTemperature();
+	public double getCurrentTemperature() throws Exception {
+		return ((RefrigerateurInternalControlCI)this.offering).getCurrentTemperature();
 	}
 
-	@Override
-	public double getRefrigeratorCurrentTemperature() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.offering).getRefrigeratorCurrentTemperature();
-	}
-
-	@Override
-	public double getFreezerCurrentTemperature() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.offering).getFreezerCurrentTemperature();
-	}
 	
 	@Override
 	public boolean cooling() throws Exception {
@@ -41,20 +32,6 @@ public class RefrigerateurInternalControlConnector extends		AbstractConnector im
 		((RefrigerateurInternalControlCI)this.offering).stopCooling();
 	}
 
-	@Override
-	public boolean freezing() throws Exception {
-		return ((RefrigerateurInternalControlCI)this.offering).freezing();
-	}
-
-	@Override
-	public void startFreezing() throws Exception {
-		((RefrigerateurInternalControlCI)this.offering).startFreezing();
-	}
-
-	@Override
-	public void stopFreezing() throws Exception {
-		((RefrigerateurInternalControlCI)this.offering).stopFreezing();
-	}
 
 
 

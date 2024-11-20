@@ -53,14 +53,12 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.Pair;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
+import projet_alasca.equipements.refrigerateur.mil.events.Cool;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotCool;
 import projet_alasca.equipements.refrigerateur.mil.events.RefrigerateurEventI;
-import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
-import projet_alasca.equipements.refrigerateur.mil.events.Freezing;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotFreezing;
+import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
+import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
 
 // -----------------------------------------------------------------------------
 /**
@@ -127,12 +125,10 @@ import projet_alasca.equipements.refrigerateur.mil.events.DoNotFreezing;
 @ModelExternalEvents(imported = {SwitchOnRefrigerateur.class,
 								 SwitchOffRefrigerateur.class,
 								 SetPowerRefrigerateur.class,
-								 Cooling.class,
-								 Freezing.class,
-								 DoNotCooling.class,
-								 DoNotFreezing.class})
+								 Cool.class,
+								 DoNotCool.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
-@ModelExportedVariable(name = "currentHeatingPower", type = Double.class)
+@ModelExportedVariable(name = "currentCoolingPower", type = Double.class)
 //-----------------------------------------------------------------------------
 public class			RefrigerateurElectricityModel
 extends		AtomicHIOA
@@ -153,7 +149,7 @@ extends		AtomicHIOA
 		/** heater is on but not heating.									*/
 		ON,
 		/** heater is on and heating.										*/
-		HEATING,
+		COOLING,
 		/** heater is off.													*/
 		OFF
 	}
@@ -168,9 +164,9 @@ extends		AtomicHIOA
 															getSimpleName();
 
 	/** power of the heater in watts.										*/
-	protected static double		NOT_HEATING_POWER = 22.0;
+	protected static double		NOT_COOLING_POWER = 22.0;
 	/** max power of the heater in watts.										*/
-	public static double		MAX_HEATING_POWER = 2000.0;
+	public static double		MAX_COOLING_POWER = 2000.0;
 	/** nominal tension (in Volts) of the heater.							*/
 	protected static double		TENSION = 220.0;
 
@@ -193,7 +189,7 @@ extends		AtomicHIOA
 	/** the current heating power between 0 and
 	 *  {@code HeaterElectricityModel.MAX_HEATING_POWER}.					*/
 	@ExportedVariable(type = Double.class)
-	protected final Value<Double>	currentHeatingPower =
+	protected final Value<Double>	currentCoolingPower =
 														new Value<Double>(this);
 	/** current intensity in amperes; intensity is power/tension.			*/
 	@ExportedVariable(type = Double.class)
@@ -225,15 +221,15 @@ extends		AtomicHIOA
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					NOT_HEATING_POWER >= 0.0,
+					NOT_COOLING_POWER >= 0.0,
 					RefrigerateurElectricityModel.class,
 					instance,
-					"NOT_HEATING_POWER >= 0.0");
+					"NOT_COOLING_POWER >= 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					MAX_HEATING_POWER > NOT_HEATING_POWER,
+					MAX_COOLING_POWER > NOT_COOLING_POWER,
 					RefrigerateurElectricityModel.class,
 					instance,
-					"MAX_HEATING_POWER > NOT_HEATING_POWER");
+					"MAX_COOLING_POWER > NOT_COOLING_POWER");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 					TENSION > 0.0,
 					RefrigerateurElectricityModel.class,
@@ -250,12 +246,12 @@ extends		AtomicHIOA
 					instance,
 					"totalConsumption >= 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!instance.currentHeatingPower.isInitialised() ||
-								instance.currentHeatingPower.getValue() >= 0.0,
+					!instance.currentCoolingPower.isInitialised() ||
+								instance.currentCoolingPower.getValue() >= 0.0,
 					RefrigerateurElectricityModel.class,
 					instance,
-					"!currentHeatingPower.isInitialised() || "
-							+ "currentHeatingPower.getValue() >= 0.0");
+					"!currentCoolingPower.isInitialised() || "
+							+ "currentCoolingPower.getValue() >= 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 					!instance.currentIntensity.isInitialised() ||
 									instance.currentIntensity.getValue() >= 0.0,
@@ -293,19 +289,19 @@ extends		AtomicHIOA
 				instance,
 				"URI != null && !URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				NOT_HEATING_POWER_RUNPNAME != null &&
-									!NOT_HEATING_POWER_RUNPNAME.isEmpty(),
+				NOT_COOLING_POWER_RUNPNAME != null &&
+									!NOT_COOLING_POWER_RUNPNAME.isEmpty(),
 				RefrigerateurElectricityModel.class,
 				instance,
-				"NOT_HEATING_POWER_RUNPNAME != null && "
-				+ "!NOT_HEATING_POWER_RUNPNAME.isEmpty()");
+				"NOT_COOLING_POWER_RUNPNAME != null && "
+				+ "!NOT_COOLING_POWER_RUNPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				MAX_HEATING_POWER_RUNPNAME != null &&
-									!MAX_HEATING_POWER_RUNPNAME.isEmpty(),
+				MAX_COOLING_POWER_RUNPNAME != null &&
+									!MAX_COOLING_POWER_RUNPNAME.isEmpty(),
 				RefrigerateurElectricityModel.class,
 				instance,
-				"MAX_HEATING_POWER_RUNPNAME != null && "
-				+ "!MAX_HEATING_POWER_RUNPNAME.isEmpty()");
+				"MAX_COOLING_POWER_RUNPNAME != null && "
+				+ "!MAX_COOLING_POWER_RUNPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				TENSION_RUNPNAME != null && !TENSION_RUNPNAME.isEmpty(),
 				RefrigerateurElectricityModel.class,
@@ -416,17 +412,17 @@ extends		AtomicHIOA
 	 * @param newPower	the new power in watts to be set on the heater.
 	 * @param t			time at which the new power is set.
 	 */
-	public void			setCurrentHeatingPower(double newPower, Time t)
+	public void			setCurrentCoolingPower(double newPower, Time t)
 	{
 		assert	newPower >= 0.0 &&
-				newPower <= RefrigerateurElectricityModel.MAX_HEATING_POWER :
+				newPower <= RefrigerateurElectricityModel.MAX_COOLING_POWER :
 			new AssertionError(
 					"Precondition violation: newPower >= 0.0 && "
-					+ "newPower <= HeaterElectricityModel.MAX_HEATING_POWER,"
+					+ "newPower <= RefrigerateurElectricityModel.MAX_COOLING_POWER,"
 					+ " but newPower = " + newPower);
 
-		double oldPower = this.currentHeatingPower.getValue();
-		this.currentHeatingPower.setNewValue(newPower, t);
+		double oldPower = this.currentCoolingPower.getValue();
+		this.currentCoolingPower.setNewValue(newPower, t);
 		if (newPower != oldPower) {
 			this.consumptionHasChanged = true;
 		}
@@ -480,10 +476,10 @@ extends		AtomicHIOA
 		Pair<Integer, Integer> ret = null;
 
 		if (!this.currentIntensity.isInitialised() ||
-								!this.currentHeatingPower.isInitialised()) {
+								!this.currentCoolingPower.isInitialised()) {
 			// initially, the heater is off, so its consumption is zero.
 			this.currentIntensity.initialise(0.0);
-			this.currentHeatingPower.initialise(MAX_HEATING_POWER);
+			this.currentCoolingPower.initialise(MAX_COOLING_POWER);
 
 			StringBuffer sb = new StringBuffer("new consumption: ");
 			sb.append(this.currentIntensity.getValue());
@@ -552,12 +548,12 @@ extends		AtomicHIOA
 		Time t = this.getCurrentStateTime();
 		if (this.currentState == State.ON) {
 			this.currentIntensity.setNewValue(
-					RefrigerateurElectricityModel.NOT_HEATING_POWER/
+					RefrigerateurElectricityModel.NOT_COOLING_POWER/
 											RefrigerateurElectricityModel.TENSION,
 					t);
-		} else if (this.currentState == State.HEATING) {
+		} else if (this.currentState == State.COOLING) {
 			this.currentIntensity.setNewValue(
-								this.currentHeatingPower.getValue()/
+								this.currentCoolingPower.getValue()/
 												RefrigerateurElectricityModel.TENSION,
 								t);
 		} else {
@@ -641,9 +637,9 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/** power of the heater in watts.										*/
-	public static final String	NOT_HEATING_POWER_RUNPNAME = "NOT_HEATING_POWER";
+	public static final String	NOT_COOLING_POWER_RUNPNAME = "NOT_COOLING_POWER";
 	/** power of the heater in watts.										*/
-	public static final String	MAX_HEATING_POWER_RUNPNAME = "MAX_HEATING_POWER";
+	public static final String	MAX_COOLING_POWER_RUNPNAME = "MAX_COOLING_POWER";
 	/** nominal tension (in Volts) of the heater.							*/
 	public static final String	TENSION_RUNPNAME = "TENSION";
 
@@ -657,15 +653,15 @@ extends		AtomicHIOA
 	{
 		super.setSimulationRunParameters(simParams);
 
-		String notHeatingName =
-			ModelI.createRunParameterName(getURI(), NOT_HEATING_POWER_RUNPNAME);
-		if (simParams.containsKey(notHeatingName)) {
-			NOT_HEATING_POWER = (double) simParams.get(notHeatingName);
+		String notCoolingName =
+			ModelI.createRunParameterName(getURI(), NOT_COOLING_POWER_RUNPNAME);
+		if (simParams.containsKey(notCoolingName)) {
+			NOT_COOLING_POWER = (double) simParams.get(notCoolingName);
 		}
-		String heatingName =
-			ModelI.createRunParameterName(getURI(), MAX_HEATING_POWER_RUNPNAME);
-		if (simParams.containsKey(heatingName)) {
-			MAX_HEATING_POWER = (double) simParams.get(heatingName);
+		String coolingName =
+			ModelI.createRunParameterName(getURI(), MAX_COOLING_POWER_RUNPNAME);
+		if (simParams.containsKey(coolingName)) {
+			MAX_COOLING_POWER = (double) simParams.get(coolingName);
 		}
 		String tensionName =
 			ModelI.createRunParameterName(getURI(), TENSION_RUNPNAME);
@@ -705,7 +701,7 @@ extends		AtomicHIOA
 	 * 
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
-	public static class		HeaterElectricityReport
+	public static class		RefrigeratorElectricityReport
 	implements	SimulationReportI, HEM_ReportI
 	{
 		private static final long serialVersionUID = 1L;
@@ -713,7 +709,7 @@ extends		AtomicHIOA
 		protected double	totalConsumption; // in kwh
 
 
-		public			HeaterElectricityReport(
+		public			RefrigeratorElectricityReport(
 			String modelURI,
 			double totalConsumption
 			)
@@ -755,7 +751,7 @@ extends		AtomicHIOA
 	@Override
 	public SimulationReportI	getFinalReport()
 	{
-		return new HeaterElectricityReport(this.getURI(), this.totalConsumption);
+		return new RefrigeratorElectricityReport(this.getURI(), this.totalConsumption);
 	}
 }
 // -----------------------------------------------------------------------------

@@ -125,26 +125,26 @@ implements	ChauffeEauEventI
 									model instanceof ChauffeEauTemperatureModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HeaterElectricityModel || "
-						+ "model instanceof HeaterTemperatureModel");
+						+ "ChauffeEauElectricityModel || "
+						+ "model instanceof ChauffeEauTemperatureModel");
 
 		if (model instanceof ChauffeEauElectricityModel) {
-			ChauffeEauElectricityModel heater = (ChauffeEauElectricityModel)model;
-			assert	heater.getState() == ChauffeEauElectricityModel.State.HEATING:
+			ChauffeEauElectricityModel chauffeEau = (ChauffeEauElectricityModel)model;
+			assert	chauffeEau.getState() == ChauffeEauElectricityModel.State.HEATING:
 				new AssertionError(
 						"model not in the right state, should be "
-								+ "HeaterElectricityModel.State.HEATING but is "
-								+ heater.getState());
-			heater.setState(ChauffeEauElectricityModel.State.ON,
+								+ "ChauffeEauElectricityModel.State.HEATING but is "
+								+ chauffeEau.getState());
+			chauffeEau.setState(ChauffeEauElectricityModel.State.ON,
 							this.getTimeOfOccurrence());
 		} else {
-			ChauffeEauTemperatureModel heater = (ChauffeEauTemperatureModel)model;
-			assert	heater.getState() == ChauffeEauTemperatureModel.State.HEATING:
+			ChauffeEauTemperatureModel chauffeEau = (ChauffeEauTemperatureModel)model;
+			assert	chauffeEau.getState() == ChauffeEauTemperatureModel.State.HEATING:
 				new AssertionError(
 						"model not in the right state, should be "
-								+ "HeaterTemperatureModel.State.HEATING but is "
-								+ heater.getState());
-			heater.setState(ChauffeEauTemperatureModel.State.NOT_HEATING);
+								+ "ChauffeEauTemperatureModel.State.HEATING but is "
+								+ chauffeEau.getState());
+			chauffeEau.setState(ChauffeEauTemperatureModel.State.NOT_HEATING);
 		}
 	}
 }

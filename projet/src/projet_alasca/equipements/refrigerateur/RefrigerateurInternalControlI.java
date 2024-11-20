@@ -7,11 +7,6 @@ public interface RefrigerateurInternalControlI extends RefrigerateurTemperatureI
 	public void			startCooling() throws Exception;
 
 	public void			stopCooling() throws Exception;
-	
-	public boolean		freezing() throws Exception;
 
-	public void			startFreezing() throws Exception;
-
-	public void			stopFreezing() throws Exception;
 
 }

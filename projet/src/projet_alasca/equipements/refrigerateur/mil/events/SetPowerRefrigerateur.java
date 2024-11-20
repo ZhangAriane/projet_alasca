@@ -1,6 +1,7 @@
 package projet_alasca.equipements.refrigerateur.mil.events;
 
 
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -119,10 +120,10 @@ implements	RefrigerateurEventI
 			super();
 
 			assert	power >= 0.0 &&
-							power <= RefrigerateurElectricityModel.MAX_HEATING_POWER :
+							power <= RefrigerateurElectricityModel.MAX_COOLING_POWER :
 					new AssertionError(
 							"Precondition violation: power >= 0.0 && "
-							+ "power <= HeaterElectricityModel.MAX_HEATING_POWER,"
+							+ "power <= RefrigerateurElectricityModel.MAX_COOLING_POWER,"
 							+ " but power = " + power);
 
 			this.power = power;
@@ -228,14 +229,14 @@ implements	RefrigerateurEventI
 		assert	model instanceof RefrigerateurElectricityModel :
 				new AssertionError(
 						"Precondition violation: model instanceof "
-						+ "HeaterElectricityModel");
+						+ "RefrigerateurElectricityModel");
 
-		RefrigerateurElectricityModel heater = (RefrigerateurElectricityModel)model;
-		assert	heater.getState() == State.HEATING :
+		RefrigerateurElectricityModel refrigerator = (RefrigerateurElectricityModel)model;
+		assert	refrigerator.getState() == State.COOLING :
 				new AssertionError(
 						"model not in the right state, should be "
-						+ "State.HEATING but is " + heater.getState());
-		heater.setCurrentHeatingPower(this.powerValue.getPower(),
+						+ "State.COOLING but is " + refrigerator.getState());
+		refrigerator.setCurrentCoolingPower(this.powerValue.getPower(),
 									  this.getTimeOfOccurrence());
 	}
 }

@@ -35,6 +35,10 @@ package projet_alasca.equipements.refrigerateur.mil;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.hem2024e2.HEM_ReportI;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.DoNotHeat;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.Heat;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.HeaterEventI;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.SwitchOffHeater;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.InternalVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelImportedVariable;
@@ -51,10 +55,6 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.Pair;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
-import projet_alasca.equipements.refrigerateur.mil.events.RefrigerateurEventI;
-import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
 
 // -----------------------------------------------------------------------------
 /**
@@ -134,11 +134,11 @@ import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-@ModelExternalEvents(imported = {SwitchOffRefrigerateur.class,
-		 						 Cooling.class,
-		 						 DoNotCooling.class})
+@ModelExternalEvents(imported = {SwitchOffHeater.class,
+		 						 Heat.class,
+		 						 DoNotHeat.class})
 @ModelImportedVariable(name = "externalTemperature", type = Double.class)
-@ModelImportedVariable(name = "currentHeatingPower", type = Double.class)
+@ModelImportedVariable(name = "currentCoolingPower", type = Double.class)
 // -----------------------------------------------------------------------------
 public class			RefrigerateurTemperatureModel
 extends		AtomicHIOA
@@ -157,9 +157,9 @@ extends		AtomicHIOA
 	 */
 	public static enum	State {
 		/** heater is not heating.											*/
-		NOT_HEATING,
+		NOT_COOLING,
 		/** heater is on and heating.										*/
-		HEATING
+		COOLING
 	}
 
 	// -------------------------------------------------------------------------
@@ -183,9 +183,9 @@ extends		AtomicHIOA
 	protected static double 	INSULATION_TRANSFER_CONSTANT = 12.5;
 	/** heating transfer constant in the differential equation when the
 	 *  heating power is maximal.											*/
-	protected static double		MIN_HEATING_TRANSFER_CONSTANT = 40.0;
+	protected static double		MIN_COOLING_TRANSFER_CONSTANT = 40.0;
 	/** temperature of the heating plate in the heater.						*/
-	protected static double		STANDARD_HEATING_TEMP = 300.0;
+	protected static double		STANDARD_COOLING_TEMP = 300.0;
 	/** update tolerance for the temperature <i>i.e.</i>, shortest elapsed
 	 *  time since the last update under which the temperature is not
 	 *  changed by the update to avoid too large computation errors.		*/
@@ -196,7 +196,7 @@ extends		AtomicHIOA
 	protected static double		STEP = 60.0/3600.0;	// 60 seconds
 
 	/** current state of the heater.										*/
-	protected State				currentState = State.NOT_HEATING;
+	protected State				currentState = State.NOT_COOLING;
 
 	// Simulation run variables
 
@@ -221,7 +221,7 @@ extends		AtomicHIOA
 	/** the current heating power between 0 and
 	 *  {@code HeaterElectricityModel.MAX_HEATING_POWER}.					*/
 	@ImportedVariable(type = Double.class)
-	protected Value<Double>					currentHeatingPower;
+	protected Value<Double>					currentCoolingPower;
 	/** current temperature in the room.									*/
 	@InternalVariable(type = Double.class)
 	protected final DerivableValue<Double>	currentTemperature =
@@ -268,7 +268,7 @@ extends		AtomicHIOA
 				instance,
 				"INSULATION_TRANSFER_CONSTANT > 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				MIN_HEATING_TRANSFER_CONSTANT > 0.0,
+				MIN_COOLING_TRANSFER_CONSTANT > 0.0,
 				RefrigerateurTemperatureModel.class,
 				instance,
 				"MIN_HEATING_TRANSFER_CONSTANT > 0.0");
@@ -293,9 +293,9 @@ extends		AtomicHIOA
 				instance,
 				"!isStateInitialised() || start != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				instance.currentHeatingPower == null ||
-					(!instance.currentHeatingPower.isInitialised() ||
-								instance.currentHeatingPower.getValue() >= 0.0),
+				instance.currentCoolingPower == null ||
+					(!instance.currentCoolingPower.isInitialised() ||
+								instance.currentCoolingPower.getValue() >= 0.0),
 				RefrigerateurTemperatureModel.class,
 				instance,
 				"currentHeatingPower == null || "
@@ -442,9 +442,9 @@ extends		AtomicHIOA
 		// transfer constant that grows as the power gets lower, hence the
 		// derivative given by the differential equation will be lower when
 		// the power gets lower, what is physically awaited.
-		double c = 1.0/(MIN_HEATING_TRANSFER_CONSTANT*
-									RefrigerateurElectricityModel.MAX_HEATING_POWER);
-		return 1.0/(c*this.currentHeatingPower.getValue());
+		double c = 1.0/(MIN_COOLING_TRANSFER_CONSTANT*
+									RefrigerateurElectricityModel.MAX_COOLING_POWER);
+		return 1.0/(c*this.currentCoolingPower.getValue());
 	}
 
 	/**
@@ -463,15 +463,15 @@ extends		AtomicHIOA
 	protected double	computeDerivatives(Double current)
 	{
 		double currentTempDerivative = 0.0;
-		if (this.currentState == State.HEATING) {
+		if (this.currentState == State.COOLING) {
 			// the heating contribution: temperature difference between the
 			// heating temperature and the room temperature divided by the
 			// heat transfer constant taking into account the size of the
 			// room
-			if (this.currentHeatingPower.getValue() >
+			if (this.currentCoolingPower.getValue() >
 												POWER_HEAT_TRANSFER_TOLERANCE) {
 				currentTempDerivative =
-						(STANDARD_HEATING_TEMP - current)/
+						(STANDARD_COOLING_TEMP - current)/
 											this.currentHeatTransfertConstant();
 			}
 		}
@@ -627,7 +627,7 @@ extends		AtomicHIOA
 								 this.getSimulatedTimeUnit()));
 
 		// Tracing
-		String mark = this.currentState == State.HEATING ? " (h)" : " (-)";
+		String mark = this.currentState == State.COOLING ? " (h)" : " (-)";
 		StringBuffer message = new StringBuffer();
 		message.append(this.currentTemperature.getTime().getSimulatedTime());
 		message.append(mark);
@@ -658,7 +658,7 @@ extends		AtomicHIOA
 		assert	currentEvents != null && currentEvents.size() == 1;
 
 		Event ce = (Event) currentEvents.get(0);
-		assert	ce instanceof RefrigerateurEventI;
+		assert	ce instanceof HeaterEventI;
 
 		StringBuffer sb = new StringBuffer("executing the external event: ");
 		sb.append(ce.eventAsString());

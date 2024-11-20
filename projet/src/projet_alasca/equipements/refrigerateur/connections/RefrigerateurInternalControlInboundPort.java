@@ -29,31 +29,18 @@ public class RefrigerateurInternalControlInboundPort extends		AbstractInboundPor
 	}
 
 	@Override
-	public double getRefrigeratorTargetTemperature() throws Exception {
+	public double getTargetTemperature() throws Exception {
 		return this.getOwner().handleRequest(
-				o -> ((RefrigerateurInternalControlI)o).getRefrigeratorTargetTemperature());
+				o -> ((RefrigerateurInternalControlI)o).getTargetTemperature());
 	}
 
 	@Override
-	public double getFreezerTargetTemperature() throws Exception {
+	public double getCurrentTemperature() throws Exception {
 		return this.getOwner().handleRequest(
-				o -> ((RefrigerateurInternalControlI)o).getFreezerTargetTemperature());
+				o -> ((RefrigerateurInternalControlI)o).getCurrentTemperature());
 
 	}
 
-	@Override
-	public double getRefrigeratorCurrentTemperature() throws Exception {
-		return this.getOwner().handleRequest(
-				o -> ((RefrigerateurInternalControlI)o).getRefrigeratorCurrentTemperature());
-
-	}
-
-	@Override
-	public double getFreezerCurrentTemperature() throws Exception {
-		return this.getOwner().handleRequest(
-				o -> ((RefrigerateurInternalControlI)o).getFreezerCurrentTemperature());
-
-	}
 
 	@Override
 	public boolean cooling() throws Exception {
@@ -81,30 +68,6 @@ public class RefrigerateurInternalControlInboundPort extends		AbstractInboundPor
 		
 	}
 
-	@Override
-	public boolean freezing() throws Exception {
-		return this.getOwner().handleRequest(
-				o -> ((RefrigerateurInternalControlI)o).freezing());
-	}
 
-	@Override
-	public void startFreezing() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((RefrigerateurInternalControlI)o).
-					startFreezing();
-				return null;
-				});
-		
-	}
-
-	@Override
-	public void stopFreezing() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((RefrigerateurInternalControlI)o).
-					stopFreezing();
-				return null;
-				});
-		
-	}
 
 }

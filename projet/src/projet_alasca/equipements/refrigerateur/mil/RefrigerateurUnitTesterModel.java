@@ -35,6 +35,12 @@ package projet_alasca.equipements.refrigerateur.mil;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.DoNotHeat;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.Heat;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.SetPowerHeater;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.SwitchOffHeater;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.SwitchOnHeater;
+import fr.sorbonne_u.components.hem2024e2.equipments.heater.mil.events.SetPowerHeater.PowerValue;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
@@ -43,12 +49,6 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
-import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
-import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur.PowerValue;
-import projet_alasca.equipements.refrigerateur.mil.events.Cooling;
-import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
 
 // -----------------------------------------------------------------------------
 /**
@@ -83,11 +83,11 @@ import projet_alasca.equipements.refrigerateur.mil.events.DoNotCooling;
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-@ModelExternalEvents(exported = {SwitchOnRefrigerateur.class,
-								 SwitchOffRefrigerateur.class,
-								 Cooling.class,
-								 DoNotCooling.class,
-								 SetPowerRefrigerateur.class})
+@ModelExternalEvents(exported = {SwitchOnHeater.class,
+								 SwitchOffHeater.class,
+								 Heat.class,
+								 DoNotHeat.class,
+								 SetPowerHeater.class})
 // -----------------------------------------------------------------------------
 public class			RefrigerateurUnitTesterModel
 extends		AtomicModel
@@ -168,35 +168,35 @@ extends		AtomicModel
 			ArrayList<EventI> ret = new ArrayList<EventI>();
 			switch (this.step) {
 			case 1:
-				ret.add(new SwitchOnRefrigerateur(this.getTimeOfNextEvent()));
+				ret.add(new SwitchOnHeater(this.getTimeOfNextEvent()));
 				break;
 			case 2:
-				ret.add(new Cooling(this.getTimeOfNextEvent()));
+				ret.add(new Heat(this.getTimeOfNextEvent()));
 				break;
 			case 3:
-				ret.add(new DoNotCooling(this.getTimeOfNextEvent()));
+				ret.add(new DoNotHeat(this.getTimeOfNextEvent()));
 				break;
 			case 4:
-				ret.add(new Cooling(this.getTimeOfNextEvent()));
+				ret.add(new Heat(this.getTimeOfNextEvent()));
 				break;
 			case 5:
-				ret.add(new SetPowerRefrigerateur(this.getTimeOfNextEvent(),
+				ret.add(new SetPowerHeater(this.getTimeOfNextEvent(),
 										   new PowerValue(1600.0)));
 				break;
 			case 6:
-				ret.add(new SetPowerRefrigerateur(this.getTimeOfNextEvent(),
+				ret.add(new SetPowerHeater(this.getTimeOfNextEvent(),
 										   new PowerValue(1200.0)));
 				break;
 			case 7:
-				ret.add(new SetPowerRefrigerateur(this.getTimeOfNextEvent(),
+				ret.add(new SetPowerHeater(this.getTimeOfNextEvent(),
 										   new PowerValue(800.0)));
 				break;
 			case 8:
-				ret.add(new SetPowerRefrigerateur(this.getTimeOfNextEvent(),
+				ret.add(new SetPowerHeater(this.getTimeOfNextEvent(),
 										   new PowerValue(400.0)));
 				break;
 			case 9:
-				ret.add(new SwitchOffRefrigerateur(this.getTimeOfNextEvent()));
+				ret.add(new SwitchOffHeater(this.getTimeOfNextEvent()));
 				break;
 			}
 			return ret;

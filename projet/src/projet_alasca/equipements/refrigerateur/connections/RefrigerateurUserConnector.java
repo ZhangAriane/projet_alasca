@@ -6,28 +6,18 @@ import projet_alasca.equipements.refrigerateur.RefrigerateurUserCI;
 public class RefrigerateurUserConnector extends		AbstractConnector implements RefrigerateurUserCI {
 
 	@Override
-	public double getRefrigeratorTargetTemperature() throws Exception {
+	public double getTargetTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.offering).getRefrigeratorTargetTemperature();
+		return ((RefrigerateurUserCI)this.offering).getTargetTemperature();
 	}
+
 
 	@Override
-	public double getFreezerTargetTemperature() throws Exception {
+	public double getCurrentTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.offering).getFreezerTargetTemperature();
+		return ((RefrigerateurUserCI)this.offering).getCurrentTemperature();
 	}
 
-	@Override
-	public double getRefrigeratorCurrentTemperature() throws Exception {
-
-		return ((RefrigerateurUserCI)this.offering).getRefrigeratorCurrentTemperature();
-	}
-
-	@Override
-	public double getFreezerCurrentTemperature() throws Exception {
-
-		return ((RefrigerateurUserCI)this.offering).getFreezerCurrentTemperature();
-	}
 
 	@Override
 	public boolean on() throws Exception {
@@ -48,16 +38,11 @@ public class RefrigerateurUserConnector extends		AbstractConnector implements Re
 	}
 
 	@Override
-	public void setRefrigeratorTargetTemperature(double target) throws Exception {
+	public void setTargetTemperature(double target) throws Exception {
 
-		((RefrigerateurUserCI)this.offering).setRefrigeratorTargetTemperature(target);
+		((RefrigerateurUserCI)this.offering).setTargetTemperature(target);
 	}
 
-	@Override
-	public void setFreezerTargetTemperature(double target) throws Exception {
-
-		((RefrigerateurUserCI)this.offering).setFreezerTargetTemperature(target);
-	}
 
 	@Override
 	public double getMaxPowerLevel() throws Exception {
@@ -77,38 +62,6 @@ public class RefrigerateurUserConnector extends		AbstractConnector implements Re
 		return ((RefrigerateurUserCI)this.offering).getCurrentPowerLevel();
 	}
 	
-	@Override
-	public void switchOnRefrigeratorCompressor() throws Exception {
-		((RefrigerateurUserCI)this.offering).switchOnRefrigeratorCompressor();
 
-	}
-
-	@Override
-	public void switchOffRefrigeratorCompressor() throws Exception {
-		((RefrigerateurUserCI)this.offering).switchOffRefrigeratorCompressor();
-
-	}
-
-	@Override
-	public void switchOnFreezerCompressor() throws Exception {
-		((RefrigerateurUserCI)this.offering).switchOnFreezerCompressor();
-
-	}
-
-	@Override
-	public void switchOffFreezerCompressor() throws Exception {
-		((RefrigerateurUserCI)this.offering).switchOnFreezerCompressor();
-
-	}
-
-	@Override
-	public boolean onRegrigeratorCompressor() throws Exception {
-		return ((RefrigerateurUserCI)this.offering).onRegrigeratorCompressor();
-	}
-
-	@Override
-	public boolean onFreezerCompressor() throws Exception {
-		return ((RefrigerateurUserCI)this.offering).onFreezerCompressor();
-	}
 
 }

@@ -8,17 +8,5 @@ public interface RefrigerateurExternalControlI extends RefrigerateurTemperatureI
 
 	public double		getCurrentPowerLevel() throws Exception;
 	
-	public void switchOnRefrigeratorCompressor() throws Exception;
-
-	public void switchOffRefrigeratorCompressor() throws Exception;
-
-	public void switchOnFreezerCompressor() throws Exception;
-
-	public void switchOffFreezerCompressor() throws Exception;
-	
-	
-	public boolean onRegrigeratorCompressor() throws Exception;
-
-	public boolean onFreezerCompressor() throws Exception;
 	
 }
