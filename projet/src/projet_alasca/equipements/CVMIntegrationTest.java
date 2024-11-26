@@ -58,6 +58,7 @@ public class CVMIntegrationTest extends		AbstractCVM{
 		MachineCafe.VERBOSE = true;
 		MachineCafe.X_RELATIVE_POSITION = 1;
 		MachineCafe.Y_RELATIVE_POSITION = 2;
+		
 		RefrigerateurTester.VERBOSE = true;
 		RefrigerateurTester.X_RELATIVE_POSITION = 0;
 		RefrigerateurTester.Y_RELATIVE_POSITION = 3;

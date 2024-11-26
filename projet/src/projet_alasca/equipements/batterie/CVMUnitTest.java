@@ -1,4 +1,4 @@
-package projet_alasca.equipements.panneauSolaire;
+package projet_alasca.equipements.batterie;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
@@ -10,12 +10,12 @@ extends AbstractCVM
 
 	public CVMUnitTest() throws Exception 
 	{
-		PanneauSolaireTester.VERBOSE = true;
-		PanneauSolaireTester.X_RELATIVE_POSITION = 0;
-		PanneauSolaireTester.Y_RELATIVE_POSITION = 0;
-		PanneauSolaire.VERBOSE = true;
-		PanneauSolaire.X_RELATIVE_POSITION = 1;
-		PanneauSolaire.Y_RELATIVE_POSITION = 0;
+		BatterieTester.VERBOSE = true;
+		BatterieTester.X_RELATIVE_POSITION = 0;
+		BatterieTester.Y_RELATIVE_POSITION = 0;
+		Batterie.VERBOSE = true;
+		Batterie.X_RELATIVE_POSITION = 1;
+		Batterie.Y_RELATIVE_POSITION = 0;
 	}
 
 
@@ -23,11 +23,11 @@ extends AbstractCVM
 	public void			deploy() throws Exception
 	{
 		AbstractComponent.createComponent(
-					PanneauSolaire.class.getCanonicalName(),
+				Batterie.class.getCanonicalName(),
 					new Object[]{});
 
 		AbstractComponent.createComponent(
-				PanneauSolaireTester.class.getCanonicalName(),
+				BatterieTester.class.getCanonicalName(),
 					new Object[]{true});
 
 		super.deploy();

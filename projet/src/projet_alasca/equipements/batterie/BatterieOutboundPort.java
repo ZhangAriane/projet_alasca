@@ -20,8 +20,20 @@ public class BatterieOutboundPort extends		AbstractOutboundPort implements Batte
 	}
 
 	@Override
-	public State getState() throws Exception {
+	public BatterieState getState() throws Exception {
 		return ((BatterieCI)this.getConnector()).getState();
+	}
+
+	@Override
+	public void swicthConsume() throws Exception {
+		((BatterieCI)this.getConnector()).swicthConsume();
+		
+	}
+
+	@Override
+	public void switchProduct() throws Exception {
+		((BatterieCI)this.getConnector()).switchProduct();
+		
 	}
 
 	

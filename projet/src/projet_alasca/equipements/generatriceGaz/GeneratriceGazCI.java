@@ -10,6 +10,14 @@ extends OfferedCI,
 		RequiredCI,
 		 GeneratriceGazI
 {
-
+	@Override
+	public GeneratriceGazState getState() throws Exception;
+	
+	
+	@Override
+	public void	turnOn() throws Exception;
+	
+	@Override
+	public void	turnOff() throws Exception;
 	
 }

@@ -24,17 +24,10 @@ public class GeneratriceGazInboundPort extends		AbstractInboundPort implements G
 	}
 
 	@Override
-	public State getState() throws Exception {
+	public GeneratriceGazState getState() throws Exception {
 		return this.getOwner().handleRequest(
 				o -> ((GeneratriceGazI)o).
 				getState());
-	}
-
-	@Override
-	public Mode getMode() throws Exception {
-		return this.getOwner().handleRequest(
-				o -> ((GeneratriceGazI)o).
-				getMode());
 	}
 
 	@Override
@@ -57,35 +50,6 @@ public class GeneratriceGazInboundPort extends		AbstractInboundPort implements G
 		
 	}
 
-	@Override
-	public void setHigh() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((GeneratriceGazI)o).
-					setHigh();
-						return null;
-				});
-		
-	}
-
-	@Override
-	public void setLow() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((GeneratriceGazI)o).
-					setLow();
-						return null;
-				});
-		
-	}
-
-	@Override
-	public void setMeddium() throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((GeneratriceGazI)o).
-					setMeddium();
-						return null;
-				});
-		
-	}
 
 
 

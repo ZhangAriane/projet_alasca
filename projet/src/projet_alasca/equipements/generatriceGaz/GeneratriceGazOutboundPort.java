@@ -21,16 +21,11 @@ public class GeneratriceGazOutboundPort extends		AbstractOutboundPort implements
 	}
 
 	@Override
-	public State getState() throws Exception {
+	public GeneratriceGazState getState() throws Exception {
 		return ((GeneratriceGazCI)this.getConnector()).
 				getState();
 	}
 
-	@Override
-	public Mode getMode() throws Exception {
-		return ((GeneratriceGazCI)this.getConnector()).
-				getMode();
-	}
 
 	@Override
 	public void turnOn() throws Exception {
@@ -45,29 +40,6 @@ public class GeneratriceGazOutboundPort extends		AbstractOutboundPort implements
 		turnOff();
 		
 	}
-
-	@Override
-	public void setHigh() throws Exception {
-		((GeneratriceGazCI)this.getConnector()).
-		setHigh();
-		
-	}
-
-	@Override
-	public void setLow() throws Exception {
-		((GeneratriceGazCI)this.getConnector()).
-		setLow();
-		
-	}
-
-	@Override
-	public void setMeddium() throws Exception {
-		((GeneratriceGazCI)this.getConnector()).
-		setMeddium();
-		
-	}
-
-	
 
 	
 

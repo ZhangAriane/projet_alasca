@@ -3,6 +3,12 @@ package projet_alasca.equipements.panneauSolaire;
 
 public interface PanneauSolaireI{
 	
+	public static enum	PanneauSolaireState
+	{
+		ON,
+		OFF
+	}
+	
 	public boolean		isOn() throws Exception;
 	
 	public void startProduce() throws Exception;

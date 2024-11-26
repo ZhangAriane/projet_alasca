@@ -15,9 +15,7 @@ import projet_alasca.equipements.ventilateur.VentilateurImplementationI.Ventilat
 import projet_alasca.equipements.ventilateur.VentilateurImplementationI.VentilateurState;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.concurrent.ExecutionException;
 
 @RequiredInterfaces(required = {VentilateurUserCI.class , ClocksServerCI.class})
 public class VentilateurTester
@@ -34,7 +32,7 @@ extends AbstractComponent
 	/* when true, the component performs a unit test.						*/
 	protected final boolean	isUnitTest;				
 	protected VentilateurOutboundPort vop;					
-	protected String 	VentilateurInboundPortURI;
+	protected String 	ventilateurInboundPortURI;
 
 
 
@@ -43,17 +41,17 @@ extends AbstractComponent
 		this(isUnitTest, Ventilateur.INBOUND_PORT_URI);
 	}
 
-	public VentilateurTester(boolean isUnitTest, String VentilateurInboundPortURI) throws Exception
+	public VentilateurTester(boolean isUnitTest, String ventilateurInboundPortURI) throws Exception
 	{
 		super(1, 0);
-		assert	VentilateurInboundPortURI != null &&
-				!VentilateurInboundPortURI.isEmpty() :
+		assert	ventilateurInboundPortURI != null &&
+				!ventilateurInboundPortURI.isEmpty() :
 					new PreconditionException(
-							"VentilateurInboundPortURI != null && "
-									+ "!VentilateurInboundPortURI.isEmpty()");
+							"ventilateurInboundPortURI != null && "
+									+ "!ventilateurInboundPortURI.isEmpty()");
 
 		this.isUnitTest = isUnitTest;
-		this.initialise(VentilateurInboundPortURI);
+		this.initialise(ventilateurInboundPortURI);
 	}
 
 
@@ -73,7 +71,7 @@ extends AbstractComponent
 			String ventilateurInboundPortURI
 			) throws Exception
 	{
-		this.VentilateurInboundPortURI = ventilateurInboundPortURI;
+		this.ventilateurInboundPortURI = ventilateurInboundPortURI;
 		this.vop = new VentilateurOutboundPort(this);
 		this.vop.publishPort();
 
@@ -164,7 +162,7 @@ extends AbstractComponent
 		try {
 			this.doPortConnection(
 					this.vop.getPortURI(),
-					VentilateurInboundPortURI,
+					ventilateurInboundPortURI,
 					VentilateurConnector.class.getCanonicalName());
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;

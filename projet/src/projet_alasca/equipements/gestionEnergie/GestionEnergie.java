@@ -24,10 +24,14 @@ import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 import projet_alasca.equipements.batterie.Batterie;
 import projet_alasca.equipements.batterie.BatterieConnector;
-import projet_alasca.equipements.batterie.BatterieI.State;
+import projet_alasca.equipements.batterie.BatterieI.BatterieState;
 import projet_alasca.equipements.batterie.BatterieOutboundPort;
 import projet_alasca.equipements.chauffeEau.ChauffeEau;
 import projet_alasca.equipements.chauffeEau.ChauffeEauTester;
+import projet_alasca.equipements.generatriceGaz.GeneratriceGaz;
+import projet_alasca.equipements.generatriceGaz.GeneratriceGazConnector;
+import projet_alasca.equipements.generatriceGaz.GeneratriceGazI.GeneratriceGazState;
+import projet_alasca.equipements.generatriceGaz.GeneratriceGazOutboundPort;
 import projet_alasca.equipements.panneauSolaire.PanneauSolaire;
 import projet_alasca.equipements.panneauSolaire.PanneauSolaireConnector;
 import projet_alasca.equipements.panneauSolaire.PanneauSolaireOutboundPort;
@@ -83,6 +87,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 
 	protected BatterieOutboundPort batterieOutboundPort;
 	protected PanneauSolaireOutboundPort panneauSolaireOutboundPort;
+	protected GeneratriceGazOutboundPort generatriceGazOutboundPort;
 
 
 
@@ -208,15 +213,22 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 					this.batterieOutboundPort.publishPort();
 					this.doPortConnection(
 							this.batterieOutboundPort.getPortURI(),
-							Batterie.batterieInboundPortURI,
+							Batterie.INBOUND_PORT_URI,
 							BatterieConnector.class.getCanonicalName());
 
 					this.panneauSolaireOutboundPort = new PanneauSolaireOutboundPort(this);
 					this.panneauSolaireOutboundPort.publishPort();
 					this.doPortConnection(
 							this.panneauSolaireOutboundPort.getPortURI(),
-							PanneauSolaire.panneauSolaireInboundPortURI,
+							PanneauSolaire.INBOUND_PORT_URI,
 							PanneauSolaireConnector.class.getCanonicalName());
+					
+					this.generatriceGazOutboundPort = new GeneratriceGazOutboundPort(this);
+					this.generatriceGazOutboundPort.publishPort();
+					this.doPortConnection(
+							this.generatriceGazOutboundPort.getPortURI(),
+							GeneratriceGaz.INBOUND_PORT_URI,
+							GeneratriceGazConnector.class.getCanonicalName());
 
 					//				this.registrationInboundPort = new RegistrationInboundPort(this.registrationInboundPortURI,this);
 					//				this.registrationInboundPort.publishPort();
@@ -254,6 +266,8 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 
 			this.testMeter();
 			this.testBatterie();
+			this.testGeneratriceGaz();
+			this.testPanneauSolaire();
 			if (this.isPreFirstStep) {
 				this.testChauffeEau();	
 				this.testRefrigerateur();
@@ -280,6 +294,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 				this.doPortDisconnection(this.batterieOutboundPort.getPortURI());
 				this.doPortDisconnection(this.panneauSolaireOutboundPort.getPortURI());
 				this.doPortDisconnection(this.chauffeEauExternalControlOutboundPort.getPortURI());
+				this.doPortDisconnection(this.generatriceGazOutboundPort.getPortURI());
 			}
 		}
 		if(this.refrigeratorTest)
@@ -299,6 +314,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 					this.refrigerateurExternalControlOutboundPort.unpublishPort();
 					this.batterieOutboundPort.unpublishPort();
 					this.panneauSolaireOutboundPort.unpublishPort();
+					this.generatriceGazOutboundPort.unpublishPort();
 				}
 			}
 			if(this.refrigeratorTest)
@@ -475,11 +491,35 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 
 
 	private void testBatterie() {
-		State state;
+		BatterieState state;
 		try {
 			state = this.batterieOutboundPort.getState();
 
 			this.logMessage("Batterie : " + state ); 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void testGeneratriceGaz() {
+		GeneratriceGazState state;
+		try {
+			state = this.generatriceGazOutboundPort.getState();
+
+			this.logMessage("Generatrice gaz : " + state ); 
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+	}
+	
+	private void testPanneauSolaire() {
+		Boolean state;
+		try {
+			state = this.panneauSolaireOutboundPort.isOn();
+
+			this.logMessage("Generatrice gaz : " + state ); 
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
 			e.printStackTrace();

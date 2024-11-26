@@ -1,4 +1,4 @@
-package projet_alasca.equipements.panneauSolaire;
+package projet_alasca.equipements.generatriceGaz;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
@@ -10,12 +10,12 @@ extends AbstractCVM
 
 	public CVMUnitTest() throws Exception 
 	{
-		PanneauSolaireTester.VERBOSE = true;
-		PanneauSolaireTester.X_RELATIVE_POSITION = 0;
-		PanneauSolaireTester.Y_RELATIVE_POSITION = 0;
-		PanneauSolaire.VERBOSE = true;
-		PanneauSolaire.X_RELATIVE_POSITION = 1;
-		PanneauSolaire.Y_RELATIVE_POSITION = 0;
+		GeneratriceGazTester.VERBOSE = true;
+		GeneratriceGazTester.X_RELATIVE_POSITION = 0;
+		GeneratriceGazTester.Y_RELATIVE_POSITION = 0;
+		GeneratriceGaz.VERBOSE = true;
+		GeneratriceGaz.X_RELATIVE_POSITION = 1;
+		GeneratriceGaz.Y_RELATIVE_POSITION = 0;
 	}
 
 
@@ -23,11 +23,11 @@ extends AbstractCVM
 	public void			deploy() throws Exception
 	{
 		AbstractComponent.createComponent(
-					PanneauSolaire.class.getCanonicalName(),
+				GeneratriceGaz.class.getCanonicalName(),
 					new Object[]{});
 
 		AbstractComponent.createComponent(
-				PanneauSolaireTester.class.getCanonicalName(),
+					GeneratriceGazTester.class.getCanonicalName(),
 					new Object[]{true});
 
 		super.deploy();

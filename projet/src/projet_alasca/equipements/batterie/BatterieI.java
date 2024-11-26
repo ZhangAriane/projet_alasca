@@ -3,11 +3,15 @@ package projet_alasca.equipements.batterie;
 
 public interface BatterieI{
 
-	public enum State{
+	public enum BatterieState{
 		CONSUME,
 		PRODUCT
 	}
 
-	public State getState() throws Exception;
+	public BatterieState getState() throws Exception;
+	
+	public void swicthConsume()throws Exception;
+	
+	public void switchProduct()throws Exception;
 
 }

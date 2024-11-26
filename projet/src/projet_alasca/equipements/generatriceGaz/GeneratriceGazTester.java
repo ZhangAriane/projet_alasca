@@ -1,4 +1,4 @@
-package projet_alasca.equipements.panneauSolaire;
+package projet_alasca.equipements.generatriceGaz;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
@@ -11,7 +11,7 @@ import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
 import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
-import projet_alasca.equipements.panneauSolaire.PanneauSolaireI.PanneauSolaireState;
+import projet_alasca.equipements.generatriceGaz.GeneratriceGazI.GeneratriceGazState;
 import projet_alasca.equipements.ventilateur.VentilateurImplementationI.VentilateurMode;
 import projet_alasca.equipements.ventilateur.VentilateurImplementationI.VentilateurState;
 
@@ -20,8 +20,8 @@ import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
 import java.util.concurrent.ExecutionException;
 
-@RequiredInterfaces(required = {PanneauSolaireCI.class , ClocksServerCI.class})
-public class PanneauSolaireTester
+@RequiredInterfaces(required = {GeneratriceGazCI.class , ClocksServerCI.class})
+public class GeneratriceGazTester
 extends AbstractComponent
 {
 
@@ -34,52 +34,52 @@ extends AbstractComponent
 
 	/* when true, the component performs a unit test.						*/
 	protected final boolean	isUnitTest;				
-	protected PanneauSolaireOutboundPort psop;					
-	protected String 	panneauSolaireInboundPortURI;
+	protected GeneratriceGazOutboundPort generatriceGazOutboundPort;					
+	protected String 	generatriceGazInboundPortURI;
 
 
 
-	protected PanneauSolaireTester(boolean isUnitTest) throws Exception 
+	protected GeneratriceGazTester(boolean isUnitTest) throws Exception 
 	{
-		this(isUnitTest, PanneauSolaire.INBOUND_PORT_URI);
+		this(isUnitTest, GeneratriceGaz.INBOUND_PORT_URI);
 	}
 
-	public PanneauSolaireTester(boolean isUnitTest, String panneauSolaireInboundPortURI) throws Exception
+	public GeneratriceGazTester(boolean isUnitTest, String generatriceGazInboundPortURI) throws Exception
 	{
 		super(1, 0);
-		assert	panneauSolaireInboundPortURI != null &&
-				!panneauSolaireInboundPortURI.isEmpty() :
+		assert	generatriceGazInboundPortURI != null &&
+				!generatriceGazInboundPortURI.isEmpty() :
 					new PreconditionException(
-							"panneauSolaireInboundPortURI != null && "
-									+ "!panneauSolaireInboundPortURI.isEmpty()");
+							"generatriceGazInboundPortURI != null && "
+									+ "!generatriceGazInboundPortURI.isEmpty()");
 
 		this.isUnitTest = isUnitTest;
-		this.initialise(panneauSolaireInboundPortURI);
+		this.initialise(generatriceGazInboundPortURI);
 	}
 
 
-	protected	PanneauSolaireTester(
+	protected	GeneratriceGazTester(
 			boolean isUnitTest,
-			String panneauSolaireInboundPortURI,
+			String generatriceGazInboundPortURI,
 			String reflectionInboundPortURI
 			) throws Exception
 	{
 		super(reflectionInboundPortURI, 1, 0);
 
 		this.isUnitTest = isUnitTest;
-		this.initialise(panneauSolaireInboundPortURI);
+		this.initialise(generatriceGazInboundPortURI);
 	}
 
 	protected void		initialise(
-			String panneauSolaireInboundPortURI
+			String generatriceGazInboundPortURI
 			) throws Exception
 	{
-		this.panneauSolaireInboundPortURI = panneauSolaireInboundPortURI;
-		this.psop = new PanneauSolaireOutboundPort(this);
-		this.psop.publishPort();
+		this.generatriceGazInboundPortURI = generatriceGazInboundPortURI;
+		this.generatriceGazOutboundPort = new GeneratriceGazOutboundPort(this);
+		this.generatriceGazOutboundPort.publishPort();
 
 		if (VERBOSE) {
-			this.tracer.get().setTitle("Panneau solaire tester component");
+			this.tracer.get().setTitle("Generatrice Gaz tester component");
 			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 					Y_RELATIVE_POSITION);
 			this.toggleTracing();
@@ -95,7 +95,7 @@ extends AbstractComponent
 	{
 		this.logMessage("testGetState()... ");
 		try {
-			assert( this.psop.isOn());
+			assertEquals(GeneratriceGazState.OFF, this.generatriceGazOutboundPort.getState());
 		} catch (Exception e) {
 			this.logMessage("...KO.");
 			assertTrue(false);
@@ -104,16 +104,16 @@ extends AbstractComponent
 	}
 
 
-	public void			testSwitchState() throws Exception
+	public void			testTurnOnOff() throws Exception
 	{
-		this.logMessage("testSwitchState()... ");
-		if(this.psop.isOn()) {
-			this.psop.stopProduce();;
-			assert( this.psop.isOn());
+		this.logMessage("testTurnOnOff()... ");
+		if(this.generatriceGazOutboundPort.getState().equals(GeneratriceGazState.OFF)) {
+			this.generatriceGazOutboundPort.turnOn();
+			assertEquals(GeneratriceGazState.ON, this.generatriceGazOutboundPort.getState());
 		}
 		else {
-			this.psop.startProduce();
-			assert(!this.psop.isOn());
+			this.generatriceGazOutboundPort.turnOff();
+			assertEquals(GeneratriceGazState.OFF, this.generatriceGazOutboundPort.getState());
 		}
 		this.logMessage("...done.");
 	}
@@ -123,8 +123,7 @@ extends AbstractComponent
 	protected void			runAllTests() throws Exception
 	{
 		this.testGetState();
-		this.testSwitchState();
-		this.testSwitchState();
+		this.testTurnOnOff();
 	}
 
 	@Override
@@ -135,9 +134,9 @@ extends AbstractComponent
 
 		try {
 			this.doPortConnection(
-					this.psop.getPortURI(),
-					panneauSolaireInboundPortURI,
-					PanneauSolaireConnector.class.getCanonicalName());
+					this.generatriceGazOutboundPort.getPortURI(),
+					generatriceGazInboundPortURI,
+					GeneratriceGazConnector.class.getCanonicalName());
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
 		}
@@ -154,7 +153,7 @@ extends AbstractComponent
 					clocksServerOutboundPort.getPortURI(),
 					ClocksServer.STANDARD_INBOUNDPORT_URI,
 					ClocksServerConnector.class.getCanonicalName());
-			this.traceMessage("Ventilateur Tester gets the clock.\n");
+			this.traceMessage("Generatrice Gaz Tester gets the clock.\n");
 			AcceleratedClock ac =
 					clocksServerOutboundPort.getClock(
 							CVMIntegrationTest.CLOCK_URI);
@@ -162,18 +161,18 @@ extends AbstractComponent
 			clocksServerOutboundPort.unpublishPort();
 			clocksServerOutboundPort = null;
 
-			this.traceMessage("Panneau solaire Tester waits until start.\n");
+			this.traceMessage("Generatrice Gaz Tester waits until start.\n");
 			ac.waitUntilStart();
 		}
-		this.traceMessage("Panneau solaire  Tester starts the tests.\n");
+		this.traceMessage("Generatrice Gaz Tester starts the tests.\n");
 		this.runAllTests();
-		this.traceMessage("Panneau solaire  Tester ends.\n");
+		this.traceMessage("Generatrice Gaz Tester ends.\n");
 	}
 
 	@Override
 	public synchronized void	finalise() throws Exception
 	{
-		this.doPortDisconnection(this.psop.getPortURI());
+		this.doPortDisconnection(this.generatriceGazOutboundPort.getPortURI());
 		super.finalise();
 	}
 
@@ -181,7 +180,7 @@ extends AbstractComponent
 	public synchronized void	shutdown() throws ComponentShutdownException
 	{
 		try {
-			this.psop.unpublishPort();
+			this.generatriceGazOutboundPort.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}

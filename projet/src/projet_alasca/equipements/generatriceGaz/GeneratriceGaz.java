@@ -2,39 +2,85 @@ package projet_alasca.equipements.generatriceGaz;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
+import fr.sorbonne_u.exceptions.PreconditionException;
+import projet_alasca.equipements.batterie.Batterie;
+import projet_alasca.equipements.batterie.BatterieInboundPort;
+import projet_alasca.equipements.batterie.BatterieI.BatterieState;
 
 public class GeneratriceGaz extends AbstractComponent implements GeneratriceGazCI {
 
 
+	// Constants et variables : 
 
-	protected GeneratriceGazInboundPort generatriceGazInboundPort;
-	public static final String generatriceGazInboundPortURI = "generatriceGazInboundPortURI";
-	public static int X_RELATIVE_POSITION = 2;
-	public static int Y_RELATIVE_POSITION = 1;
-	public static boolean VERBOSE = false;
-	
-	protected State state = State.OFF;
-	protected Mode mode = Mode.LOW;
+	public static final String			INBOUND_PORT_URI =
+			"GENERATRICE-GAZ-INBOUND-PORT-URI";							
+	public static boolean	VERBOSE = false;
+
+	public static int	X_RELATIVE_POSITION = 0;
+	public static int	Y_RELATIVE_POSITION = 0;
+
+	public static final GeneratriceGazState	INITIAL_STATE  = GeneratriceGazState.OFF;
+
+	protected GeneratriceGazState	currentState;
 
 
-	protected GeneratriceGaz() {
-		super(1, 0);
-		try {
-			this.generatriceGazInboundPort = new GeneratriceGazInboundPort(generatriceGazInboundPortURI, this);
-			this.generatriceGazInboundPort.publishPort();
+	protected GeneratriceGazInboundPort	generatriceGazInboundPort;
 
-			if (GeneratriceGaz.VERBOSE) {
-				this.tracer.get().setTitle("GeneratriceGaz component");
-				this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
-						Y_RELATIVE_POSITION);
-				this.toggleTracing();
-			}
-		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
+
+
+
+	//---------------------------------------------------------
+	protected GeneratriceGaz()  throws Exception{
+		super(1,0);
+		this.initialise(INBOUND_PORT_URI);
 
 	}
+
+
+	protected	GeneratriceGaz(
+			String GeneratriceGazInboundPortURI)
+					throws Exception
+	{
+		super(1, 0);
+		this.initialise(GeneratriceGazInboundPortURI);
+	}
+
+	protected			GeneratriceGaz(
+			String GeneratriceGazInboundPortURI,
+			String reflectionInboundPortURI
+			) throws Exception
+	{
+		super(reflectionInboundPortURI, 1, 0);
+		this.initialise(GeneratriceGazInboundPortURI);
+	}
+
+
+
+
+	protected void	initialise(String generatriceGazInboundPortURI)
+			throws Exception
+	{
+		assert	generatriceGazInboundPortURI != null :
+			new PreconditionException(
+					"generatriceGazInboundPortURI != null");
+		assert	!generatriceGazInboundPortURI.isEmpty() :
+			new PreconditionException(
+					"!generatriceGazInboundPortURI.isEmpty()");
+
+		this.currentState = INITIAL_STATE;
+		this.generatriceGazInboundPort = new GeneratriceGazInboundPort(generatriceGazInboundPortURI, this);
+		this.generatriceGazInboundPort.publishPort();
+
+		if (GeneratriceGaz.VERBOSE) {
+			this.tracer.get().setTitle("Generatrice gaz component");
+			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
+					Y_RELATIVE_POSITION);
+			this.toggleTracing();
+		}
+	}
+
+
+
 	@Override
 	public synchronized void	shutdown() throws ComponentShutdownException
 	{
@@ -46,38 +92,37 @@ public class GeneratriceGaz extends AbstractComponent implements GeneratriceGazC
 		super.shutdown();
 	}
 	@Override
-	public State getState() throws Exception {
-		return this.state;
+	public GeneratriceGazState getState() throws Exception {
+		if(GeneratriceGaz.VERBOSE)
+			this.logMessage("Generatrice Gaz returns its state : " + currentState);
+		return currentState;
 	}
-	@Override
-	public Mode getMode() throws Exception {
-		return this.mode;
-	}
+
 	@Override
 	public void turnOn() throws Exception {
-		this.state = State.ON;
-		
+		if (GeneratriceGaz.VERBOSE) {
+			this.traceMessage("Generatrice Gaz is turned on.\n");
+		}
+
+		assert	this.getState() == GeneratriceGazState.OFF:
+			new PreconditionException("getState() == GeneratriceGazState.OFF");
+
+		this.currentState = GeneratriceGazState.ON;
+
 	}
 	@Override
 	public void turnOff() throws Exception {
-		this.state = State.OFF;
-		
+		if (GeneratriceGaz.VERBOSE) {
+			this.traceMessage("Generatrice Gaz is turned off.\n");
+		}
+
+		assert	this.getState() == GeneratriceGazState.ON:
+			new PreconditionException("getState() == GeneratriceGazState.ON");
+
+		this.currentState = GeneratriceGazState.OFF;
+
 	}
-	@Override
-	public void setHigh() throws Exception {
-		this.mode = Mode.HIGH;
-		
-	}
-	@Override
-	public void setLow() throws Exception {
-		this.mode = Mode.LOW;
-		
-	}
-	@Override
-	public void setMeddium() throws Exception {
-		this.mode = Mode.MEDDIUM;
-		
-	}
+
 
 
 }

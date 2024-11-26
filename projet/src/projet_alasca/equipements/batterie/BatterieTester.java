@@ -1,4 +1,4 @@
-package projet_alasca.equipements.panneauSolaire;
+package projet_alasca.equipements.batterie;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
@@ -11,17 +11,14 @@ import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
 import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
-import projet_alasca.equipements.panneauSolaire.PanneauSolaireI.PanneauSolaireState;
-import projet_alasca.equipements.ventilateur.VentilateurImplementationI.VentilateurMode;
-import projet_alasca.equipements.ventilateur.VentilateurImplementationI.VentilateurState;
+import projet_alasca.equipements.batterie.BatterieI.BatterieState;
+
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.concurrent.ExecutionException;
 
-@RequiredInterfaces(required = {PanneauSolaireCI.class , ClocksServerCI.class})
-public class PanneauSolaireTester
+@RequiredInterfaces(required = {BatterieCI.class , ClocksServerCI.class})
+public class BatterieTester
 extends AbstractComponent
 {
 
@@ -34,52 +31,52 @@ extends AbstractComponent
 
 	/* when true, the component performs a unit test.						*/
 	protected final boolean	isUnitTest;				
-	protected PanneauSolaireOutboundPort psop;					
-	protected String 	panneauSolaireInboundPortURI;
+	protected BatterieOutboundPort batterieOutboundPort;					
+	protected String 	batterieInboundPortURI;
 
 
 
-	protected PanneauSolaireTester(boolean isUnitTest) throws Exception 
+	protected BatterieTester(boolean isUnitTest) throws Exception 
 	{
-		this(isUnitTest, PanneauSolaire.INBOUND_PORT_URI);
+		this(isUnitTest, Batterie.INBOUND_PORT_URI);
 	}
 
-	public PanneauSolaireTester(boolean isUnitTest, String panneauSolaireInboundPortURI) throws Exception
+	public BatterieTester(boolean isUnitTest, String batterieInboundPortURI) throws Exception
 	{
 		super(1, 0);
-		assert	panneauSolaireInboundPortURI != null &&
-				!panneauSolaireInboundPortURI.isEmpty() :
+		assert	batterieInboundPortURI != null &&
+				!batterieInboundPortURI.isEmpty() :
 					new PreconditionException(
-							"panneauSolaireInboundPortURI != null && "
-									+ "!panneauSolaireInboundPortURI.isEmpty()");
+							"batterieInboundPortURI != null && "
+									+ "!batterieInboundPortURI.isEmpty()");
 
 		this.isUnitTest = isUnitTest;
-		this.initialise(panneauSolaireInboundPortURI);
+		this.initialise(batterieInboundPortURI);
 	}
 
 
-	protected	PanneauSolaireTester(
+	protected	BatterieTester(
 			boolean isUnitTest,
-			String panneauSolaireInboundPortURI,
+			String batterieInboundPortURI,
 			String reflectionInboundPortURI
 			) throws Exception
 	{
 		super(reflectionInboundPortURI, 1, 0);
 
 		this.isUnitTest = isUnitTest;
-		this.initialise(panneauSolaireInboundPortURI);
+		this.initialise(batterieInboundPortURI);
 	}
 
 	protected void		initialise(
-			String panneauSolaireInboundPortURI
+			String ventilateurInboundPortURI
 			) throws Exception
 	{
-		this.panneauSolaireInboundPortURI = panneauSolaireInboundPortURI;
-		this.psop = new PanneauSolaireOutboundPort(this);
-		this.psop.publishPort();
+		this.batterieInboundPortURI = ventilateurInboundPortURI;
+		this.batterieOutboundPort = new BatterieOutboundPort(this);
+		this.batterieOutboundPort.publishPort();
 
 		if (VERBOSE) {
-			this.tracer.get().setTitle("Panneau solaire tester component");
+			this.tracer.get().setTitle("Batterie tester component");
 			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 					Y_RELATIVE_POSITION);
 			this.toggleTracing();
@@ -95,7 +92,7 @@ extends AbstractComponent
 	{
 		this.logMessage("testGetState()... ");
 		try {
-			assert( this.psop.isOn());
+			assertEquals(BatterieState.PRODUCT, this.batterieOutboundPort.getState());
 		} catch (Exception e) {
 			this.logMessage("...KO.");
 			assertTrue(false);
@@ -104,16 +101,17 @@ extends AbstractComponent
 	}
 
 
+
 	public void			testSwitchState() throws Exception
 	{
 		this.logMessage("testSwitchState()... ");
-		if(this.psop.isOn()) {
-			this.psop.stopProduce();;
-			assert( this.psop.isOn());
+		if(this.batterieOutboundPort.getState().equals(BatterieState.PRODUCT)) {
+			this.batterieOutboundPort.swicthConsume();
+			assertEquals(BatterieState.CONSUME, this.batterieOutboundPort.getState());
 		}
 		else {
-			this.psop.startProduce();
-			assert(!this.psop.isOn());
+			this.batterieOutboundPort.switchProduct();;;
+			assertEquals(BatterieState.PRODUCT, this.batterieOutboundPort.getState());
 		}
 		this.logMessage("...done.");
 	}
@@ -123,7 +121,6 @@ extends AbstractComponent
 	protected void			runAllTests() throws Exception
 	{
 		this.testGetState();
-		this.testSwitchState();
 		this.testSwitchState();
 	}
 
@@ -135,9 +132,9 @@ extends AbstractComponent
 
 		try {
 			this.doPortConnection(
-					this.psop.getPortURI(),
-					panneauSolaireInboundPortURI,
-					PanneauSolaireConnector.class.getCanonicalName());
+					this.batterieOutboundPort.getPortURI(),
+					batterieInboundPortURI,
+					BatterieConnector.class.getCanonicalName());
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
 		}
@@ -154,7 +151,7 @@ extends AbstractComponent
 					clocksServerOutboundPort.getPortURI(),
 					ClocksServer.STANDARD_INBOUNDPORT_URI,
 					ClocksServerConnector.class.getCanonicalName());
-			this.traceMessage("Ventilateur Tester gets the clock.\n");
+			this.traceMessage("Batterie Tester gets the clock.\n");
 			AcceleratedClock ac =
 					clocksServerOutboundPort.getClock(
 							CVMIntegrationTest.CLOCK_URI);
@@ -162,18 +159,18 @@ extends AbstractComponent
 			clocksServerOutboundPort.unpublishPort();
 			clocksServerOutboundPort = null;
 
-			this.traceMessage("Panneau solaire Tester waits until start.\n");
+			this.traceMessage("Batterie Tester waits until start.\n");
 			ac.waitUntilStart();
 		}
-		this.traceMessage("Panneau solaire  Tester starts the tests.\n");
+		this.traceMessage("Batterie Tester starts the tests.\n");
 		this.runAllTests();
-		this.traceMessage("Panneau solaire  Tester ends.\n");
+		this.traceMessage("Batterie Tester ends.\n");
 	}
 
 	@Override
 	public synchronized void	finalise() throws Exception
 	{
-		this.doPortDisconnection(this.psop.getPortURI());
+		this.doPortDisconnection(this.batterieOutboundPort.getPortURI());
 		super.finalise();
 	}
 
@@ -181,7 +178,7 @@ extends AbstractComponent
 	public synchronized void	shutdown() throws ComponentShutdownException
 	{
 		try {
-			this.psop.unpublishPort();
+			this.batterieOutboundPort.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}

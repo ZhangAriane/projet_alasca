@@ -93,8 +93,6 @@ public class Refrigerateur extends AbstractComponent implements RefrigerateurUse
 	protected double							currentPowerLevel;
 	/** current state (on, off) of the refrigerator compressor.								*/
 	protected CompressorState refrigeratorCompressor;
-	/** current state (on, off) of the freezer compressor								*/
-	protected CompressorState freezerCompressor;
 
 	/** inbound port offering the <code>RefrigerateurUserCI</code> interface.		*/
 	protected RefrigerateurUserInboundPort				refrigerateurUserInboundPort;

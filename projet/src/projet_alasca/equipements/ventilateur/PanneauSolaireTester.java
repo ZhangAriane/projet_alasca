@@ -1,4 +1,4 @@
-package projet_alasca.equipements.panneauSolaire;
+package projet_alasca.equipements.ventilateur;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
@@ -11,16 +11,13 @@ import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import fr.sorbonne_u.utils.aclocks.ClocksServerCI;
 import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
-import projet_alasca.equipements.panneauSolaire.PanneauSolaireI.PanneauSolaireState;
 import projet_alasca.equipements.ventilateur.VentilateurImplementationI.VentilateurMode;
 import projet_alasca.equipements.ventilateur.VentilateurImplementationI.VentilateurState;
 
 import static org.junit.jupiter.api.Assertions.assertEquals;
-import static org.junit.jupiter.api.Assertions.assertThrows;
 import static org.junit.jupiter.api.Assertions.assertTrue;
-import java.util.concurrent.ExecutionException;
 
-@RequiredInterfaces(required = {PanneauSolaireCI.class , ClocksServerCI.class})
+@RequiredInterfaces(required = {VentilateurUserCI.class , ClocksServerCI.class})
 public class PanneauSolaireTester
 extends AbstractComponent
 {
@@ -34,52 +31,52 @@ extends AbstractComponent
 
 	/* when true, the component performs a unit test.						*/
 	protected final boolean	isUnitTest;				
-	protected PanneauSolaireOutboundPort psop;					
-	protected String 	panneauSolaireInboundPortURI;
+	protected VentilateurOutboundPort vop;					
+	protected String 	ventilateurInboundPortURI;
 
 
 
 	protected PanneauSolaireTester(boolean isUnitTest) throws Exception 
 	{
-		this(isUnitTest, PanneauSolaire.INBOUND_PORT_URI);
+		this(isUnitTest, Ventilateur.INBOUND_PORT_URI);
 	}
 
-	public PanneauSolaireTester(boolean isUnitTest, String panneauSolaireInboundPortURI) throws Exception
+	public PanneauSolaireTester(boolean isUnitTest, String ventilateurInboundPortURI) throws Exception
 	{
 		super(1, 0);
-		assert	panneauSolaireInboundPortURI != null &&
-				!panneauSolaireInboundPortURI.isEmpty() :
+		assert	ventilateurInboundPortURI != null &&
+				!ventilateurInboundPortURI.isEmpty() :
 					new PreconditionException(
-							"panneauSolaireInboundPortURI != null && "
-									+ "!panneauSolaireInboundPortURI.isEmpty()");
+							"ventilateurInboundPortURI != null && "
+									+ "!ventilateurInboundPortURI.isEmpty()");
 
 		this.isUnitTest = isUnitTest;
-		this.initialise(panneauSolaireInboundPortURI);
+		this.initialise(ventilateurInboundPortURI);
 	}
 
 
 	protected	PanneauSolaireTester(
 			boolean isUnitTest,
-			String panneauSolaireInboundPortURI,
+			String ventilateurInboundPortURI,
 			String reflectionInboundPortURI
 			) throws Exception
 	{
 		super(reflectionInboundPortURI, 1, 0);
 
 		this.isUnitTest = isUnitTest;
-		this.initialise(panneauSolaireInboundPortURI);
+		this.initialise(ventilateurInboundPortURI);
 	}
 
 	protected void		initialise(
-			String panneauSolaireInboundPortURI
+			String ventilateurInboundPortURI
 			) throws Exception
 	{
-		this.panneauSolaireInboundPortURI = panneauSolaireInboundPortURI;
-		this.psop = new PanneauSolaireOutboundPort(this);
-		this.psop.publishPort();
+		this.ventilateurInboundPortURI = ventilateurInboundPortURI;
+		this.vop = new VentilateurOutboundPort(this);
+		this.vop.publishPort();
 
 		if (VERBOSE) {
-			this.tracer.get().setTitle("Panneau solaire tester component");
+			this.tracer.get().setTitle("Ventilateur tester component");
 			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 					Y_RELATIVE_POSITION);
 			this.toggleTracing();
@@ -95,7 +92,7 @@ extends AbstractComponent
 	{
 		this.logMessage("testGetState()... ");
 		try {
-			assert( this.psop.isOn());
+			assertEquals(VentilateurState.OFF, this.vop.getState());
 		} catch (Exception e) {
 			this.logMessage("...KO.");
 			assertTrue(false);
@@ -103,28 +100,57 @@ extends AbstractComponent
 		this.logMessage("...done.");
 	}
 
-
-	public void			testSwitchState() throws Exception
+	public void			testGetMode()
 	{
-		this.logMessage("testSwitchState()... ");
-		if(this.psop.isOn()) {
-			this.psop.stopProduce();;
-			assert( this.psop.isOn());
-		}
-		else {
-			this.psop.startProduce();
-			assert(!this.psop.isOn());
+		this.logMessage("testGetMode()... ");
+		try {
+			assertEquals(VentilateurMode.LOW, this.vop.getMode());
+		} catch (Exception e) {
+			assertTrue(false);
 		}
 		this.logMessage("...done.");
 	}
 
 
+	public void			testTurnOnOff() throws Exception
+	{
+		this.logMessage("testTurnOnOff()... ");
+		if(this.vop.getState().equals(VentilateurState.OFF)) {
+			this.vop.turnOn();
+			assertEquals(VentilateurState.ON, this.vop.getState());
+		}
+		else {
+			this.vop.turnOff();
+			assertEquals(VentilateurState.OFF, this.vop.getState());
+		}
+		this.logMessage("...done.");
+	}
+
+
+	public void			testSetLowHigh() throws Exception
+	{
+		this.logMessage("testSetLowHigh()... ");
+
+		if(this.vop.getMode().equals(VentilateurMode.LOW)) {
+			this.vop.setHigh();
+			assertEquals(VentilateurState.ON, this.vop.getState());
+			assertEquals(VentilateurMode.HIGH, this.vop.getMode());
+		}
+		else {
+			this.vop.setLow();
+			assertEquals(VentilateurState.ON, this.vop.getState());
+			assertEquals(VentilateurMode.LOW, this.vop.getMode());
+		}
+
+		this.logMessage("...done.");
+	}
 
 	protected void			runAllTests() throws Exception
 	{
 		this.testGetState();
-		this.testSwitchState();
-		this.testSwitchState();
+		this.testGetMode();
+		this.testTurnOnOff();
+		this.testSetLowHigh();
 	}
 
 	@Override
@@ -135,9 +161,9 @@ extends AbstractComponent
 
 		try {
 			this.doPortConnection(
-					this.psop.getPortURI(),
-					panneauSolaireInboundPortURI,
-					PanneauSolaireConnector.class.getCanonicalName());
+					this.vop.getPortURI(),
+					ventilateurInboundPortURI,
+					VentilateurConnector.class.getCanonicalName());
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
 		}
@@ -173,7 +199,7 @@ extends AbstractComponent
 	@Override
 	public synchronized void	finalise() throws Exception
 	{
-		this.doPortDisconnection(this.psop.getPortURI());
+		this.doPortDisconnection(this.vop.getPortURI());
 		super.finalise();
 	}
 
@@ -181,7 +207,7 @@ extends AbstractComponent
 	public synchronized void	shutdown() throws ComponentShutdownException
 	{
 		try {
-			this.psop.unpublishPort();
+			this.vop.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}
