@@ -27,16 +27,24 @@ public class RefrigerateurUserInboundPort extends		AbstractInboundPort implement
 		}
 
 	@Override
-	public double getTargetTemperature() throws Exception {
-		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getTargetTemperature());
+	public double getRefrigeratorTargetTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getRefrigeratorTargetTemperature());
 	}
-
 
 	@Override
-	public double getCurrentTemperature() throws Exception {
-		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getCurrentTemperature());
+	public double getFreezerTargetTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getFreezerTargetTemperature());
 	}
 
+	@Override
+	public double getRefrigeratorCurrentTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getRefrigeratorCurrentTemperature());
+	}
+
+	@Override
+	public double getFreezerCurrentTemperature() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurTemperatureI)o).getFreezerCurrentTemperature());
+	}
 
 	@Override
 	public boolean on() throws Exception {
@@ -61,14 +69,20 @@ public class RefrigerateurUserInboundPort extends		AbstractInboundPort implement
 }
 
 	@Override
-	public void setTargetTemperature(double target) throws Exception {
+	public void setRefrigeratorTargetTemperature(double target) throws Exception {
 		this.getOwner().handleRequest(
-				o -> {	((RefrigerateurUserI)o).setTargetTemperature(target);;
+				o -> {	((RefrigerateurUserI)o).setRefrigeratorTargetTemperature(target);;
 						return null;
 				});
 }
 
-
+	@Override
+	public void setFreezerTargetTemperature(double target) throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((RefrigerateurUserI)o).setFreezerTargetTemperature(target);;
+						return null;
+				});
+}
 
 	@Override
 	public double getMaxPowerLevel() throws Exception {
@@ -89,8 +103,51 @@ public class RefrigerateurUserInboundPort extends		AbstractInboundPort implement
 
 		return this.getOwner().handleRequest(o -> ((RefrigerateurExternalControlI)o).getCurrentPowerLevel());
 	}
+	
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((RefrigerateurExternalControlI)o).switchOnRefrigeratorCompressor();;
+						return null;
+				});
+		
+	}
 
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((RefrigerateurExternalControlI)o).switchOffRefrigeratorCompressor();;
+						return null;
+				});
+		
+	}
 
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((RefrigerateurExternalControlI)o).switchOnFreezerCompressor();;
+						return null;
+				});
+		
+	}
 
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((RefrigerateurExternalControlI)o).switchOffFreezerCompressor();;
+						return null;
+				});
+		
+	}
+
+	@Override
+	public boolean onRefrigeratorCompressor() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurExternalControlI)o).onRefrigeratorCompressor());
+	}
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return this.getOwner().handleRequest(o -> ((RefrigerateurExternalControlI)o).onFreezerCompressor());
+	}
 
 }

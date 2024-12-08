@@ -54,6 +54,9 @@ import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import projet_alasca.equipements.refrigerateur.mil.events.Cool;
 import projet_alasca.equipements.refrigerateur.mil.events.DoNotCool;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotFreeze;
+import projet_alasca.equipements.refrigerateur.mil.events.Freeze;
+import projet_alasca.equipements.refrigerateur.mil.events.SetPowerCongelateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
@@ -115,7 +118,7 @@ public class			RunRefrigerateurUnitaryMILSimulation
 			// map that will contain the atomic model descriptors to construct
 			// the simulation architecture
 			Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+					new HashMap<>();
 
 			// the heater models simulating its electricity consumption, its
 			// temperatures and the external temperature are atomic HIOA models
@@ -141,6 +144,16 @@ public class			RunRefrigerateurUnitaryMILSimulation
 							ExternalTemperatureModel.URI,
 							TimeUnit.HOURS,
 							null));
+
+			atomicModelDescriptors.put(
+					CongelateurTemperatureModel.URI,
+					AtomicHIOA_Descriptor.create(
+							CongelateurTemperatureModel.class,
+							CongelateurTemperatureModel.URI,
+							TimeUnit.HOURS,
+							null));
+
+
 			// the heater unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
@@ -154,7 +167,7 @@ public class			RunRefrigerateurUnitaryMILSimulation
 			// map that will contain the coupled model descriptors to construct
 			// the simulation architecture
 			Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-																new HashMap<>();
+					new HashMap<>();
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
@@ -162,105 +175,148 @@ public class			RunRefrigerateurUnitaryMILSimulation
 			submodels.add(RefrigerateurTemperatureModel.URI);
 			submodels.add(ExternalTemperatureModel.URI);
 			submodels.add(RefrigerateurUnitTesterModel.URI);
-			
+			submodels.add(CongelateurTemperatureModel.URI);
+
 			// event exchanging connections between exporting and importing
 			// models
 			Map<EventSource,EventSink[]> connections =
-										new HashMap<EventSource,EventSink[]>();
+					new HashMap<EventSource,EventSink[]>();
 
-			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI,
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI,
 									SetPowerRefrigerateur.class),
-					new EventSink[] {
-							new EventSink(RefrigerateurElectricityModel.URI,
-										  SetPowerRefrigerateur.class)
-					});
-			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI,
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											SetPowerRefrigerateur.class)
+							});
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI,
 									SwitchOnRefrigerateur.class),
-					new EventSink[] {
-							new EventSink(RefrigerateurElectricityModel.URI,
-										  SwitchOnRefrigerateur.class)
-					});
-			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI,
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											SwitchOnRefrigerateur.class)
+							});
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI,
 									SwitchOffRefrigerateur.class),
-					new EventSink[] {
-							new EventSink(RefrigerateurElectricityModel.URI,
-									SwitchOffRefrigerateur.class),
-							new EventSink(RefrigerateurTemperatureModel.URI,
-									SwitchOffRefrigerateur.class)
-					});
-			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI, Cool.class),
-					new EventSink[] {
-							new EventSink(RefrigerateurElectricityModel.URI,
-										  Cool.class),
-							new EventSink(RefrigerateurTemperatureModel.URI,
-									Cool.class)
-					});
-			connections.put(
-					new EventSource(RefrigerateurUnitTesterModel.URI, DoNotCool.class),
-					new EventSink[] {
-							new EventSink(RefrigerateurElectricityModel.URI,
-									DoNotCool.class),
-							new EventSink(RefrigerateurTemperatureModel.URI,
-									DoNotCool.class)
-					});
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											SwitchOffRefrigerateur.class),
+									new EventSink(RefrigerateurTemperatureModel.URI,
+											SwitchOffRefrigerateur.class)
+							});
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI, Cool.class),
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											Cool.class),
+									new EventSink(RefrigerateurTemperatureModel.URI,
+											Cool.class)
+							});
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI, DoNotCool.class),
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											DoNotCool.class),
+									new EventSink(RefrigerateurTemperatureModel.URI,
+											DoNotCool.class)
+							});
 
-			// variable bindings between exporting and importing models
-			Map<VariableSource,VariableSink[]> bindings =
-								new HashMap<VariableSource,VariableSink[]>();
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI,
+									SetPowerCongelateur.class),
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											SetPowerCongelateur.class)
+							});
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI, Freeze.class),
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											Freeze.class),
+									new EventSink(CongelateurTemperatureModel.URI,
+											Freeze.class)
+							});
+					connections.put(
+							new EventSource(RefrigerateurUnitTesterModel.URI, DoNotFreeze.class),
+							new EventSink[] {
+									new EventSink(RefrigerateurElectricityModel.URI,
+											DoNotFreeze.class),
+									new EventSink(CongelateurTemperatureModel.URI,
+											DoNotFreeze.class)
+							});
 
-			bindings.put(new VariableSource("externalTemperature",
-											Double.class,
-											ExternalTemperatureModel.URI),
-						 new VariableSink[] {
-								 new VariableSink("externalTemperature",
-										 		  Double.class,
-										 		  RefrigerateurTemperatureModel.URI)
-						 });
-			bindings.put(new VariableSource("currentCoolingPower",
-											Double.class,
-											RefrigerateurElectricityModel.URI),
-						 new VariableSink[] {
-								 new VariableSink("currentCoolingPower",
-										 		  Double.class,
-										 		  RefrigerateurTemperatureModel.URI)
-						 });
+					// variable bindings between exporting and importing models
+					Map<VariableSource,VariableSink[]> bindings =
+							new HashMap<VariableSource,VariableSink[]>();
 
-			// coupled model descriptor
-			coupledModelDescriptors.put(
-					RefrigerateurCoupledModel.URI,
-					new CoupledHIOA_Descriptor(
-							RefrigerateurCoupledModel.class,
-							RefrigerateurCoupledModel.URI,
-							submodels,
-							null,
-							null,
-							connections,
-							null,
-							null,
-							null,
-							bindings));
+							bindings.put(new VariableSource("externalTemperature",
+									Double.class,
+									ExternalTemperatureModel.URI),
+									new VariableSink[] {
+											new VariableSink("externalTemperature",
+													Double.class,
+													RefrigerateurTemperatureModel.URI)
+							});
+							bindings.put(new VariableSource("currentCoolingPower",
+									Double.class,
+									RefrigerateurElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentCoolingPower",
+													Double.class,
+													RefrigerateurTemperatureModel.URI)
+							});
+							
+							bindings.put(new VariableSource("externalTemperature",
+									Double.class,
+									ExternalTemperatureModel.URI),
+									new VariableSink[] {
+											new VariableSink("externalTemperature",
+													Double.class,
+													CongelateurTemperatureModel.URI)
+							});
+							
+							bindings.put(new VariableSource("currentFreezingPower",
+									Double.class,
+									RefrigerateurElectricityModel.URI),
+									new VariableSink[] {
+											new VariableSink("currentFreezingPower",
+													Double.class,
+													CongelateurTemperatureModel.URI)
+							});
 
-			// simulation architecture
-			ArchitectureI architecture =
-					new Architecture(
-							RefrigerateurCoupledModel.URI,
-							atomicModelDescriptors,
-							coupledModelDescriptors,
-							TimeUnit.HOURS);
+							// coupled model descriptor
+							coupledModelDescriptors.put(
+									RefrigerateurCoupledModel.URI,
+									new CoupledHIOA_Descriptor(
+											RefrigerateurCoupledModel.class,
+											RefrigerateurCoupledModel.URI,
+											submodels,
+											null,
+											null,
+											connections,
+											null,
+											null,
+											null,
+											bindings));
 
-			// create the simulator from the simulation architecture
-			SimulatorI se = architecture.constructSimulator();
-			// this add additional time at each simulation step in
-			// standard simulations (useful when debugging)
-			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
-			// run a simulation with the simulation beginning at 0.0 and
-			// ending at 24.0
-			se.doStandAloneSimulation(0.0, 24.0);
-			System.exit(0);
+							// simulation architecture
+							ArchitectureI architecture =
+									new Architecture(
+											RefrigerateurCoupledModel.URI,
+											atomicModelDescriptors,
+											coupledModelDescriptors,
+											TimeUnit.HOURS);
+
+							// create the simulator from the simulation architecture
+							SimulatorI se = architecture.constructSimulator();
+							// this add additional time at each simulation step in
+							// standard simulations (useful when debugging)
+							SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
+							// run a simulation with the simulation beginning at 0.0 and
+							// ending at 24.0
+							se.doStandAloneSimulation(0.0, 24.0);
+							System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

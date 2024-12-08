@@ -40,6 +40,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import projet_alasca.equipements.refrigerateur.mil.RefrigerateurElectricityModel;
+import projet_alasca.equipements.refrigerateur.mil.RefrigerateurElectricityModel.CompressorState;
 import projet_alasca.equipements.refrigerateur.mil.RefrigerateurElectricityModel.State;
 
 // -----------------------------------------------------------------------------
@@ -232,10 +233,15 @@ implements	RefrigerateurEventI
 						+ "RefrigerateurElectricityModel");
 
 		RefrigerateurElectricityModel refrigerator = (RefrigerateurElectricityModel)model;
-		assert	refrigerator.getState() == State.COOLING :
+		assert	refrigerator.getState() == State.ON :
 				new AssertionError(
 						"model not in the right state, should be "
-						+ "State.COOLING but is " + refrigerator.getState());
+						+ "State.ON but is " + refrigerator.getState());
+		assert	refrigerator.getRefrigeratorCompressorState() == CompressorState.ON :
+			new AssertionError(
+					"model not in the right state, should be "
+					+ "CompressorState.ON but is " + refrigerator.getRefrigeratorCompressorState());
+		
 		refrigerator.setCurrentCoolingPower(this.powerValue.getPower(),
 									  this.getTimeOfOccurrence());
 	}

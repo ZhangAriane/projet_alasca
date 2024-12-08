@@ -29,17 +29,30 @@ public class RefrigerateurExternalControlInboundPort extends		AbstractInboundPor
 	}
 
 	@Override
-	public double getTargetTemperature() throws Exception {
+	public double getRefrigeratorTargetTemperature() throws Exception {
 		return this.getOwner().handleRequest(
-				o -> ((RefrigerateurTemperatureI)o).getTargetTemperature());
+				o -> ((RefrigerateurTemperatureI)o).getRefrigeratorTargetTemperature());
 	
 	}
 
+	@Override
+	public double getFreezerTargetTemperature() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((RefrigerateurTemperatureI)o).getFreezerTargetTemperature());
+	
+	}
 
 	@Override
-	public double getCurrentTemperature() throws Exception {
+	public double getRefrigeratorCurrentTemperature() throws Exception {
 		return this.getOwner().handleRequest(
-				o -> ((RefrigerateurTemperatureI)o).getCurrentTemperature());
+				o -> ((RefrigerateurTemperatureI)o).getRefrigeratorCurrentTemperature());
+	
+	}
+
+	@Override
+	public double getFreezerCurrentTemperature() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((RefrigerateurTemperatureI)o).getFreezerCurrentTemperature());
 	
 	}
 
@@ -67,5 +80,59 @@ public class RefrigerateurExternalControlInboundPort extends		AbstractInboundPor
 				o -> ((RefrigerateurExternalControlI)o).getCurrentPowerLevel());
 	}
 	
+
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {((RefrigerateurExternalControlI)o).switchOnRefrigeratorCompressor();
+				return null;
+				});
+
+	}
+
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {((RefrigerateurExternalControlI)o).switchOffRefrigeratorCompressor();
+				return null;
+				});
+
+	}
+
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {((RefrigerateurExternalControlI)o).switchOnFreezerCompressor();
+				return null;
+				});
+
+	}
+
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		this.getOwner().handleRequest(
+				o -> {((RefrigerateurExternalControlI)o).switchOffFreezerCompressor();
+				return null;
+				});
+
+	}
+
+
+	@Override
+	public boolean onRefrigeratorCompressor() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((RefrigerateurExternalControlI)o).onRefrigeratorCompressor());
+	}
+
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((RefrigerateurExternalControlI)o).onFreezerCompressor());
+	}
+
 	
 }

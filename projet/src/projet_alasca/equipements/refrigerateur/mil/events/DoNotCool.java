@@ -133,13 +133,20 @@ implements	RefrigerateurEventI
 
 		if (model instanceof RefrigerateurElectricityModel) {
 			RefrigerateurElectricityModel refrigerator = (RefrigerateurElectricityModel)model;
-			assert	refrigerator.getState() == RefrigerateurElectricityModel.State.COOLING:
+			assert	refrigerator.getState() == RefrigerateurElectricityModel.State.ON:
 				new AssertionError(
 						"model not in the right state, should be "
 								+ "RefrigerateurElectricityModel.State.HEATING but is "
 								+ refrigerator.getState());
-			refrigerator.setState(RefrigerateurElectricityModel.State.ON,
-							this.getTimeOfOccurrence());
+			
+			assert	refrigerator.getRefrigeratorCompressorState() == RefrigerateurElectricityModel.CompressorState.ON:
+				new AssertionError(
+						"model not in the right congelator compressor state, should be "
+								+ "RefrigerateurElectricityModel.CompressorState.ON but is "
+								+ refrigerator.getState());
+			
+			refrigerator.setRefrigeratorCompresorState(RefrigerateurElectricityModel.CompressorState.OFF,
+					this.getTimeOfOccurrence());						
 		} else {
 			RefrigerateurTemperatureModel refrigerator = (RefrigerateurTemperatureModel)model;
 			assert	refrigerator.getState() == RefrigerateurTemperatureModel.State.COOLING:

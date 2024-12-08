@@ -19,16 +19,27 @@ public class RefrigerateurUserOutboundPort extends		AbstractOutboundPort impleme
 	}
 
 	@Override
-	public double getTargetTemperature() throws Exception {
+	public double getRefrigeratorTargetTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.getConnector()).getTargetTemperature();
+		return ((RefrigerateurUserCI)this.getConnector()).getRefrigeratorTargetTemperature();
 	}
 
+	@Override
+	public double getFreezerTargetTemperature() throws Exception {
+
+		return ((RefrigerateurUserCI)this.getConnector()).getFreezerTargetTemperature();
+	}
 
 	@Override
-	public double getCurrentTemperature() throws Exception {
+	public double getRefrigeratorCurrentTemperature() throws Exception {
 
-		return ((RefrigerateurUserCI)this.getConnector()).getCurrentTemperature();
+		return ((RefrigerateurUserCI)this.getConnector()).getRefrigeratorCurrentTemperature();
+	}
+
+	@Override
+	public double getFreezerCurrentTemperature() throws Exception {
+
+		return ((RefrigerateurUserCI)this.getConnector()).getFreezerCurrentTemperature();
 	}
 
 	@Override
@@ -50,11 +61,16 @@ public class RefrigerateurUserOutboundPort extends		AbstractOutboundPort impleme
 	}
 
 	@Override
-	public void setTargetTemperature(double target) throws Exception {
+	public void setRefrigeratorTargetTemperature(double target) throws Exception {
 
-		((RefrigerateurUserCI)this.getConnector()).setTargetTemperature(target);
+		((RefrigerateurUserCI)this.getConnector()).setRefrigeratorTargetTemperature(target);
 	}
 
+	@Override
+	public void setFreezerTargetTemperature(double target) throws Exception {
+
+		((RefrigerateurUserCI)this.getConnector()).setFreezerTargetTemperature(target);
+	}
 
 	@Override
 	public double getMaxPowerLevel() throws Exception {
@@ -74,5 +90,38 @@ public class RefrigerateurUserOutboundPort extends		AbstractOutboundPort impleme
 		return ((RefrigerateurUserCI)this.getConnector()).getCurrentPowerLevel();
 	}
 	
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		((RefrigerateurUserCI)this.getConnector()).switchOnRefrigeratorCompressor();
+
+	}
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		((RefrigerateurUserCI)this.getConnector()).switchOffRefrigeratorCompressor();
+
+	}
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		((RefrigerateurUserCI)this.getConnector()).switchOnFreezerCompressor();
+
+	}
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		((RefrigerateurUserCI)this.getConnector()).switchOffFreezerCompressor();
+
+	}
+
+	@Override
+	public boolean onRefrigeratorCompressor() throws Exception {
+		return ((RefrigerateurUserCI)this.getConnector()).onRefrigeratorCompressor();
+	}
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return ((RefrigerateurUserCI)this.getConnector()).onFreezerCompressor();
+	}
 
 }

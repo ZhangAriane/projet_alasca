@@ -59,6 +59,9 @@ import projet_alasca.equipements.refrigerateur.mil.events.RefrigerateurEventI;
 import projet_alasca.equipements.refrigerateur.mil.events.SetPowerRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOffRefrigerateur;
 import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
+import projet_alasca.equipements.refrigerateur.mil.events.Freeze;
+import projet_alasca.equipements.refrigerateur.mil.events.DoNotFreeze;
+import projet_alasca.equipements.refrigerateur.mil.events.SetPowerCongelateur;
 
 // -----------------------------------------------------------------------------
 /**
@@ -123,12 +126,17 @@ import projet_alasca.equipements.refrigerateur.mil.events.SwitchOnRefrigerateur;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 @ModelExternalEvents(imported = {SwitchOnRefrigerateur.class,
-								 SwitchOffRefrigerateur.class,
-								 SetPowerRefrigerateur.class,
-								 Cool.class,
-								 DoNotCool.class})
+		SwitchOffRefrigerateur.class,
+		SetPowerRefrigerateur.class,
+		Cool.class,
+		DoNotCool.class,
+		SetPowerCongelateur.class,
+		Freeze.class,
+		DoNotFreeze.class,
+		})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
 @ModelExportedVariable(name = "currentCoolingPower", type = Double.class)
+@ModelExportedVariable(name = "currentFreezingPower", type = Double.class)
 //-----------------------------------------------------------------------------
 public class			RefrigerateurElectricityModel
 extends		AtomicHIOA
@@ -148,9 +156,12 @@ extends		AtomicHIOA
 	public static enum	State {
 		/** heater is on but not heating.									*/
 		ON,
-		/** heater is on and heating.										*/
-		COOLING,
 		/** heater is off.													*/
+		OFF
+	}
+
+	public static enum CompressorState{
+		ON,
 		OFF
 	}
 
@@ -161,12 +172,14 @@ extends		AtomicHIOA
 	private static final long	serialVersionUID = 1L;
 	/** URI for a model; works when only one instance is created.			*/
 	public static final String	URI = RefrigerateurElectricityModel.class.
-															getSimpleName();
+			getSimpleName();
 
 	/** power of the heater in watts.										*/
 	protected static double		NOT_COOLING_POWER = 22.0;
 	/** max power of the heater in watts.										*/
 	public static double		MAX_COOLING_POWER = 2000.0;
+	protected static double		NOT_FREEZING_POWER = 22.0;
+	public static double		MAX_FREEZING_POWER = 2000.0;
 	/** nominal tension (in Volts) of the heater.							*/
 	protected static double		TENSION = 220.0;
 
@@ -182,6 +195,9 @@ extends		AtomicHIOA
 	/** total consumption of the heater during the simulation in kwh.		*/
 	protected double			totalConsumption;
 
+	protected CompressorState refrigeratorCompressor;
+	protected CompressorState congelatorCompressor;
+
 	// -------------------------------------------------------------------------
 	// HIOA model variables
 	// -------------------------------------------------------------------------
@@ -190,7 +206,10 @@ extends		AtomicHIOA
 	 *  {@code HeaterElectricityModel.MAX_HEATING_POWER}.					*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double>	currentCoolingPower =
-														new Value<Double>(this);
+	new Value<Double>(this);
+	@ExportedVariable(type = Double.class)
+	protected final Value<Double>	currentFreezingPower =
+	new Value<Double>(this);
 	/** current intensity in amperes; intensity is power/tension.			*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double>	currentIntensity = new Value<Double>(this);
@@ -213,52 +232,69 @@ extends		AtomicHIOA
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	glassBoxInvariants(
-		RefrigerateurElectricityModel instance
-		)
+			RefrigerateurElectricityModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new AssertionError("Precondition violation: instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					NOT_COOLING_POWER >= 0.0,
-					RefrigerateurElectricityModel.class,
-					instance,
-					"NOT_COOLING_POWER >= 0.0");
+				NOT_COOLING_POWER >= 0.0,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"NOT_COOLING_POWER >= 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					MAX_COOLING_POWER > NOT_COOLING_POWER,
-					RefrigerateurElectricityModel.class,
-					instance,
-					"MAX_COOLING_POWER > NOT_COOLING_POWER");
+				MAX_COOLING_POWER > NOT_COOLING_POWER,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"MAX_COOLING_POWER > NOT_COOLING_POWER");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					TENSION > 0.0,
-					RefrigerateurElectricityModel.class,
-					instance,
-					"TENSION > 0.0");
+				TENSION > 0.0,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"TENSION > 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					instance.currentState != null,
-					RefrigerateurElectricityModel.class,
-					instance,
-					"currentState != null");
+				instance.currentState != null,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"currentState != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					instance.totalConsumption >= 0.0,
-					RefrigerateurElectricityModel.class,
-					instance,
-					"totalConsumption >= 0.0");
+				instance.totalConsumption >= 0.0,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"totalConsumption >= 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!instance.currentCoolingPower.isInitialised() ||
-								instance.currentCoolingPower.getValue() >= 0.0,
-					RefrigerateurElectricityModel.class,
-					instance,
-					"!currentCoolingPower.isInitialised() || "
-							+ "currentCoolingPower.getValue() >= 0.0");
+				!instance.currentCoolingPower.isInitialised() ||
+				instance.currentCoolingPower.getValue() >= 0.0,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"!currentCoolingPower.isInitialised() || "
+						+ "currentCoolingPower.getValue() >= 0.0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!instance.currentIntensity.isInitialised() ||
-									instance.currentIntensity.getValue() >= 0.0,
-					RefrigerateurElectricityModel.class,
-					instance,
-					"!currentIntensity.isInitialised() || "
-							+ "currentIntensity.getValue() >= 0.0");
+				!instance.currentIntensity.isInitialised() ||
+				instance.currentIntensity.getValue() >= 0.0,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"!currentIntensity.isInitialised() || "
+						+ "currentIntensity.getValue() >= 0.0");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+				!instance.currentFreezingPower.isInitialised() ||
+				instance.currentFreezingPower.getValue() >= 0.0,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"!currentFreezingPower.isInitialised() || "
+						+ "currentFreezingPower.getValue() >= 0.0");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+				NOT_FREEZING_POWER >= 0.0,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"NOT_FREEZING_POWER >= 0.0");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+				MAX_FREEZING_POWER > NOT_COOLING_POWER,
+				RefrigerateurElectricityModel.class,
+				instance,
+				"MAX_FREEZING_POWER > NOT_FREEZING_POWER");
 		return ret;
 	}
 
@@ -276,11 +312,11 @@ extends		AtomicHIOA
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	blackBoxInvariants(
-		RefrigerateurElectricityModel instance
-		)
+			RefrigerateurElectricityModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new AssertionError("Precondition violation: instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
@@ -290,23 +326,38 @@ extends		AtomicHIOA
 				"URI != null && !URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				NOT_COOLING_POWER_RUNPNAME != null &&
-									!NOT_COOLING_POWER_RUNPNAME.isEmpty(),
+				!NOT_COOLING_POWER_RUNPNAME.isEmpty(),
 				RefrigerateurElectricityModel.class,
 				instance,
 				"NOT_COOLING_POWER_RUNPNAME != null && "
-				+ "!NOT_COOLING_POWER_RUNPNAME.isEmpty()");
+						+ "!NOT_COOLING_POWER_RUNPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MAX_COOLING_POWER_RUNPNAME != null &&
-									!MAX_COOLING_POWER_RUNPNAME.isEmpty(),
+				!MAX_COOLING_POWER_RUNPNAME.isEmpty(),
 				RefrigerateurElectricityModel.class,
 				instance,
 				"MAX_COOLING_POWER_RUNPNAME != null && "
-				+ "!MAX_COOLING_POWER_RUNPNAME.isEmpty()");
+						+ "!MAX_COOLING_POWER_RUNPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				TENSION_RUNPNAME != null && !TENSION_RUNPNAME.isEmpty(),
 				RefrigerateurElectricityModel.class,
 				instance,
 				"TENSION_RUNPNAME != null && !TENSION_RUNPNAME.isEmpty()");
+
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				NOT_FREEZING_POWER_RUNPNAME != null &&
+				!NOT_FREEZING_POWER_RUNPNAME.isEmpty(),
+				RefrigerateurElectricityModel.class,
+				instance,
+				"NOT_FREEZING_POWER_RUNPNAME != null && "
+						+ "!NOT_FREEZING_POWER_RUNPNAME.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MAX_FREEZING_POWER_RUNPNAME != null &&
+				!MAX_FREEZING_POWER_RUNPNAME.isEmpty(),
+				RefrigerateurElectricityModel.class,
+				instance,
+				"MAX_FREEZING_POWER_RUNPNAME != null && "
+						+ "!MAX_FREEZING_POWER_RUNPNAME.isEmpty()");
 		return ret;
 	}
 
@@ -337,18 +388,18 @@ extends		AtomicHIOA
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				RefrigerateurElectricityModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		AtomicSimulatorI simulationEngine
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			AtomicSimulatorI simulationEngine
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.getSimulationEngine().setLogger(new StandardLogger());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
 	}
 
 	// -------------------------------------------------------------------------
@@ -377,9 +428,9 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
 	}
 
 	/**
@@ -416,10 +467,10 @@ extends		AtomicHIOA
 	{
 		assert	newPower >= 0.0 &&
 				newPower <= RefrigerateurElectricityModel.MAX_COOLING_POWER :
-			new AssertionError(
-					"Precondition violation: newPower >= 0.0 && "
-					+ "newPower <= RefrigerateurElectricityModel.MAX_COOLING_POWER,"
-					+ " but newPower = " + newPower);
+					new AssertionError(
+							"Precondition violation: newPower >= 0.0 && "
+									+ "newPower <= RefrigerateurElectricityModel.MAX_COOLING_POWER,"
+									+ " but newPower = " + newPower);
 
 		double oldPower = this.currentCoolingPower.getValue();
 		this.currentCoolingPower.setNewValue(newPower, t);
@@ -428,9 +479,80 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
+	}
+
+
+
+	public void			setRefrigeratorCompresorState(CompressorState s, Time t)
+	{
+		assert this.currentState == State.ON :
+			new AssertionError(
+					"Precondition violation: currentState == State.ON && "
+							+ " but currentState = " + currentState);
+
+		CompressorState old = this.refrigeratorCompressor;
+		this.refrigeratorCompressor = s;
+		if (old != s) {
+			this.consumptionHasChanged = true;					
+		}
+
+		assert	glassBoxInvariants(this) :
+			new AssertionError("White-box invariants violation!");
+		assert	blackBoxInvariants(this) :
+			new AssertionError("Black-box invariants violation!");
+	}
+
+	public void			setCongelartorCompresorState(CompressorState s, Time t)
+	{
+		assert this.currentState == State.ON :
+			new AssertionError(
+					"Precondition violation: currentState == State.ON && "
+							+ " but currentState = " + currentState);
+
+		CompressorState old = this.congelatorCompressor;
+		this.congelatorCompressor = s;
+		if (old != s) {
+			this.consumptionHasChanged = true;					
+		}
+
+		assert	glassBoxInvariants(this) :
+			new AssertionError("White-box invariants violation!");
+		assert	blackBoxInvariants(this) :
+			new AssertionError("Black-box invariants violation!");
+	}
+
+	public CompressorState		getRefrigeratorCompressorState()
+	{
+		return this.refrigeratorCompressor;
+	}
+
+	public CompressorState		getCongelatorCompressorState()
+	{
+		return this.congelatorCompressor;
+	}
+
+	public void			setCurrentFreezingPower(double newPower, Time t)
+	{
+		assert	newPower >= 0.0 &&
+				newPower <= RefrigerateurElectricityModel.MAX_FREEZING_POWER :
+					new AssertionError(
+							"Precondition violation: newPower >= 0.0 && "
+									+ "newPower <= RefrigerateurElectricityModel.MAX_FREEZING_POWER,"
+									+ " but newPower = " + newPower);
+
+		double oldPower = this.currentFreezingPower.getValue();
+		this.currentFreezingPower.setNewValue(newPower, t);
+		if (newPower != oldPower) {
+			this.consumptionHasChanged = true;
+		}
+
+		assert	glassBoxInvariants(this) :
+			new AssertionError("White-box invariants violation!");
+		assert	blackBoxInvariants(this) :
+			new AssertionError("Black-box invariants violation!");
 	}
 
 	// -------------------------------------------------------------------------
@@ -453,9 +575,9 @@ extends		AtomicHIOA
 		this.logMessage("simulation begins.\n");
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
 	}
 
 	/**
@@ -476,10 +598,11 @@ extends		AtomicHIOA
 		Pair<Integer, Integer> ret = null;
 
 		if (!this.currentIntensity.isInitialised() ||
-								!this.currentCoolingPower.isInitialised()) {
+				!this.currentCoolingPower.isInitialised()) {
 			// initially, the heater is off, so its consumption is zero.
 			this.currentIntensity.initialise(0.0);
 			this.currentCoolingPower.initialise(MAX_COOLING_POWER);
+			this.currentFreezingPower.initialise(MAX_FREEZING_POWER);
 
 			StringBuffer sb = new StringBuffer("new consumption: ");
 			sb.append(this.currentIntensity.getValue());
@@ -493,9 +616,9 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
 
 		return ret;
 	}
@@ -530,9 +653,9 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
 
 		return ret;
 	}
@@ -548,14 +671,28 @@ extends		AtomicHIOA
 		Time t = this.getCurrentStateTime();
 		if (this.currentState == State.ON) {
 			this.currentIntensity.setNewValue(
-					RefrigerateurElectricityModel.NOT_COOLING_POWER/
-											RefrigerateurElectricityModel.TENSION,
+					(RefrigerateurElectricityModel.NOT_COOLING_POWER +RefrigerateurElectricityModel.NOT_FREEZING_POWER) /
+					RefrigerateurElectricityModel.TENSION,
 					t);
-		} else if (this.currentState == State.COOLING) {
-			this.currentIntensity.setNewValue(
-								this.currentCoolingPower.getValue()/
-												RefrigerateurElectricityModel.TENSION,
-								t);
+			if (this.refrigeratorCompressor== CompressorState.ON && this.congelatorCompressor== CompressorState.ON) {
+				this.currentIntensity.setNewValue(
+						(this.currentCoolingPower.getValue() + this.currentFreezingPower.getValue())/
+						RefrigerateurElectricityModel.TENSION,
+						t);
+			}
+			if (this.refrigeratorCompressor== CompressorState.ON && this.congelatorCompressor== CompressorState.OFF) {
+				this.currentIntensity.setNewValue(
+						this.currentCoolingPower.getValue()/
+						RefrigerateurElectricityModel.TENSION,
+						t);
+			}
+
+			if (this.refrigeratorCompressor== CompressorState.OFF && this.congelatorCompressor== CompressorState.ON) {
+				this.currentIntensity.setNewValue(
+						this.currentFreezingPower.getValue()/
+						RefrigerateurElectricityModel.TENSION,
+						t);
+			}
 		} else {
 			assert	this.currentState == State.OFF;
 			this.currentIntensity.setNewValue(0.0, t);
@@ -569,9 +706,10 @@ extends		AtomicHIOA
 		this.logMessage(sb.toString());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
+
 	}
 
 	/**
@@ -595,8 +733,8 @@ extends		AtomicHIOA
 		// compute the total consumption for the simulation report.
 		this.totalConsumption +=
 				Electricity.computeConsumption(
-									elapsedTime,
-									TENSION*this.currentIntensity.getValue());
+						elapsedTime,
+						TENSION*this.currentIntensity.getValue());
 
 		StringBuffer sb = new StringBuffer("execute the external event: ");
 		sb.append(ce.eventAsString());
@@ -611,9 +749,9 @@ extends		AtomicHIOA
 		ce.executeOn(this);
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
 	}
 
 	/**
@@ -625,8 +763,8 @@ extends		AtomicHIOA
 		Duration d = endTime.subtract(this.getCurrentStateTime());
 		this.totalConsumption +=
 				Electricity.computeConsumption(
-									d,
-									TENSION*this.currentIntensity.getValue());
+						d,
+						TENSION*this.currentIntensity.getValue());
 
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
@@ -640,6 +778,9 @@ extends		AtomicHIOA
 	public static final String	NOT_COOLING_POWER_RUNPNAME = "NOT_COOLING_POWER";
 	/** power of the heater in watts.										*/
 	public static final String	MAX_COOLING_POWER_RUNPNAME = "MAX_COOLING_POWER";
+
+	public static final String	NOT_FREEZING_POWER_RUNPNAME = "NOT_FREEZING_POWER";
+	public static final String	MAX_FREEZING_POWER_RUNPNAME = "MAX_FREEZING_POWER";
 	/** nominal tension (in Volts) of the heater.							*/
 	public static final String	TENSION_RUNPNAME = "TENSION";
 
@@ -648,31 +789,42 @@ extends		AtomicHIOA
 	 */
 	@Override
 	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws MissingRunParameterException
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
 
 		String notCoolingName =
-			ModelI.createRunParameterName(getURI(), NOT_COOLING_POWER_RUNPNAME);
+				ModelI.createRunParameterName(getURI(), NOT_COOLING_POWER_RUNPNAME);
 		if (simParams.containsKey(notCoolingName)) {
 			NOT_COOLING_POWER = (double) simParams.get(notCoolingName);
 		}
 		String coolingName =
-			ModelI.createRunParameterName(getURI(), MAX_COOLING_POWER_RUNPNAME);
+				ModelI.createRunParameterName(getURI(), MAX_COOLING_POWER_RUNPNAME);
 		if (simParams.containsKey(coolingName)) {
 			MAX_COOLING_POWER = (double) simParams.get(coolingName);
 		}
 		String tensionName =
-			ModelI.createRunParameterName(getURI(), TENSION_RUNPNAME);
+				ModelI.createRunParameterName(getURI(), TENSION_RUNPNAME);
 		if (simParams.containsKey(tensionName)) {
 			TENSION = (double) simParams.get(tensionName);
 		}
 
+		String notFreezingName =
+				ModelI.createRunParameterName(getURI(), NOT_FREEZING_POWER_RUNPNAME);
+		if (simParams.containsKey(notFreezingName)) {
+			NOT_FREEZING_POWER = (double) simParams.get(notFreezingName);
+		}
+		String freezingName =
+				ModelI.createRunParameterName(getURI(), MAX_FREEZING_POWER_RUNPNAME);
+		if (simParams.containsKey(freezingName)) {
+			MAX_FREEZING_POWER = (double) simParams.get(freezingName);
+		}
+
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new AssertionError("White-box invariants violation!");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new AssertionError("Black-box invariants violation!");
 	}
 
 	// -------------------------------------------------------------------------
@@ -710,9 +862,9 @@ extends		AtomicHIOA
 
 
 		public			RefrigeratorElectricityReport(
-			String modelURI,
-			double totalConsumption
-			)
+				String modelURI,
+				double totalConsumption
+				)
 		{
 			super();
 			this.modelURI = modelURI;

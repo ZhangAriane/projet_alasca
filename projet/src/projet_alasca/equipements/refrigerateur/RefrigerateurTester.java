@@ -174,9 +174,13 @@ public class RefrigerateurTester extends AbstractComponent {
 	{
 		this.traceMessage("testTargetTemperature()...\n");
 		try {
-			this.refrigerateurUserOutboundPort.setTargetTemperature(6.0);			
-			assertEquals(6.0, this.refrigerateurUserOutboundPort.getTargetTemperature());
-			this.refrigerateurUserOutboundPort.setTargetTemperature(Refrigerateur.STANDARD_TARGET_TEMPERATURE);
+			this.refrigerateurUserOutboundPort.setRefrigeratorTargetTemperature(6.0);			
+			assertEquals(6.0, this.refrigerateurUserOutboundPort.getRefrigeratorTargetTemperature());
+			this.refrigerateurUserOutboundPort.setRefrigeratorTargetTemperature(Refrigerateur.STANDARD_REFRIGERATOR_TARGET_TEMPERATURE);
+
+			this.refrigerateurUserOutboundPort.setFreezerTargetTemperature(-15.0);
+			assertEquals(-15.0, this.refrigerateurUserOutboundPort.getFreezerTargetTemperature());
+			this.refrigerateurUserOutboundPort.setFreezerTargetTemperature(Refrigerateur.STANDARD_FREEZER_TARGET_TEMPERATURE);
 
 		} catch (Exception e) {
 			this.traceMessage("...KO. " + e + "\n");
@@ -193,11 +197,13 @@ public class RefrigerateurTester extends AbstractComponent {
 		this.traceMessage("testCurrentTemperature()...\n");
 		try {
 			this.refrigerateurUserOutboundPort.switchOn();
-			this.logMessage("fake :" + Refrigerateur.FAKE_CURRENT_TEMPERATURE);
-			this.logMessage("current :" + this.refrigerateurUserOutboundPort.getCurrentTemperature());
-			assertEquals(Refrigerateur.FAKE_CURRENT_TEMPERATURE,
-					this.refrigerateurUserOutboundPort.getCurrentTemperature());
+			this.logMessage("fake :" + Refrigerateur.FAKE_REFRIGERATOR_CURRENT_TEMPERATURE);
+			this.logMessage("current :" + this.refrigerateurUserOutboundPort.getRefrigeratorCurrentTemperature());
+			assertEquals(Refrigerateur.FAKE_REFRIGERATOR_CURRENT_TEMPERATURE,
+					this.refrigerateurUserOutboundPort.getRefrigeratorCurrentTemperature());
 
+			assertEquals(Refrigerateur.FAKE_FREEZER_CURRENT_TEMPERATURE,
+					this.refrigerateurUserOutboundPort.getFreezerCurrentTemperature());
 			this.refrigerateurUserOutboundPort.switchOff();
 		} catch (Exception e) {
 			this.traceMessage("...KO. " + e + "\n");
@@ -228,19 +234,27 @@ public class RefrigerateurTester extends AbstractComponent {
 	{
 		this.traceMessage("testInternalControl()...\n");
 		try {
-			assertEquals(Refrigerateur.STANDARD_TARGET_TEMPERATURE,
-					this.refrigerateurInternalControlOutboundPort.getTargetTemperature());
+			assertEquals(Refrigerateur.STANDARD_REFRIGERATOR_TARGET_TEMPERATURE,
+					this.refrigerateurInternalControlOutboundPort.getRefrigeratorTargetTemperature());
+			assertEquals(Refrigerateur.STANDARD_FREEZER_TARGET_TEMPERATURE,
+					this.refrigerateurInternalControlOutboundPort.getFreezerTargetTemperature());
 
 			this.refrigerateurUserOutboundPort.switchOn();
 			assertEquals(true, this.refrigerateurUserOutboundPort.on());
 
-			assertEquals(Refrigerateur.FAKE_CURRENT_TEMPERATURE,
-					this.refrigerateurInternalControlOutboundPort.getCurrentTemperature());
+			assertEquals(Refrigerateur.FAKE_REFRIGERATOR_CURRENT_TEMPERATURE,
+					this.refrigerateurInternalControlOutboundPort.getRefrigeratorCurrentTemperature());
 			this.refrigerateurInternalControlOutboundPort.startCooling();
 			assertTrue(this.refrigerateurInternalControlOutboundPort.cooling());
 			this.refrigerateurInternalControlOutboundPort.stopCooling();
 			assertTrue(!this.refrigerateurInternalControlOutboundPort.cooling());
 
+			assertEquals(Refrigerateur.STANDARD_FREEZER_TARGET_TEMPERATURE,
+					this.refrigerateurInternalControlOutboundPort.getFreezerCurrentTemperature());
+			this.refrigerateurInternalControlOutboundPort.startFreezing();
+			assertTrue(this.refrigerateurInternalControlOutboundPort.freezing());
+			this.refrigerateurInternalControlOutboundPort.stopFreezing();
+			assertTrue(!this.refrigerateurInternalControlOutboundPort.freezing());
 
 		} catch (Exception e) {
 			this.traceMessage("...KO. " + e + "\n");

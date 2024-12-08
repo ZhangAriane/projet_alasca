@@ -105,6 +105,7 @@ type = Double.class)
 @ModelImportedVariable(name = "currentChauffeEauIntensity",
 type = Double.class)
 
+
 //-----------------------------------------------------------------------------
 public class			ElectricMeterElectricityModel
 extends		AtomicHIOA

@@ -6,16 +6,24 @@ import projet_alasca.equipements.refrigerateur.RefrigerateurExternalControlCI;
 public class RefrigerateurExternalControlConnector extends		AbstractConnector implements RefrigerateurExternalControlCI{
 
 	@Override
-	public double getTargetTemperature() throws Exception {
-		return ((RefrigerateurExternalControlCI)this.offering).getTargetTemperature();
+	public double getRefrigeratorTargetTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).getRefrigeratorTargetTemperature();
 	}
-
 
 	@Override
-	public double getCurrentTemperature() throws Exception {
-		return ((RefrigerateurExternalControlCI)this.offering).getTargetTemperature();
+	public double getFreezerTargetTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).getFreezerTargetTemperature();
 	}
 
+	@Override
+	public double getRefrigeratorCurrentTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).getRefrigeratorTargetTemperature();
+	}
+
+	@Override
+	public double getFreezerCurrentTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).getFreezerCurrentTemperature();
+	}
 
 	@Override
 	public double getMaxPowerLevel() throws Exception {
@@ -33,5 +41,38 @@ public class RefrigerateurExternalControlConnector extends		AbstractConnector im
 		return ((RefrigerateurExternalControlCI)this.offering).getCurrentPowerLevel();
 	}
 	
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOnRefrigeratorCompressor();
+	}
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOffRefrigeratorCompressor();
+
+	}
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOnFreezerCompressor();
+
+	}
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.offering).switchOffFreezerCompressor();
+
+	}
+
+	@Override
+	public boolean onRefrigeratorCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).onRefrigeratorCompressor();
+	}
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.offering).onFreezerCompressor();
+	}
+
 	
 }

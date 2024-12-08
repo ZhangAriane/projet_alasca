@@ -24,7 +24,7 @@ public class PanneauSolaireElectricityModel extends AtomicHIOA {
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.getSimulationEngine().setLogger(new StandardLogger());
         this.production = 0.0;
-
+        
 	}
 	
 	@Override

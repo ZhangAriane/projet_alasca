@@ -137,7 +137,14 @@ implements	RefrigerateurEventI
 							"model not in the right state, should be "
 							+ "RefrigerateurElectricityModel.State.ON but is "
 							+ refrigerator.getState());
-			refrigerator.setState(RefrigerateurElectricityModel.State.COOLING,
+			
+			assert	refrigerator.getRefrigeratorCompressorState() == RefrigerateurElectricityModel.CompressorState.OFF:
+				new AssertionError(
+						"model not in the right refigerator compressor state, should be "
+						+ "RefrigerateurElectricityModel.CompressorState.OFF but is "
+						+ refrigerator.getRefrigeratorCompressorState());
+			
+			refrigerator.setRefrigeratorCompresorState(RefrigerateurElectricityModel.CompressorState.ON,
 							this.getTimeOfOccurrence());
 		} else {
 			RefrigerateurTemperatureModel refrigerator = (RefrigerateurTemperatureModel)model;

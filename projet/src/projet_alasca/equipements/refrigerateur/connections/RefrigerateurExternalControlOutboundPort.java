@@ -19,19 +19,28 @@ public class RefrigerateurExternalControlOutboundPort extends		AbstractOutboundP
 	}
 	
 	@Override
-	public double getTargetTemperature() throws Exception {
+	public double getRefrigeratorTargetTemperature() throws Exception {
 		return ((RefrigerateurExternalControlCI)this.getConnector()).
-				getTargetTemperature();
+				getRefrigeratorTargetTemperature();
 	}
-
-
 
 	@Override
-	public double getCurrentTemperature() throws Exception {
+	public double getFreezerTargetTemperature() throws Exception {
 		return ((RefrigerateurExternalControlCI)this.getConnector()).
-				getCurrentTemperature();
+				getFreezerTargetTemperature();
 	}
 
+	@Override
+	public double getRefrigeratorCurrentTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				getRefrigeratorCurrentTemperature();
+	}
+
+	@Override
+	public double getFreezerCurrentTemperature() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				getFreezerCurrentTemperature();
+	}
 
 
 	@Override
@@ -52,6 +61,46 @@ public class RefrigerateurExternalControlOutboundPort extends		AbstractOutboundP
 				getCurrentPowerLevel();
 	}
 	
+
+	@Override
+	public void switchOnRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+				switchOnRefrigeratorCompressor();
+		
+	}
+
+	@Override
+	public void switchOffRefrigeratorCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+		switchOffRefrigeratorCompressor();
+		
+	}
+
+	@Override
+	public void switchOnFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+		switchOnFreezerCompressor();
+		
+	}
+
+	@Override
+	public void switchOffFreezerCompressor() throws Exception {
+		((RefrigerateurExternalControlCI)this.getConnector()).
+		switchOffFreezerCompressor();
+		
+	}
+
+	@Override
+	public boolean onRefrigeratorCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				onRefrigeratorCompressor();
+	}
+
+	@Override
+	public boolean onFreezerCompressor() throws Exception {
+		return ((RefrigerateurExternalControlCI)this.getConnector()).
+				onFreezerCompressor();
+	}
 
 	
 }
