@@ -55,9 +55,9 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 
 	/** inbound port offering the <code>MachineCafeCI</code> interface.		*/
 	protected MachineCafeInboundPort	machineCafeInboundPort;
-	
+
 	// Execution/Simulation
-	
+
 	/** current type of execution.											*/
 	protected final ExecutionType		currentExecutionType;
 	/** current type of simulation.											*/
@@ -89,84 +89,84 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentState != null,
-							MachineCafe.class, mc,
-					"currentState != null");
+				mc.currentState != null,
+				MachineCafe.class, mc,
+				"currentState != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentExecutionType != null,
-							MachineCafe.class, mc,
-					"currentExecutionType != null");
+				mc.currentExecutionType != null,
+				MachineCafe.class, mc,
+				"currentExecutionType != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentSimulationType != null,
-							MachineCafe.class, mc,
-					"mc.urrentSimulationType != null");
+				mc.currentSimulationType != null,
+				MachineCafe.class, mc,
+				"mc.urrentSimulationType != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!mc.currentExecutionType.isStandard() ||
-								mc.currentSimulationType.isNoSimulation(),
-								MachineCafe.class, mc,
-					"!currentExecutionType.isStandard() || "
-					+ "currentSimulationType.isNoSimulation()");
+				!mc.currentExecutionType.isStandard() ||
+				mc.currentSimulationType.isNoSimulation(),
+				MachineCafe.class, mc,
+				"!currentExecutionType.isStandard() || "
+						+ "currentSimulationType.isNoSimulation()");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentSimulationType.isNoSimulation() ||
-						(mc.globalArchitectureURI != null &&
-							!mc.globalArchitectureURI.isEmpty()),
-						MachineCafe.class, mc,
-					"currentSimulationType.isNoSimulation() || "
-					+ "(globalArchitectureURI != null && "
-					+ "!globalArchitectureURI.isEmpty())");
+				mc.currentSimulationType.isNoSimulation() ||
+				(mc.globalArchitectureURI != null &&
+				!mc.globalArchitectureURI.isEmpty()),
+				MachineCafe.class, mc,
+				"currentSimulationType.isNoSimulation() || "
+						+ "(globalArchitectureURI != null && "
+						+ "!globalArchitectureURI.isEmpty())");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentSimulationType.isNoSimulation() ||
-						(mc.localArchitectureURI != null &&
-							!mc.localArchitectureURI.isEmpty()),
-						MachineCafe.class, mc,
-					"currentSimulationType.isNoSimulation() || "
-					+ "(localArchitectureURI != null && "
-					+ "!localArchitectureURI.isEmpty())");
+				mc.currentSimulationType.isNoSimulation() ||
+				(mc.localArchitectureURI != null &&
+				!mc.localArchitectureURI.isEmpty()),
+				MachineCafe.class, mc,
+				"currentSimulationType.isNoSimulation() || "
+						+ "(localArchitectureURI != null && "
+						+ "!localArchitectureURI.isEmpty())");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!mc.currentSimulationType.isSimulated() ||
-												mc.simulationTimeUnit != null,
-														MachineCafe.class, mc,
-					"!currentSimulationType.isSimulated() || "
-					+ "simulationTimeUnit != null");
+				!mc.currentSimulationType.isSimulated() ||
+				mc.simulationTimeUnit != null,
+				MachineCafe.class, mc,
+				"!currentSimulationType.isSimulated() || "
+						+ "simulationTimeUnit != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!mc.currentSimulationType.isRealTimeSimulation() ||
-														mc.accFactor > 0.0,
-														MachineCafe.class, mc,
-					"!mc.currentSimulationType.isRealTimeSimulation() || "
-					+ "mc");
+				!mc.currentSimulationType.isRealTimeSimulation() ||
+				mc.accFactor > 0.0,
+				MachineCafe.class, mc,
+				"!mc.currentSimulationType.isRealTimeSimulation() || "
+						+ "mc");
 		return ret;
 	}
-	
+
 	protected static boolean	blackBoxInvariants(MachineCafe mc)
 	{
 		assert 	mc != null : new PreconditionException("mc != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-					X_RELATIVE_POSITION >= 0,
-							MachineCafe.class, mc,
-					"X_RELATIVE_POSITION >= 0");
+				X_RELATIVE_POSITION >= 0,
+				MachineCafe.class, mc,
+				"X_RELATIVE_POSITION >= 0");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-					Y_RELATIVE_POSITION >= 0,
-							MachineCafe.class, mc,
-					"Y_RELATIVE_POSITION >= 0");
+				Y_RELATIVE_POSITION >= 0,
+				MachineCafe.class, mc,
+				"Y_RELATIVE_POSITION >= 0");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-					REFLECTION_INBOUND_PORT_URI != null &&
-								!REFLECTION_INBOUND_PORT_URI.isEmpty(),
-								MachineCafe.class, mc,
-					"REFLECTION_INBOUND_PORT_URI != null && "
-							+ "!REFLECTION_INBOUND_PORT_URI.isEmpty()");
+				REFLECTION_INBOUND_PORT_URI != null &&
+				!REFLECTION_INBOUND_PORT_URI.isEmpty(),
+				MachineCafe.class, mc,
+				"REFLECTION_INBOUND_PORT_URI != null && "
+						+ "!REFLECTION_INBOUND_PORT_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-					INBOUND_PORT_URI != null && !INBOUND_PORT_URI.isEmpty(),
-							MachineCafe.class, mc,
-					"INBOUND_PORT_URI != null && !INBOUND_PORT_URI.isEmpty()");
+				INBOUND_PORT_URI != null && !INBOUND_PORT_URI.isEmpty(),
+				MachineCafe.class, mc,
+				"INBOUND_PORT_URI != null && !INBOUND_PORT_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-					INITIAL_STATE != null,
-							MachineCafe.class, mc,
-					"INITIAL_STATE != null");
+				INITIAL_STATE != null,
+				MachineCafe.class, mc,
+				"INITIAL_STATE != null");
 		return ret;
 	}
-	
+
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -186,15 +186,15 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 			String machineCafeInboundPortURI,
 			ExecutionType currentExecutionType
 			) throws Exception
-		{
+	{
 		this(REFLECTION_INBOUND_PORT_URI,machineCafeInboundPortURI,
 				currentExecutionType, SimulationType.NO_SIMULATION,
 				null,null,null,0.0,null);
-		
 
-			assert	currentExecutionType.isTest() :
-					new PreconditionException("currentExecutionType.isTest()");
-		}
+
+		assert	currentExecutionType.isTest() :
+			new PreconditionException("currentExecutionType.isTest()");
+	}
 
 
 
@@ -209,154 +209,154 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 			double accFactor,
 			String clockURI
 			) throws Exception
-		{
-			// one thread for the method execute and one to answer the calls to
-			// the component services
-			super(reflectionInboundPortURI, 2, 0);
+	{
+		// one thread for the method execute and one to answer the calls to
+		// the component services
+		super(reflectionInboundPortURI, 2, 0);
 
-			assert	machineCafeInboundPortURI != null &&
-												!machineCafeInboundPortURI.isEmpty() :
+		assert	machineCafeInboundPortURI != null &&
+				!machineCafeInboundPortURI.isEmpty() :
 					new PreconditionException(
 							"machineCafeInboundPortURI != null && "
-							+ "!machineCafeInboundPortURI.isEmpty()");
-			assert	currentExecutionType != null :
-					new PreconditionException("currentExecutionType != null");
-			assert	currentExecutionType.isStandard() ||
-										clockURI != null && !clockURI.isEmpty() :
-					new PreconditionException(
-							"currentExecutionType.isStandard() || "
+									+ "!machineCafeInboundPortURI.isEmpty()");
+		assert	currentExecutionType != null :
+			new PreconditionException("currentExecutionType != null");
+		assert	currentExecutionType.isStandard() ||
+		clockURI != null && !clockURI.isEmpty() :
+			new PreconditionException(
+					"currentExecutionType.isStandard() || "
 							+ "clockURI != null && !clockURI.isEmpty()");
-			assert	!currentExecutionType.isStandard() ||
-											currentSimulationType.isNoSimulation() :
-					new PreconditionException(
-							"!currentExecutionType.isStandard() || "
+		assert	!currentExecutionType.isStandard() ||
+		currentSimulationType.isNoSimulation() :
+			new PreconditionException(
+					"!currentExecutionType.isStandard() || "
 							+ "currentSimulationType.isNoSimulation()");
-			assert	currentSimulationType.isNoSimulation() ||
-							(globalArchitectureURI != null &&
-												!globalArchitectureURI.isEmpty()) :
-					new PreconditionException(
-							"currentSimulationType.isNoSimulation() || "
+		assert	currentSimulationType.isNoSimulation() ||
+		(globalArchitectureURI != null &&
+		!globalArchitectureURI.isEmpty()) :
+			new PreconditionException(
+					"currentSimulationType.isNoSimulation() || "
 							+ "(globalArchitectureURI != null && "
 							+ "!globalArchitectureURI.isEmpty())");
-			assert	currentSimulationType.isNoSimulation() ||
-							(localArchitectureURI != null && 
-												!localArchitectureURI.isEmpty()) :
-					new PreconditionException(
-							"currentSimulationType.isNoSimulation() || "
+		assert	currentSimulationType.isNoSimulation() ||
+		(localArchitectureURI != null && 
+		!localArchitectureURI.isEmpty()) :
+			new PreconditionException(
+					"currentSimulationType.isNoSimulation() || "
 							+ "(localArchitectureURI != null && "
 							+ "!localArchitectureURI.isEmpty())");
-			assert	!currentSimulationType.isSimulated() ||
-														simulationTimeUnit != null :
-					new PreconditionException(
-							"!currentSimulationType.isSimulated() || "
+		assert	!currentSimulationType.isSimulated() ||
+		simulationTimeUnit != null :
+			new PreconditionException(
+					"!currentSimulationType.isSimulated() || "
 							+ "simulationTimeUnit != null");
-			assert	!currentSimulationType.isRealTimeSimulation() ||
-																accFactor > 0.0 :
-					new PreconditionException(
-							"!currentSimulationType.isRealTimeSimulation() || "
+		assert	!currentSimulationType.isRealTimeSimulation() ||
+		accFactor > 0.0 :
+			new PreconditionException(
+					"!currentSimulationType.isRealTimeSimulation() || "
 							+ "accFactor > 0.0");
 
-			this.currentExecutionType = currentExecutionType;
-			this.currentSimulationType = currentSimulationType;
-			this.globalArchitectureURI = globalArchitectureURI;
-			this.localArchitectureURI = localArchitectureURI;
-			this.simulationTimeUnit = simulationTimeUnit;
-			this.accFactor = accFactor;
-			this.clockURI = clockURI;
+		this.currentExecutionType = currentExecutionType;
+		this.currentSimulationType = currentSimulationType;
+		this.globalArchitectureURI = globalArchitectureURI;
+		this.localArchitectureURI = localArchitectureURI;
+		this.simulationTimeUnit = simulationTimeUnit;
+		this.accFactor = accFactor;
+		this.clockURI = clockURI;
 
-			this.initialise(machineCafeInboundPortURI);
+		this.initialise(machineCafeInboundPortURI);
 
-			assert	MachineCafe.glassBoxInvariants(this) :
-					new ImplementationInvariantException(
-							"MachineCafe.glassBoxInvariants(this)");
-			assert	MachineCafe.blackBoxInvariants(this) :
-					new InvariantException("MachineCafe.blackBoxInvariants(this)");
-		}
-	
+		assert	MachineCafe.glassBoxInvariants(this) :
+			new ImplementationInvariantException(
+					"MachineCafe.glassBoxInvariants(this)");
+		assert	MachineCafe.blackBoxInvariants(this) :
+			new InvariantException("MachineCafe.blackBoxInvariants(this)");
+	}
+
 	protected void		initialise(String machineCafeInboundPortURI)
 			throws Exception
-			{
-				assert	machineCafeInboundPortURI != null :
-						new PreconditionException("machineCafeInboundPortURI != null");
-				assert	!machineCafeInboundPortURI.isEmpty() :
-						new PreconditionException(
-								"!machineCafeInboundPortURI.isEmpty()");
+	{
+		assert	machineCafeInboundPortURI != null :
+			new PreconditionException("machineCafeInboundPortURI != null");
+		assert	!machineCafeInboundPortURI.isEmpty() :
+			new PreconditionException(
+					"!machineCafeInboundPortURI.isEmpty()");
 
-				this.currentState = INITIAL_STATE;
-				this.machineCafeInboundPort = new MachineCafeInboundPort(machineCafeInboundPortURI, this);
-				this.machineCafeInboundPort.publishPort();
+		this.currentState = INITIAL_STATE;
+		this.machineCafeInboundPort = new MachineCafeInboundPort(machineCafeInboundPortURI, this);
+		this.machineCafeInboundPort.publishPort();
 
-				// create the simulation architecture given the current type of
-				// simulation i.e., for the current execution
-				switch (this.currentSimulationType) {
-				case MIL_SIMULATION:
-					Architecture architecture = null;
-					if (this.currentExecutionType.isUnitTest()) {
-						architecture =
-							LocalSimulationArchitectures.
-								createHairDryerMILLocalArchitecture4UnitTest(
-															this.localArchitectureURI,
-															this.simulationTimeUnit);
-					} else {
-						assert	this.currentExecutionType.isIntegrationTest();
-						architecture =
-								LocalSimulationArchitectures.
-									createHairDryerMILArchitecture4IntegrationTest(
-															this.localArchitectureURI,
-															this.simulationTimeUnit);
-					}
-					assert	architecture.getRootModelURI().equals(
-														this.localArchitectureURI) :
-							new BCMException(
-									"local simulation architecture "
-									+ this.localArchitectureURI
-									+ " does not exist!");
-					this.addLocalSimulatorArchitecture(architecture);
-					this.global2localSimulationArchitectureURIS.
-							put(this.globalArchitectureURI, this.localArchitectureURI);
-					break;
-				case MIL_RT_SIMULATION:
-					// in MIL RT simulations, the HairDryer component uses the same
-					// simulators as in SIL simulations
-				case SIL_SIMULATION:
-					architecture = null;
-					if (this.currentExecutionType.isUnitTest()) {
-						architecture =
-							LocalSimulationArchitectures.
-										createHairDryerMIL_RT_Architecture4UnitTest(
-											this.localArchitectureURI,
-											this.simulationTimeUnit,
-											this.accFactor);
-					} else {
-						assert	this.currentExecutionType.isIntegrationTest();
-						architecture =
-								LocalSimulationArchitectures.
-									createHairDryerMIL_RT_Architecture4IntegrationTest(
-															this.localArchitectureURI,
-															this.simulationTimeUnit,
-															this.accFactor);
-
-					}
-					assert	architecture.getRootModelURI().equals(
-															this.localArchitectureURI) :
-							new BCMException(
-									"local simulation architecture "
-									+ this.localArchitectureURI
-									+ " does not exist!");
-					this.addLocalSimulatorArchitecture(architecture);
-					this.global2localSimulationArchitectureURIS.
-							put(this.globalArchitectureURI, this.localArchitectureURI);
-					break;
-				default:
-				}
-
-				if (VERBOSE) {
-					this.tracer.get().setTitle("Hair dryer component");
-					this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
-														  Y_RELATIVE_POSITION);
-					this.toggleTracing();
-				}
+		// create the simulation architecture given the current type of
+		// simulation i.e., for the current execution
+		switch (this.currentSimulationType) {
+		case MIL_SIMULATION:
+			Architecture architecture = null;
+			if (this.currentExecutionType.isUnitTest()) {
+				architecture =
+						LocalSimulationArchitectures.
+						createHairDryerMILLocalArchitecture4UnitTest(
+								this.localArchitectureURI,
+								this.simulationTimeUnit);
+			} else {
+				assert	this.currentExecutionType.isIntegrationTest();
+				architecture =
+						LocalSimulationArchitectures.
+						createHairDryerMILArchitecture4IntegrationTest(
+								this.localArchitectureURI,
+								this.simulationTimeUnit);
 			}
+			assert	architecture.getRootModelURI().equals(
+					this.localArchitectureURI) :
+						new BCMException(
+								"local simulation architecture "
+										+ this.localArchitectureURI
+										+ " does not exist!");
+			this.addLocalSimulatorArchitecture(architecture);
+			this.global2localSimulationArchitectureURIS.
+			put(this.globalArchitectureURI, this.localArchitectureURI);
+			break;
+		case MIL_RT_SIMULATION:
+			// in MIL RT simulations, the HairDryer component uses the same
+			// simulators as in SIL simulations
+		case SIL_SIMULATION:
+			architecture = null;
+			if (this.currentExecutionType.isUnitTest()) {
+				architecture =
+						LocalSimulationArchitectures.
+						createHairDryerMIL_RT_Architecture4UnitTest(
+								this.localArchitectureURI,
+								this.simulationTimeUnit,
+								this.accFactor);
+			} else {
+				assert	this.currentExecutionType.isIntegrationTest();
+				architecture =
+						LocalSimulationArchitectures.
+						createHairDryerMIL_RT_Architecture4IntegrationTest(
+								this.localArchitectureURI,
+								this.simulationTimeUnit,
+								this.accFactor);
+
+			}
+			assert	architecture.getRootModelURI().equals(
+					this.localArchitectureURI) :
+						new BCMException(
+								"local simulation architecture "
+										+ this.localArchitectureURI
+										+ " does not exist!");
+			this.addLocalSimulatorArchitecture(architecture);
+			this.global2localSimulationArchitectureURIS.
+			put(this.globalArchitectureURI, this.localArchitectureURI);
+			break;
+		default:
+		}
+
+		if (VERBOSE) {
+			this.tracer.get().setTitle("Hair dryer component");
+			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
+					Y_RELATIVE_POSITION);
+			this.toggleTracing();
+		}
+	}
 
 	// -------------------------------------------------------------------------
 	// Component life-cycle
@@ -376,9 +376,9 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 			case MIL_SIMULATION:
 				this.asp = new AtomicSimulatorPlugin();
 				String uri = this.global2localSimulationArchitectureURIS.
-												get(this.globalArchitectureURI);
+						get(this.globalArchitectureURI);
 				Architecture architecture =
-					(Architecture) this.localSimulationArchitectures.get(uri);
+						(Architecture) this.localSimulationArchitectures.get(uri);
 				this.asp.setPluginURI(uri);
 				this.asp.setSimulationArchitecture(architecture);
 				this.installPlugin(this.asp);
@@ -388,12 +388,12 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 				// simulation models
 				this.asp = new RTAtomicSimulatorPlugin();
 				uri = this.global2localSimulationArchitectureURIS.
-												get(this.globalArchitectureURI);
+						get(this.globalArchitectureURI);
 				architecture =
-					(Architecture) this.localSimulationArchitectures.get(uri);
+						(Architecture) this.localSimulationArchitectures.get(uri);
 				((RTAtomicSimulatorPlugin)this.asp).setPluginURI(uri);
 				((RTAtomicSimulatorPlugin)this.asp).
-										setSimulationArchitecture(architecture);
+				setSimulationArchitecture(architecture);
 				this.installPlugin(this.asp);
 				break;
 			case SIL_SIMULATION:
@@ -401,12 +401,12 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 				// simulation models
 				this.asp = new RTAtomicSimulatorPlugin();
 				uri = this.global2localSimulationArchitectureURIS.
-												get(this.globalArchitectureURI);
+						get(this.globalArchitectureURI);
 				architecture =
-					(Architecture) this.localSimulationArchitectures.get(uri);
+						(Architecture) this.localSimulationArchitectures.get(uri);
 				((RTAtomicSimulatorPlugin)this.asp).setPluginURI(uri);
 				((RTAtomicSimulatorPlugin)this.asp).
-										setSimulationArchitecture(architecture);
+				setSimulationArchitecture(architecture);
 				this.installPlugin(this.asp);
 				break;
 			case NO_SIMULATION:
@@ -424,7 +424,7 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 	public void			execute() throws Exception
 	{
 		if (this.currentExecutionType.isUnitTest() &&
-								this.currentSimulationType.isSILSimulation()) {
+				this.currentSimulationType.isSILSimulation()) {
 			// First, the component must synchronise with other components
 			// to start the execution of the test scenario; we use a
 			// time-triggered synchronisation scheme with the accelerated clock
@@ -437,17 +437,17 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 					ClocksServerWithSimulationConnector.class.getCanonicalName());
 			this.logMessage("HairDryer gets the clock.");
 			AcceleratedAndSimulationClock acceleratedClock =
-				clocksServerOutboundPort.getClockWithSimulation(this.clockURI);
+					clocksServerOutboundPort.getClockWithSimulation(this.clockURI);
 			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
 			clocksServerOutboundPort.unpublishPort();
 
 			this.asp.createSimulator();
 			this.asp.setSimulationRunParameters(new HashMap<>());
 			this.asp.initialiseSimulation(
-						new Time(acceleratedClock.getSimulatedStartTime(),
-								 this.simulationTimeUnit),
-						new Duration(acceleratedClock.getSimulatedDuration(),
-									 this.simulationTimeUnit));
+					new Time(acceleratedClock.getSimulatedStartTime(),
+							this.simulationTimeUnit),
+					new Duration(acceleratedClock.getSimulatedDuration(),
+							this.simulationTimeUnit));
 			// schedule the start of the SIL (real time) simulation
 			this.asp.startRTSimulation(
 					TimeUnit.NANOSECONDS.toMillis(

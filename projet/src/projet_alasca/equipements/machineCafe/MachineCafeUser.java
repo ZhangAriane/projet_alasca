@@ -147,7 +147,7 @@ import java.util.concurrent.TimeUnit;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 @RequiredInterfaces(required = {MachineCafeUserCI.class,
-								ClocksServerWithSimulationCI.class})
+		ClocksServerWithSimulationCI.class})
 public class			MachineCafeUser
 extends		AbstractCyPhyComponent
 implements	MachineCafeOperationI
@@ -166,7 +166,7 @@ implements	MachineCafeOperationI
 	/** standard reflection, inbound port URI for the {@code HairDryerUser}
 	 *  component.															*/
 	public static final String			REFLECTION_INBOUND_PORT_URI =
-													"MACHINE-CAFE-USER-RIP-URI";
+			"MACHINE-CAFE-USER-RIP-URI";
 
 	/** outbound port to connect to the {@code HairDryer} component.		*/
 	protected MachineCafeOutboundPort		mcop;
@@ -219,55 +219,55 @@ implements	MachineCafeOperationI
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					REFLECTION_INBOUND_PORT_URI != null &&
-									!REFLECTION_INBOUND_PORT_URI.isEmpty(),
-					MachineCafeUser.class, mc,
-					"REFLECTION_INBOUND_PORT_URI != null && "
-								+ "!REFLECTION_INBOUND_PORT_URI.isEmpty()");
+				REFLECTION_INBOUND_PORT_URI != null &&
+				!REFLECTION_INBOUND_PORT_URI.isEmpty(),
+				MachineCafeUser.class, mc,
+				"REFLECTION_INBOUND_PORT_URI != null && "
+						+ "!REFLECTION_INBOUND_PORT_URI.isEmpty()");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					X_RELATIVE_POSITION >= 0,
-					MachineCafeUser.class, mc,
-					"X_RELATIVE_POSITION >= 0");
+				X_RELATIVE_POSITION >= 0,
+				MachineCafeUser.class, mc,
+				"X_RELATIVE_POSITION >= 0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					Y_RELATIVE_POSITION >= 0,
-					MachineCafeUser.class, mc,
-					"Y_RELATIVE_POSITION >= 0");		
+				Y_RELATIVE_POSITION >= 0,
+				MachineCafeUser.class, mc,
+				"Y_RELATIVE_POSITION >= 0");		
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentExecutionType != null,
-					MachineCafeUser.class, mc,
-					"currentExecutionType != null");
+				mc.currentExecutionType != null,
+				MachineCafeUser.class, mc,
+				"currentExecutionType != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentSimulationType != null,
-					MachineCafeUser.class, mc,
-					"hcurrentSimulationType != null");
+				mc.currentSimulationType != null,
+				MachineCafeUser.class, mc,
+				"hcurrentSimulationType != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!mc.currentExecutionType.isStandard() ||
-								mc.currentSimulationType.isNoSimulation(),
-					MachineCafeUser.class, mc,
-					"!currentExecutionType.isStandard() || "
-					+ "currentSimulationType.isNoSimulation()");
+				!mc.currentExecutionType.isStandard() ||
+				mc.currentSimulationType.isNoSimulation(),
+				MachineCafeUser.class, mc,
+				"!currentExecutionType.isStandard() || "
+						+ "currentSimulationType.isNoSimulation()");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentSimulationType.isNoSimulation() ||
-							(mc.globalArchitectureURI != null &&
-										!mc.globalArchitectureURI.isEmpty()),
-					MachineCafeUser.class, mc,
-					"currentSimulationType.isNoSimulation() || "
-					+ "(globalArchitectureURI != null && "
-					+ "!globalArchitectureURI.isEmpty())");
+				mc.currentSimulationType.isNoSimulation() ||
+				(mc.globalArchitectureURI != null &&
+				!mc.globalArchitectureURI.isEmpty()),
+				MachineCafeUser.class, mc,
+				"currentSimulationType.isNoSimulation() || "
+						+ "(globalArchitectureURI != null && "
+						+ "!globalArchitectureURI.isEmpty())");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					mc.currentSimulationType.isNoSimulation() ||
-							(mc.localArchitectureURI != null &&
-										!mc.localArchitectureURI.isEmpty()),
-					MachineCafeUser.class, mc,
-					"currentSimulationType.isNoSimulation() || "
-					+ "(localArchitectureURI != null && "
-					+ "!localArchitectureURI.isEmpty())");
+				mc.currentSimulationType.isNoSimulation() ||
+				(mc.localArchitectureURI != null &&
+				!mc.localArchitectureURI.isEmpty()),
+				MachineCafeUser.class, mc,
+				"currentSimulationType.isNoSimulation() || "
+						+ "(localArchitectureURI != null && "
+						+ "!localArchitectureURI.isEmpty())");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-					!mc.currentSimulationType.isSILSimulation() ||
-														mc.accFactor > 0.0,
-					MachineCafeUser.class, mc,
-					"!mc.currentSimulationType.isSILSimulation() || "
-					+ "mc.accFactor > 0.0");
+				!mc.currentSimulationType.isSILSimulation() ||
+				mc.accFactor > 0.0,
+				MachineCafeUser.class, mc,
+				"!mc.currentSimulationType.isSILSimulation() || "
+						+ "mc.accFactor > 0.0");
 		return ret;
 	}
 
@@ -329,7 +329,7 @@ implements	MachineCafeOperationI
 	 * @throws Exception				<i>to do</i>.
 	 */
 	protected			MachineCafeUser(String machineCafeInboundPortURI) 
-	throws Exception
+			throws Exception
 	{
 		this(machineCafeInboundPortURI, ExecutionType.STANDARD);
 	}
@@ -349,16 +349,16 @@ implements	MachineCafeOperationI
 	 * @throws Exception				<i>to do</i>.
 	 */
 	protected			MachineCafeUser(
-		String machineCafeInboundPortURI,
-		ExecutionType currentExecutionType
-		) throws Exception
+			String machineCafeInboundPortURI,
+			ExecutionType currentExecutionType
+			) throws Exception
 	{
 		this(REFLECTION_INBOUND_PORT_URI, machineCafeInboundPortURI,
-			 currentExecutionType, SimulationType.NO_SIMULATION,
-			 null, null, null, 0.0, null);
+				currentExecutionType, SimulationType.NO_SIMULATION,
+				null, null, null, 0.0, null);
 
 		assert	currentExecutionType.isTest() :
-				new PreconditionException("currentExecutionType.isTest()");
+			new PreconditionException("currentExecutionType.isTest()");
 	}
 
 	/**
@@ -386,55 +386,55 @@ implements	MachineCafeOperationI
 	 * @throws Exception				<i>to do</i>.
 	 */
 	protected			MachineCafeUser(
-		String reflectionInboundPortURI,
-		String machineCafeInboundPortURI,
-		ExecutionType currentExecutionType,
-		SimulationType currentSimulationType,
-		String globalArchitectureURI,
-		String localArchitectureURI,
-		TimeUnit simulationTimeUnit,
-		double accFactor,
-		String clockURI
-		) throws Exception
+			String reflectionInboundPortURI,
+			String machineCafeInboundPortURI,
+			ExecutionType currentExecutionType,
+			SimulationType currentSimulationType,
+			String globalArchitectureURI,
+			String localArchitectureURI,
+			TimeUnit simulationTimeUnit,
+			double accFactor,
+			String clockURI
+			) throws Exception
 	{
 		// one thread for execute and one schedulable for SIL scenarios
 		super(reflectionInboundPortURI, 1, 1);
 
 		assert	machineCafeInboundPortURI != null &&
-										!machineCafeInboundPortURI.isEmpty() :
-				new PreconditionException(
-						"machineCafeInboundPortURI != null && "
-						+ "!machineCafeInboundPortURI.isEmpty()");
+				!machineCafeInboundPortURI.isEmpty() :
+					new PreconditionException(
+							"machineCafeInboundPortURI != null && "
+									+ "!machineCafeInboundPortURI.isEmpty()");
 		assert	currentExecutionType != null :
-				new PreconditionException("currentExecutionType != null");
+			new PreconditionException("currentExecutionType != null");
 		assert	currentExecutionType.isStandard() ||
-								clockURI != null && !clockURI.isEmpty() :
-				new PreconditionException(
-						"currentExecutionType.isStandard() || "
-						+ "clockURI != null && !clockURI.isEmpty()");
+		clockURI != null && !clockURI.isEmpty() :
+			new PreconditionException(
+					"currentExecutionType.isStandard() || "
+							+ "clockURI != null && !clockURI.isEmpty()");
 		assert	!currentExecutionType.isStandard() ||
-										currentSimulationType.isNoSimulation() :
-				new PreconditionException(
-						"!currentExecutionType.isStandard() || "
-						+ "currentSimulationType.isNoSimulation()");
+		currentSimulationType.isNoSimulation() :
+			new PreconditionException(
+					"!currentExecutionType.isStandard() || "
+							+ "currentSimulationType.isNoSimulation()");
 		assert	currentSimulationType.isNoSimulation() ||
-								(globalArchitectureURI != null &&
-											!globalArchitectureURI.isEmpty()) :
-				new PreconditionException(
-						"currentSimulationType.isNoSimulation() ||  "
-						+ "(globalArchitectureURI != null && "
-						+ "!globalArchitectureURI.isEmpty())");
+		(globalArchitectureURI != null &&
+		!globalArchitectureURI.isEmpty()) :
+			new PreconditionException(
+					"currentSimulationType.isNoSimulation() ||  "
+							+ "(globalArchitectureURI != null && "
+							+ "!globalArchitectureURI.isEmpty())");
 		assert	currentSimulationType.isNoSimulation() ||
-								(localArchitectureURI != null &&
-											!localArchitectureURI.isEmpty()) :
-				new PreconditionException(
-						"currentSimulationType.isNoSimulation() ||  "
-						+ "(localArchitectureURI != null && "
-						+ "!localArchitectureURI.isEmpty())");
+		(localArchitectureURI != null &&
+		!localArchitectureURI.isEmpty()) :
+			new PreconditionException(
+					"currentSimulationType.isNoSimulation() ||  "
+							+ "(localArchitectureURI != null && "
+							+ "!localArchitectureURI.isEmpty())");
 		assert	!currentSimulationType.isSILSimulation() || accFactor > 0.0 :
-				new PreconditionException(
-						"!currentSimulationType.isSILSimulation() || "
-						+ "accFactor > 0.0");
+			new PreconditionException(
+					"!currentSimulationType.isSILSimulation() || "
+							+ "accFactor > 0.0");
 
 		if (currentExecutionType.isStandard()) {
 			throw new RuntimeException(
@@ -452,10 +452,10 @@ implements	MachineCafeOperationI
 		this.initialise(machineCafeInboundPortURI);
 
 		assert	MachineCafeUser.glassBoxInvariants(this) :
-				new ImplementationInvariantException(
-						"MachineCafeUser.glassBoxInvariants(this)");
+			new ImplementationInvariantException(
+					"MachineCafeUser.glassBoxInvariants(this)");
 		assert	MachineCafeUser.blackBoxInvariants(this) :
-				new InvariantException("MachineCafeUser.blackBoxInvariants(this)");
+			new InvariantException("MachineCafeUser.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -472,8 +472,8 @@ implements	MachineCafeOperationI
 	 * @throws Exception				<i>to do</i>.
 	 */
 	protected void		initialise(
-		String machineCafeInboundPortURI
-		) throws Exception
+			String machineCafeInboundPortURI
+			) throws Exception
 	{
 		this.machineCafeInboundPortURI = machineCafeInboundPortURI;
 		this.mcop = new MachineCafeOutboundPort(this);
@@ -484,35 +484,35 @@ implements	MachineCafeOperationI
 		switch (this.currentSimulationType) {
 		case MIL_SIMULATION:
 			Architecture architecture =
-					LocalSimulationArchitectures.
-						createHairDryerUserMIL_Architecture(
-											this.localArchitectureURI,
-											this.simulationTimeUnit);
+			LocalSimulationArchitectures.
+			createHairDryerUserMIL_Architecture(
+					this.localArchitectureURI,
+					this.simulationTimeUnit);
 			assert	architecture.getRootModelURI().
-										equals(this.localArchitectureURI) :
-					new AssertionError(
-							"local simulation architecture "
-							+ this.localArchitectureURI
-							+ " does not exist!");
+			equals(this.localArchitectureURI) :
+				new AssertionError(
+						"local simulation architecture "
+								+ this.localArchitectureURI
+								+ " does not exist!");
 			this.addLocalSimulatorArchitecture(architecture);
 			this.global2localSimulationArchitectureURIS.
-					put(this.globalArchitectureURI, this.localArchitectureURI);
+			put(this.globalArchitectureURI, this.localArchitectureURI);
 			break;
 		case MIL_RT_SIMULATION:
 			architecture =
-					LocalSimulationArchitectures.
-						createHairDryerUserMIL_RT_Architecture(
-											this.localArchitectureURI,
-											this.simulationTimeUnit,
-											this.accFactor);
+			LocalSimulationArchitectures.
+			createHairDryerUserMIL_RT_Architecture(
+					this.localArchitectureURI,
+					this.simulationTimeUnit,
+					this.accFactor);
 			assert	architecture.getRootModelURI().equals(
-												this.localArchitectureURI) :
-					new BCMException(
-							"local simulator " + this.localArchitectureURI
-							+ " does not exist!");
+					this.localArchitectureURI) :
+						new BCMException(
+								"local simulator " + this.localArchitectureURI
+								+ " does not exist!");
 			this.addLocalSimulatorArchitecture(architecture);
 			this.global2localSimulationArchitectureURIS.
-					put(this.globalArchitectureURI, this.localArchitectureURI);
+			put(this.globalArchitectureURI, this.localArchitectureURI);
 			break;
 		case SIL_SIMULATION:
 		case NO_SIMULATION:
@@ -524,7 +524,7 @@ implements	MachineCafeOperationI
 		if (VERBOSE) {
 			this.tracer.get().setTitle("Machine cafe user component");
 			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
-												  Y_RELATIVE_POSITION);
+					Y_RELATIVE_POSITION);
 			this.toggleTracing();
 		}
 	}
@@ -533,7 +533,7 @@ implements	MachineCafeOperationI
 	// Component internal testing method triggered by the SIL simulator
 	// -------------------------------------------------------------------------
 
-	
+
 	/**
 	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOn()
 	 */
@@ -566,7 +566,7 @@ implements	MachineCafeOperationI
 		}
 	}
 
-	
+
 
 	// -------------------------------------------------------------------------
 	// Component internal tests
@@ -584,7 +584,7 @@ implements	MachineCafeOperationI
 		this.logMessage("...done.");
 	}
 
-	
+
 	public void			testTurnOnOff()
 	{
 		this.logMessage("testTurnOnOff()... ");
@@ -597,7 +597,7 @@ implements	MachineCafeOperationI
 		}
 		try {
 			assertThrows(ExecutionException.class,
-						 () -> this.mcop.turnOn());
+					() -> this.mcop.turnOn());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -609,7 +609,7 @@ implements	MachineCafeOperationI
 		}
 		try {
 			assertThrows(ExecutionException.class,
-						 () -> this.mcop.turnOff());
+					() -> this.mcop.turnOff());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
@@ -632,11 +632,11 @@ implements	MachineCafeOperationI
 	 */
 	@Override
 	public synchronized void	start()
-	throws ComponentStartException
+			throws ComponentStartException
 	{
 		super.start();
 
-		
+
 		try {
 			this.doPortConnection(
 					this.mcop.getPortURI(),
@@ -647,9 +647,9 @@ implements	MachineCafeOperationI
 			case MIL_SIMULATION:
 				AtomicSimulatorPlugin asp = new AtomicSimulatorPlugin();
 				String uri = this.global2localSimulationArchitectureURIS.
-												get(this.globalArchitectureURI);
+						get(this.globalArchitectureURI);
 				Architecture architecture =
-					(Architecture) this.localSimulationArchitectures.get(uri);
+						(Architecture) this.localSimulationArchitectures.get(uri);
 				asp.setPluginURI(uri);
 				asp.setSimulationArchitecture(architecture);
 				this.installPlugin(asp);
@@ -657,9 +657,9 @@ implements	MachineCafeOperationI
 			case MIL_RT_SIMULATION:
 				RTAtomicSimulatorPlugin rtasp = new RTAtomicSimulatorPlugin();
 				uri = this.global2localSimulationArchitectureURIS.
-											get(this.globalArchitectureURI);
+						get(this.globalArchitectureURI);
 				architecture =
-					(Architecture) this.localSimulationArchitectures.get(uri);
+						(Architecture) this.localSimulationArchitectures.get(uri);
 				rtasp.setPluginURI(uri);
 				rtasp.setSimulationArchitecture(architecture);
 				this.installPlugin(rtasp);
@@ -684,12 +684,12 @@ implements	MachineCafeOperationI
 		this.logMessage("MachineCafeUser executes.");
 		if (this.currentExecutionType.isTest() &&
 				(this.currentSimulationType.isNoSimulation() ||
-							this.currentSimulationType.isSILSimulation())) {
+						this.currentSimulationType.isSILSimulation())) {
 			// First, the component must synchronise with other components
 			// to start the execution of the test scenario; we use a
 			// time-triggered synchronisation scheme with the accelerated clock
 			ClocksServerWithSimulationOutboundPort clocksServerOutboundPort =
-							new ClocksServerWithSimulationOutboundPort(this);
+					new ClocksServerWithSimulationOutboundPort(this);
 			clocksServerOutboundPort.publishPort();
 			this.doPortConnection(
 					clocksServerOutboundPort.getPortURI(),
@@ -697,7 +697,7 @@ implements	MachineCafeOperationI
 					ClocksServerWithSimulationConnector.class.getCanonicalName());
 			this.logMessage("MachineCafeUser gets the clock.");
 			AcceleratedAndSimulationClock acceleratedClock =
-				clocksServerOutboundPort.getClockWithSimulation(this.clockURI);
+					clocksServerOutboundPort.getClockWithSimulation(this.clockURI);
 			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
 			clocksServerOutboundPort.unpublishPort();
 
@@ -766,18 +766,16 @@ implements	MachineCafeOperationI
 	 *
 	 */
 	protected void			silTestScenario(
-		AcceleratedAndSimulationClock acceleratedClock
-		)
+			AcceleratedAndSimulationClock acceleratedClock
+			)
 	{
 		assert	!acceleratedClock.simulationStartTimeNotReached() :
-				new BCMException("!acceleratedClock.startTimeNotReached()");
+			new BCMException("!acceleratedClock.startTimeNotReached()");
 
 		// Define the instants of the different actions in the scenario.
 		Instant simulationStartInstant =
-								acceleratedClock.getSimulationStartInstant();
+				acceleratedClock.getSimulationStartInstant();
 		Instant switchOn = simulationStartInstant.plusSeconds(3600L);
-		Instant setHigh = simulationStartInstant.plusSeconds(4500L);
-		Instant setLow = simulationStartInstant.plusSeconds(6300L);
 		Instant switchOff = simulationStartInstant.plusSeconds(7200L);
 
 		// For each action, compute the waiting time for this action using the
@@ -788,25 +786,25 @@ implements	MachineCafeOperationI
 				"MachineCafe#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
-												+ " " + TimeUnit.MILLISECONDS
+				+ " " + TimeUnit.MILLISECONDS
 				+ " to reach " + switchOn);
 		this.scheduleTask(
 				o -> { logMessage("MachineCafeUser SIL test scenario begins.");
-					   ((MachineCafeUser)o).turnOn();
-					 },
+				((MachineCafeUser)o).turnOn();
+				},
 				delayInNanos, TimeUnit.NANOSECONDS);
-		
+
 		delayInNanos = acceleratedClock.nanoDelayUntilInstant(switchOff);
 		this.logMessage(
 				"MachineCafe#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
-												+ " " + TimeUnit.MILLISECONDS
+				+ " " + TimeUnit.MILLISECONDS
 				+ " to reach " + switchOff);
 		this.scheduleTask(
 				o -> { ((MachineCafeUser)o).turnOff() ;
-					   logMessage("MachineCafeUser SIL test scenario ends.");
-					 },
+				logMessage("MachineCafeUser SIL test scenario ends.");
+				},
 				delayInNanos, TimeUnit.NANOSECONDS);
 	}
 }

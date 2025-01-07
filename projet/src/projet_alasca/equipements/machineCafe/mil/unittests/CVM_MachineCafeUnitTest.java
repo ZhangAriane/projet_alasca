@@ -190,15 +190,15 @@ extends		AbstractCVM
 	/** the type of execution, to select among the values of the
 	 *  enumeration {@code ExecutionType}.									*/
 	public static ExecutionType		CURRENT_EXECUTION_TYPE =
-											//ExecutionType.STANDARD;
-											ExecutionType.UNIT_TEST;
+			//ExecutionType.STANDARD;
+			ExecutionType.UNIT_TEST;
 	/** the type of execution, to select among the values of the
 	 *  enumeration {@code ExecutionType}.									*/
 	public static SimulationType	CURRENT_SIMULATION_TYPE =
-											//SimulationType.NO_SIMULATION;
-											SimulationType.MIL_SIMULATION;
-											//SimulationType.MIL_RT_SIMULATION;
-											//SimulationType.SIL_SIMULATION;
+			//SimulationType.NO_SIMULATION;
+			SimulationType.MIL_SIMULATION;
+	//SimulationType.MIL_RT_SIMULATION;
+	//SimulationType.SIL_SIMULATION;
 
 	/** for unit tests and SIL simulation tests, a {@code Clock} is
 	 *  used to get a time-triggered synchronisation of the actions of
@@ -254,13 +254,13 @@ extends		AbstractCVM
 	public void			deploy() throws Exception
 	{
 		assert	!CURRENT_EXECUTION_TYPE.isIntegrationTest() :
-				new RuntimeException(
-						"!CURRENT_EXECUTION_TYPE.isIntegrationTest()");
+			new RuntimeException(
+					"!CURRENT_EXECUTION_TYPE.isIntegrationTest()");
 		assert	!CURRENT_EXECUTION_TYPE.isStandard() ||
-									CURRENT_SIMULATION_TYPE.isNoSimulation() :
-				new RuntimeException(
-						"!CURRENT_EXECUTION_TYPE.isStandard() || "
-						+ "CURRENT_SIMULATION_TYPE.isNoSimulation()");
+		CURRENT_SIMULATION_TYPE.isNoSimulation() :
+			new RuntimeException(
+					"!CURRENT_EXECUTION_TYPE.isStandard() || "
+							+ "CURRENT_SIMULATION_TYPE.isNoSimulation()");
 
 		// Set the main execution run parameters, depending on the type of
 		// execution that is required.
@@ -309,24 +309,24 @@ extends		AbstractCVM
 				MachineCafe.class.getCanonicalName(),
 				new Object[]{MachineCafe.REFLECTION_INBOUND_PORT_URI,
 						MachineCafe.INBOUND_PORT_URI,
-							 CURRENT_EXECUTION_TYPE,
-							 CURRENT_SIMULATION_TYPE,
-							 architectureURI,
-							 machineCafeLocalArchitectureURI,
-							 SIMULATION_TIME_UNIT,
-							 ACCELERATION_FACTOR,
-							 CLOCK_URI});
+						CURRENT_EXECUTION_TYPE,
+						CURRENT_SIMULATION_TYPE,
+						architectureURI,
+						machineCafeLocalArchitectureURI,
+						SIMULATION_TIME_UNIT,
+						ACCELERATION_FACTOR,
+						CLOCK_URI});
 		AbstractComponent.createComponent(
 				MachineCafeUser.class.getCanonicalName(),
 				new Object[]{MachineCafeUser.REFLECTION_INBOUND_PORT_URI,
 						MachineCafe.INBOUND_PORT_URI,
-							 CURRENT_EXECUTION_TYPE,
-							 CURRENT_SIMULATION_TYPE,
-							 architectureURI,
-							 machineCafeUserLocalArchitectureURI,
-							 SIMULATION_TIME_UNIT,
-							 ACCELERATION_FACTOR,
-							 CLOCK_URI});
+						CURRENT_EXECUTION_TYPE,
+						CURRENT_SIMULATION_TYPE,
+						architectureURI,
+						machineCafeUserLocalArchitectureURI,
+						SIMULATION_TIME_UNIT,
+						ACCELERATION_FACTOR,
+						CLOCK_URI});
 
 		// a clock server with simulation is created even if there is no
 		// simulation for simplicity, but simulaiton values are not used if
@@ -338,7 +338,7 @@ extends		AbstractCVM
 						CLOCK_URI,
 						// start time in Unix epoch time
 						TimeUnit.MILLISECONDS.toNanos(
-										 		unixEpochStartTimeInMillis),
+								unixEpochStartTimeInMillis),
 						// start instant synchronised with the start time
 						Instant.parse(START_INSTANT),
 						ACCELERATION_FACTOR,
@@ -348,7 +348,7 @@ extends		AbstractCVM
 						SIMULATION_TIME_UNIT});
 
 		if (CURRENT_SIMULATION_TYPE.isMilSimulation() ||
-								CURRENT_SIMULATION_TYPE.isMILRTSimulation()) {
+				CURRENT_SIMULATION_TYPE.isMILRTSimulation()) {
 			// A supervisor component and a coordinator component are only
 			// needed for MIL and MIL real time simulation because for the
 			// hair dryer unit tests with SIL simulation executes only one
@@ -361,7 +361,7 @@ extends		AbstractCVM
 			AbstractComponent.createComponent(
 					MachineCafeUnitTestsSupervisor.class.getCanonicalName(),
 					new Object[]{CURRENT_SIMULATION_TYPE,
-								 architectureURI});
+							architectureURI});
 		}
 
 		super.deploy();
@@ -401,8 +401,8 @@ extends		AbstractCVM
 				// is sufficient to use EXECUTION_DURATION as the duration of
 				// the application execution
 				executionDurationInMillis =
-					DELAY_TO_START + DELAY_TO_START_SIMULATION 
-										+ EXECUTION_DURATION + DELAY_TO_STOP;
+				DELAY_TO_START + DELAY_TO_START_SIMULATION 
+				+ EXECUTION_DURATION + DELAY_TO_STOP;
 				break;
 			case MIL_RT_SIMULATION:
 			case SIL_SIMULATION:
@@ -416,14 +416,14 @@ extends		AbstractCVM
 				// 60 will take one minute execution time converted to 60000
 				// milliseconds.
 				executionDurationInMillis =
-					DELAY_TO_START + DELAY_TO_START_SIMULATION
-						+ ((long)(((double)SIMULATION_TIME_UNIT.toMillis(1))
-								* (SIMULATION_DURATION/ACCELERATION_FACTOR)))
-						+ DELAY_TO_STOP;
+				DELAY_TO_START + DELAY_TO_START_SIMULATION
+				+ ((long)(((double)SIMULATION_TIME_UNIT.toMillis(1))
+						* (SIMULATION_DURATION/ACCELERATION_FACTOR)))
+				+ DELAY_TO_STOP;
 				break;
 			case NO_SIMULATION:
 				executionDurationInMillis =
-					DELAY_TO_START + EXECUTION_DURATION + DELAY_TO_STOP;
+				DELAY_TO_START + EXECUTION_DURATION + DELAY_TO_STOP;
 				break;
 			default:
 			}

@@ -146,7 +146,7 @@ public class			RunMachineCafeUnitaryMILRTSimulation
 			// map that will contain the atomic model descriptors to construct
 			// the simulation architecture
 			Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-																new HashMap<>();
+					new HashMap<>();
 
 			// the hair dyer model simulating its electricity consumption, an
 			// atomic HIOA model hence we use an AtomicHIOA_Descriptor
@@ -180,7 +180,7 @@ public class			RunMachineCafeUnitaryMILRTSimulation
 			// map that will contain the coupled model descriptors to construct
 			// the simulation architecture
 			Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-																new HashMap<>();
+					new HashMap<>();
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
@@ -191,81 +191,81 @@ public class			RunMachineCafeUnitaryMILRTSimulation
 			// event exchanging connections between exporting and importing
 			// models
 			Map<EventSource,EventSink[]> connections =
-										new HashMap<EventSource,EventSink[]>();
+					new HashMap<EventSource,EventSink[]>();
 
-			connections.put(
-				new EventSource(MachineCafeUserModel.MIL_RT_URI,
-								SwitchOnMachineCafe.class),
-				new EventSink[] {
-					new EventSink(MachineCafeStateModel.MIL_RT_URI,
-								  SwitchOnMachineCafe.class)
-				});
-			connections.put(
-				new EventSource(MachineCafeUserModel.MIL_RT_URI,
-								SwitchOffMachineCafe.class),
-				new EventSink[] {
-					new EventSink(MachineCafeStateModel.MIL_RT_URI,
-								  SwitchOffMachineCafe.class)
-				});
-			
-			connections.put(
-				new EventSource(MachineCafeStateModel.MIL_RT_URI,
-								SwitchOnMachineCafe.class),
-				new EventSink[] {
-					new EventSink(MachineCafeElectricityModel.MIL_RT_URI,
-								  SwitchOnMachineCafe.class)
-				});
-			connections.put(
-				new EventSource(MachineCafeStateModel.MIL_RT_URI,
-								SwitchOffMachineCafe.class),
-				new EventSink[] {
-					new EventSink(MachineCafeElectricityModel.MIL_RT_URI,
-								  SwitchOffMachineCafe.class)
-				});
-			
+					connections.put(
+							new EventSource(MachineCafeUserModel.MIL_RT_URI,
+									SwitchOnMachineCafe.class),
+							new EventSink[] {
+									new EventSink(MachineCafeStateModel.MIL_RT_URI,
+											SwitchOnMachineCafe.class)
+							});
+					connections.put(
+							new EventSource(MachineCafeUserModel.MIL_RT_URI,
+									SwitchOffMachineCafe.class),
+							new EventSink[] {
+									new EventSink(MachineCafeStateModel.MIL_RT_URI,
+											SwitchOffMachineCafe.class)
+							});
 
-			// coupled model descriptor
-			coupledModelDescriptors.put(
-					MachineCafeCoupledModel.MIL_RT_URI,
-					new RTCoupledModelDescriptor(
-							MachineCafeCoupledModel.class,
+					connections.put(
+							new EventSource(MachineCafeStateModel.MIL_RT_URI,
+									SwitchOnMachineCafe.class),
+							new EventSink[] {
+									new EventSink(MachineCafeElectricityModel.MIL_RT_URI,
+											SwitchOnMachineCafe.class)
+							});
+					connections.put(
+							new EventSource(MachineCafeStateModel.MIL_RT_URI,
+									SwitchOffMachineCafe.class),
+							new EventSink[] {
+									new EventSink(MachineCafeElectricityModel.MIL_RT_URI,
+											SwitchOffMachineCafe.class)
+							});
+
+
+					// coupled model descriptor
+					coupledModelDescriptors.put(
 							MachineCafeCoupledModel.MIL_RT_URI,
-							submodels,
-							null,
-							null,
-							connections,
-							null,
-							ACCELERATION_FACTOR));
+							new RTCoupledModelDescriptor(
+									MachineCafeCoupledModel.class,
+									MachineCafeCoupledModel.MIL_RT_URI,
+									submodels,
+									null,
+									null,
+									connections,
+									null,
+									ACCELERATION_FACTOR));
 
-			// simulation architecture
-			ArchitectureI architecture =
-					new RTArchitecture(
-							MachineCafeCoupledModel.MIL_RT_URI,
-							atomicModelDescriptors,
-							coupledModelDescriptors,
-							TIME_UNIT);
+					// simulation architecture
+					ArchitectureI architecture =
+							new RTArchitecture(
+									MachineCafeCoupledModel.MIL_RT_URI,
+									atomicModelDescriptors,
+									coupledModelDescriptors,
+									TIME_UNIT);
 
-			// create the simulator from the simulation architecture
-			SimulatorI se = architecture.constructSimulator();
-			// this add additional time at each simulation step in
-			// standard simulations (useful when debugging)
-			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
-			// run a simulation with the simulation beginning at 0.0 and
-			// ending at 24.0
-			// run a simulation with the simulation beginning at 0.0 and
-			// ending at 24.0
-			long start = System.currentTimeMillis() + 100;
-			double simulationDuration = 24.0;
-			se.startRTSimulation(start, 0.0, simulationDuration);
-			long executionDuration =					
-				new Double(TIME_UNIT.toMillis(1)*
+					// create the simulator from the simulation architecture
+					SimulatorI se = architecture.constructSimulator();
+					// this add additional time at each simulation step in
+					// standard simulations (useful when debugging)
+					SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
+					// run a simulation with the simulation beginning at 0.0 and
+					// ending at 24.0
+					// run a simulation with the simulation beginning at 0.0 and
+					// ending at 24.0
+					long start = System.currentTimeMillis() + 100;
+					double simulationDuration = 24.0;
+					se.startRTSimulation(start, 0.0, simulationDuration);
+					long executionDuration =					
+							new Double(TIME_UNIT.toMillis(1)*
 									(simulationDuration/ACCELERATION_FACTOR)).
-																	longValue();
-			Thread.sleep(executionDuration + 2000L);
-			SimulationReportI sr = se.getSimulatedModel().getFinalReport();
-			System.out.println(sr);
-			Thread.sleep(10000L);
-			System.exit(0);
+							longValue();
+					Thread.sleep(executionDuration + 2000L);
+					SimulationReportI sr = se.getSimulatedModel().getFinalReport();
+					System.out.println(sr);
+					Thread.sleep(10000L);
+					System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}

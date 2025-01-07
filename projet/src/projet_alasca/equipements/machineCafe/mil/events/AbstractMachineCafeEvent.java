@@ -87,9 +87,9 @@ extends		ES_Event
 	 * @param content			content (data) associated with the event.
 	 */
 	public				AbstractMachineCafeEvent(
-		Time timeOfOccurrence,
-		EventInformationI content
-		)
+			Time timeOfOccurrence,
+			EventInformationI content
+			)
 	{
 		super(timeOfOccurrence, content);
 	}

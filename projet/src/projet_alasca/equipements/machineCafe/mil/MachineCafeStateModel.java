@@ -110,9 +110,9 @@ import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
  */
 // -----------------------------------------------------------------------------
 @ModelExternalEvents(
-	imported = {SwitchOnMachineCafe.class,SwitchOffMachineCafe.class},
-	exported = {SwitchOnMachineCafe.class,SwitchOffMachineCafe.class}
-	)
+		imported = {SwitchOnMachineCafe.class,SwitchOffMachineCafe.class},
+		exported = {SwitchOnMachineCafe.class,SwitchOffMachineCafe.class}
+		)
 // -----------------------------------------------------------------------------
 public class			MachineCafeStateModel
 extends		AtomicModel
@@ -126,16 +126,16 @@ implements	MachineCafeOperationI
 	/** URI for an instance model in MIL simulations; works as long as
 	 *  only one instance is created.										*/
 	public static final String	MIL_URI = MachineCafeStateModel.class.
-												getSimpleName() + "-MIL";
+			getSimpleName() + "-MIL";
 	/** URI for an instance model in MIL real time simulations; works as
 	 *  long as only one instance is created.								*/
 	public static final String	MIL_RT_URI = MachineCafeStateModel.class.
-												getSimpleName() + "-MIL/SIL_RT";
+			getSimpleName() + "-MIL/SIL_RT";
 	/** URI for an instance model in SIL simulations; works as long as
 	 *  only one instance is created. It is the same value as for MIL
 	 *  real time simulations as the same models are used in both cases.	*/
 	public static final String	SIL_URI = MachineCafeStateModel.class.
-												getSimpleName() + "-MIL/SIL_RT";
+			getSimpleName() + "-MIL/SIL_RT";
 
 	/** current state of the hair dryer.									*/
 	protected State						currentState;
@@ -162,8 +162,8 @@ implements	MachineCafeOperationI
 	protected static boolean	glassBoxInvariants(MachineCafeStateModel instance)
 	{
 		assert	instance != null :
-				new NeoSim4JavaException("Precondition violation: "
-						+ "instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
 		boolean ret = true;
 		return ret;
@@ -185,8 +185,8 @@ implements	MachineCafeOperationI
 	protected static boolean	blackBoxInvariants(MachineCafeStateModel instance)
 	{
 		assert	instance != null :
-				new NeoSim4JavaException("Precondition violation: "
-						+ "instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
@@ -234,21 +234,21 @@ implements	MachineCafeOperationI
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				MachineCafeStateModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		AtomicSimulatorI simulationEngine
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			AtomicSimulatorI simulationEngine
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine);
 		// set the logger to a standard simulation logger
 		this.getSimulationEngine().setLogger(new StandardLogger());
 
 		assert	glassBoxInvariants(this) :
-				new NeoSim4JavaException(
-						"MachineCafeStateModel.glassBoxInvariants(this)");
+			new NeoSim4JavaException(
+					"MachineCafeStateModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new NeoSim4JavaException(
-						"MachineCafeStateModel.blackBoxInvariants(this)");
+			new NeoSim4JavaException(
+					"MachineCafeStateModel.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -374,8 +374,8 @@ implements	MachineCafeOperationI
 	 */
 	@Override
 	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws MissingRunParameterException
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
 
@@ -384,11 +384,11 @@ implements	MachineCafeOperationI
 		// operations or tasks or to get the value of variables held by the
 		// component when necessary.
 		if (simParams.containsKey(
-						AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+				AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
 			// by the following, all of the logging will appear in the owner
 			// component logger
 			this.getSimulationEngine().setLogger(
-						AtomicSimulatorPlugin.createComponentLogger(simParams));
+					AtomicSimulatorPlugin.createComponentLogger(simParams));
 		}
 	}
 }

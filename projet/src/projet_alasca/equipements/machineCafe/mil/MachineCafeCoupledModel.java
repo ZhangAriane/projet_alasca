@@ -81,17 +81,17 @@ extends		CoupledModel
 	private static final long serialVersionUID = 1L;
 	/** URI for an instance model; works as long as only one instance is
 	 *  created.															*/
-	
+
 	public static final String	MIL_URI = MachineCafeCoupledModel.class.
 			getSimpleName() + "-MIL";
-/** URI for an instance model in MIL simulations; works as long as
-*  only one instance is created.										*/
-public static final String	MIL_RT_URI = MachineCafeCoupledModel.class.
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.										*/
+	public static final String	MIL_RT_URI = MachineCafeCoupledModel.class.
 			getSimpleName() + "-MIL_RT";
-/** URI for an instance model in MIL simulations; works as long as
-*  only one instance is created. It is the same value as for MIL
-*  real time simulations as the same models are used in both cases.	*/
-public static final String	SIL_URI = MachineCafeCoupledModel.class.
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created. It is the same value as for MIL
+	 *  real time simulations as the same models are used in both cases.	*/
+	public static final String	SIL_URI = MachineCafeCoupledModel.class.
 			getSimpleName() + "-MIL_RT";
 
 	// -------------------------------------------------------------------------
@@ -126,17 +126,17 @@ public static final String	SIL_URI = MachineCafeCoupledModel.class.
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				MachineCafeCoupledModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		CoordinatorI simulationEngine,
-		ModelI[] submodels,
-		Map<Class<? extends EventI>,EventSink[]> imported,
-		Map<Class<? extends EventI>,ReexportedEvent> reexported,
-		Map<EventSource, EventSink[]> connections
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			CoordinatorI simulationEngine,
+			ModelI[] submodels,
+			Map<Class<? extends EventI>,EventSink[]> imported,
+			Map<Class<? extends EventI>,ReexportedEvent> reexported,
+			Map<EventSource, EventSink[]> connections
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine, submodels,
-			  imported, reexported, connections);
+				imported, reexported, connections);
 	}
 }
 // -----------------------------------------------------------------------------

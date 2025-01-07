@@ -153,7 +153,7 @@ public abstract class	LocalSimulationArchitectures
 	 * the {@code HairDryerUser} component and it will be connected through
 	 * the overall multi-component simulation architecture.
 	 * </p>
- 	 * 
+	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
 	 * <pre>
@@ -167,14 +167,14 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public static Architecture	createHairDryerMILLocalArchitecture4UnitTest(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit
-		) throws Exception
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the hair dyer model simulating its electricity consumption, an
 		// atomic HIOA model hence we use an AtomicHIOA_Descriptor
@@ -197,7 +197,7 @@ public abstract class	LocalSimulationArchitectures
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
@@ -209,63 +209,63 @@ public abstract class	LocalSimulationArchitectures
 		Map<Class<? extends EventI>,EventSink[]> imported =
 				new HashMap<Class<? extends EventI>,EventSink[]>();
 
-		imported.put(
-			SwitchOnMachineCafe.class,
-			new EventSink[] {
-				new EventSink(MachineCafeStateModel.MIL_URI,
-						SwitchOnMachineCafe.class)
-			});
-		imported.put(
-				SwitchOffMachineCafe.class,
-				new EventSink[] {
-					new EventSink(MachineCafeStateModel.MIL_URI,
-							SwitchOffMachineCafe.class)
-				});
+				imported.put(
+						SwitchOnMachineCafe.class,
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_URI,
+										SwitchOnMachineCafe.class)
+						});
+				imported.put(
+						SwitchOffMachineCafe.class,
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_URI,
+										SwitchOffMachineCafe.class)
+						});
 
 
-		// event exchanging connections between exporting and importing
-		// models
-		Map<EventSource,EventSink[]> connections =
-									new HashMap<EventSource,EventSink[]>();
+				// event exchanging connections between exporting and importing
+				// models
+				Map<EventSource,EventSink[]> connections =
+						new HashMap<EventSource,EventSink[]>();
 
-		connections.put(
-			new EventSource(MachineCafeStateModel.MIL_URI,
-					SwitchOnMachineCafe.class),
-			new EventSink[] {
-				new EventSink(MachineCafeElectricityModel.MIL_URI,
-						SwitchOnMachineCafe.class)
-			});
-		connections.put(
-			new EventSource(MachineCafeStateModel.MIL_URI,
-					SwitchOffMachineCafe.class),
-			new EventSink[] {
-				new EventSink(MachineCafeElectricityModel.MIL_URI,
-						SwitchOffMachineCafe.class)
-			});
-		
+						connections.put(
+								new EventSource(MachineCafeStateModel.MIL_URI,
+										SwitchOnMachineCafe.class),
+								new EventSink[] {
+										new EventSink(MachineCafeElectricityModel.MIL_URI,
+												SwitchOnMachineCafe.class)
+								});
+						connections.put(
+								new EventSource(MachineCafeStateModel.MIL_URI,
+										SwitchOffMachineCafe.class),
+								new EventSink[] {
+										new EventSink(MachineCafeElectricityModel.MIL_URI,
+												SwitchOffMachineCafe.class)
+								});
 
-		// coupled model descriptor
-		coupledModelDescriptors.put(
-				MachineCafeCoupledModel.MIL_URI,
-				new CoupledModelDescriptor(
-						MachineCafeCoupledModel.class,
-						MachineCafeCoupledModel.MIL_URI,
-						submodels,
-						imported,
-						null,
-						connections,
-						null));
 
-		// simulation architecture
-		Architecture architecture =
-				new Architecture(
-						architectureURI,
-						MachineCafeCoupledModel.MIL_URI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						simulatedTimeUnit);
+						// coupled model descriptor
+						coupledModelDescriptors.put(
+								MachineCafeCoupledModel.MIL_URI,
+								new CoupledModelDescriptor(
+										MachineCafeCoupledModel.class,
+										MachineCafeCoupledModel.MIL_URI,
+										submodels,
+										imported,
+										null,
+										connections,
+										null));
 
-		return architecture;
+						// simulation architecture
+						Architecture architecture =
+								new Architecture(
+										architectureURI,
+										MachineCafeCoupledModel.MIL_URI,
+										atomicModelDescriptors,
+										coupledModelDescriptors,
+										simulatedTimeUnit);
+
+						return architecture;
 	}
 
 	/**
@@ -297,15 +297,15 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception			<i>to do</i>.
 	 */
 	public static Architecture	createHairDryerMIL_RT_Architecture4UnitTest(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit,
-		double accelerationFactor
-		) throws Exception
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit,
+			double accelerationFactor
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the hair dyer model simulating its electricity consumption, an
 		// atomic HIOA model hence we use an AtomicHIOA_Descriptor
@@ -330,7 +330,7 @@ public abstract class	LocalSimulationArchitectures
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
@@ -342,65 +342,65 @@ public abstract class	LocalSimulationArchitectures
 		Map<Class<? extends EventI>,EventSink[]> imported =
 				new HashMap<Class<? extends EventI>,EventSink[]>();
 
-		imported.put(
-			SwitchOnMachineCafe.class,
-			new EventSink[] {
-				new EventSink(MachineCafeStateModel.MIL_RT_URI,
-						SwitchOnMachineCafe.class)
-			});
-		imported.put(
-				SwitchOffMachineCafe.class,
-				new EventSink[] {
-					new EventSink(MachineCafeStateModel.MIL_RT_URI,
-							SwitchOffMachineCafe.class)
-				});
+				imported.put(
+						SwitchOnMachineCafe.class,
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_RT_URI,
+										SwitchOnMachineCafe.class)
+						});
+				imported.put(
+						SwitchOffMachineCafe.class,
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_RT_URI,
+										SwitchOffMachineCafe.class)
+						});
 
 
-		// event exchanging connections between exporting and importing
-		// models
-		Map<EventSource,EventSink[]> connections =
-									new HashMap<EventSource,EventSink[]>();
+				// event exchanging connections between exporting and importing
+				// models
+				Map<EventSource,EventSink[]> connections =
+						new HashMap<EventSource,EventSink[]>();
 
-		connections.put(
-			new EventSource(MachineCafeStateModel.MIL_RT_URI,
-					SwitchOnMachineCafe.class),
-			new EventSink[] {
-				new EventSink(MachineCafeStateModel.MIL_RT_URI,
-						SwitchOnMachineCafe.class)
-			});
-		connections.put(
-			new EventSource(MachineCafeStateModel.MIL_RT_URI,
-					SwitchOffMachineCafe.class),
-			new EventSink[] {
-				new EventSink(MachineCafeStateModel.MIL_RT_URI,
-						SwitchOffMachineCafe.class)
-			});
+						connections.put(
+								new EventSource(MachineCafeStateModel.MIL_RT_URI,
+										SwitchOnMachineCafe.class),
+								new EventSink[] {
+										new EventSink(MachineCafeStateModel.MIL_RT_URI,
+												SwitchOnMachineCafe.class)
+								});
+						connections.put(
+								new EventSource(MachineCafeStateModel.MIL_RT_URI,
+										SwitchOffMachineCafe.class),
+								new EventSink[] {
+										new EventSink(MachineCafeStateModel.MIL_RT_URI,
+												SwitchOffMachineCafe.class)
+								});
 
 
-		// coupled model descriptor
-		coupledModelDescriptors.put(
-				MachineCafeCoupledModel.MIL_RT_URI,
-				new RTCoupledModelDescriptor(
-						MachineCafeCoupledModel.class,
-						MachineCafeCoupledModel.MIL_RT_URI,
-						submodels,
-						imported,
-						null,
-						connections,
-						null,
-						accelerationFactor));
+						// coupled model descriptor
+						coupledModelDescriptors.put(
+								MachineCafeCoupledModel.MIL_RT_URI,
+								new RTCoupledModelDescriptor(
+										MachineCafeCoupledModel.class,
+										MachineCafeCoupledModel.MIL_RT_URI,
+										submodels,
+										imported,
+										null,
+										connections,
+										null,
+										accelerationFactor));
 
-		// simulation architecture
-		Architecture architecture =
-				new RTArchitecture(
-						architectureURI,
-						MachineCafeCoupledModel.MIL_RT_URI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						simulatedTimeUnit,
-						accelerationFactor);
+						// simulation architecture
+						Architecture architecture =
+								new RTArchitecture(
+										architectureURI,
+										MachineCafeCoupledModel.MIL_RT_URI,
+										atomicModelDescriptors,
+										coupledModelDescriptors,
+										simulatedTimeUnit,
+										accelerationFactor);
 
-		return architecture;
+						return architecture;
 	}
 
 	/**
@@ -442,14 +442,14 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public static Architecture	createHairDryerMILArchitecture4IntegrationTest(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit
-		) throws Exception
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the hair dyer model simulating its electricity consumption, an
 		// atomic HIOA model hence we use an AtomicHIOA_Descriptor
@@ -464,7 +464,7 @@ public abstract class	LocalSimulationArchitectures
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// simulation architecture
 		Architecture architecture =
@@ -518,18 +518,18 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception			<i>to do</i>.
 	 */
 	public static Architecture	createHairDryerMIL_RT_Architecture4IntegrationTest(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit,
-		double accelerationFactor
-		) throws Exception
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit,
+			double accelerationFactor
+			) throws Exception
 	{
 		assert	accelerationFactor > 0.0 :
-				new PreconditionException("accelerationFactor > 0.0");
+			new PreconditionException("accelerationFactor > 0.0");
 
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the hair dyer model simulating its electricity consumption, an
 		// atomic HIOA model hence we use an AtomicHIOA_Descriptor
@@ -545,7 +545,7 @@ public abstract class	LocalSimulationArchitectures
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// simulation architecture
 		Architecture architecture =
@@ -588,14 +588,14 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public static Architecture	createHairDryerUserMIL_Architecture(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit
-		) throws Exception
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// for atomic model, we use an AtomicModelDescriptor
 		atomicModelDescriptors.put(
@@ -609,7 +609,7 @@ public abstract class	LocalSimulationArchitectures
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// simulation architecture
 		Architecture architecture =
@@ -657,18 +657,18 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception			<i>to do</i>.
 	 */
 	public static Architecture	createHairDryerUserMIL_RT_Architecture(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit,
-		double accelerationFactor
-		) throws Exception
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit,
+			double accelerationFactor
+			) throws Exception
 	{
 		assert	accelerationFactor > 0.0 :
-				new PreconditionException("accelerationFactor > 0.0");
+			new PreconditionException("accelerationFactor > 0.0");
 
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// for atomic model, we use an AtomicModelDescriptor
 		atomicModelDescriptors.put(
@@ -683,7 +683,7 @@ public abstract class	LocalSimulationArchitectures
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// simulation architecture
 		Architecture architecture =

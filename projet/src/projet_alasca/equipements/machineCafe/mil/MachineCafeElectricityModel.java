@@ -550,7 +550,7 @@ implements MachineCafeOperationI
 		assert	glassBoxInvariants(this) :
 			new NeoSim4JavaException(
 					"MachineCafeElectricityModel.glassBoxInvariants(this)");
-	assert	blackBoxInvariants(this) :
+		assert	blackBoxInvariants(this) :
 			new NeoSim4JavaException(
 					"MachineCafeElectricityModel.blackBoxInvariants(this)");
 	}
