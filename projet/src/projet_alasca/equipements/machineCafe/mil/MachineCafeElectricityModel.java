@@ -35,9 +35,12 @@ package projet_alasca.equipements.machineCafe.mil;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.components.hem2024e2.HEM_ReportI;
 import fr.sorbonne_u.components.hem2024e2.utils.Electricity;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
@@ -58,11 +61,12 @@ import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
 
 
 @ModelExternalEvents(imported = {SwitchOnMachineCafe.class,
-								 SwitchOffMachineCafe.class})
+		SwitchOffMachineCafe.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
 // -----------------------------------------------------------------------------
 public class			MachineCafeElectricityModel
 extends		AtomicHIOA
+implements MachineCafeOperationI
 {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
@@ -80,10 +84,21 @@ extends		AtomicHIOA
 
 	private static final long		serialVersionUID = 1L;
 
-														
-	public static final String		URI = MachineCafeElectricityModel.class.
-																getSimpleName();
 
+
+	/** URI for an instance model in MIL simulations; works as long as
+	 *   only one instance is created.										*/
+	public static final String	MIL_URI = MachineCafeElectricityModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for an instance model in MIL real time simulations; works as
+	 *  long as  only one instance is created.								*/
+	public static final String	MIL_RT_URI = MachineCafeElectricityModel.class.
+			getSimpleName() + "-MIL_RT";
+	/** URI for an instance model in SIL simulations; works as long as
+	 *   only one instance is created. It is the same value as for MIL
+	 *  real time simulations as the same models are used in both cases.	*/
+	public static final String	SIL_URI = MachineCafeElectricityModel.class.
+			getSimpleName() + "-MIL_RT";
 
 	protected static double			CONSUMPTION = 660.0; // Watts
 
@@ -91,7 +106,7 @@ extends		AtomicHIOA
 
 
 	protected State					currentState = State.OFF;
-	
+
 	protected boolean				consumptionHasChanged = false;
 
 	protected double				totalConsumption;
@@ -122,11 +137,11 @@ extends		AtomicHIOA
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	glassBoxInvariants(
-		MachineCafeElectricityModel instance
-		)
+			MachineCafeElectricityModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new AssertionError("Precondition violation: instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
@@ -151,11 +166,11 @@ extends		AtomicHIOA
 				"currentState != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				!instance.currentIntensity.isInitialised() ||
-									instance.currentIntensity.getValue() >= 0.0,
+				instance.currentIntensity.getValue() >= 0.0,
 				MachineCafeElectricityModel.class,
 				instance,
 				"!currentIntensity.isInitialised() || "
-				+ "currentIntensity.getValue() >= 0.0");
+						+ "currentIntensity.getValue() >= 0.0");
 		return ret;
 	}
 
@@ -173,25 +188,35 @@ extends		AtomicHIOA
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	blackBoxInvariants(
-		MachineCafeElectricityModel instance
-		)
+			MachineCafeElectricityModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new AssertionError("Precondition violation: instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				URI != null && !URI.isEmpty(),
+				MIL_URI != null && !MIL_URI.isEmpty(),
 				MachineCafeElectricityModel.class,
 				instance,
-				"URI != null && !URI.isEmpty()");
+				"MIL_URI != null && !MIL_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
+				MachineCafeElectricityModel.class,
+				instance,
+				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				SIL_URI != null && !SIL_URI.isEmpty(),
+				MachineCafeElectricityModel.class,
+				instance,
+				"SIL_URI != null && !SIL_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				CONSUMPTION_RPNAME != null &&
-										!CONSUMPTION_RPNAME.isEmpty(),
+				!CONSUMPTION_RPNAME.isEmpty(),
 				MachineCafeElectricityModel.class,
 				instance,
 				"CONSUMPTION_RPNAME != null && "
-								+ "!CONSUMPTION_RPNAME.isEmpty()");
+						+ "!CONSUMPTION_RPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				TENSION_RPNAME != null && !TENSION_RPNAME.isEmpty(),
 				MachineCafeElectricityModel.class,
@@ -227,18 +252,20 @@ extends		AtomicHIOA
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				MachineCafeElectricityModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		AtomicSimulatorI simulationEngine
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			AtomicSimulatorI simulationEngine
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.getSimulationEngine().setLogger(new StandardLogger());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -246,53 +273,38 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * set the state of the hair dryer.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code s != null}
-	 * post	{@code getState() == s}
-	 * </pre>
-	 *
-	 * @param s		the new state.
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOn()
 	 */
-	public void			setState(State s)
+	@Override
+	public void			turnOn()
 	{
-		this.currentState = s;
+		if (this.currentState == MachineCafeElectricityModel.State.OFF) {
+			// then put it in the state LOW
+			this.currentState = MachineCafeElectricityModel.State.ON;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
 	}
 
 	/**
-	 * return the state of the hair dryer.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code ret != null}
-	 * </pre>
-	 *
-	 * @return	the state of the hair dryer.
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOff()
 	 */
-	public State		getState()
+	@Override
+	public void			turnOff()
 	{
-		return this.currentState;
+		// a SwitchOff event can be executed when the state of the hair
+		// dryer model is *not* in the state OFF
+		if (this.currentState == MachineCafeElectricityModel.State.ON) {
+			// then put it in the state OFF
+			this.currentState = MachineCafeElectricityModel.State.OFF;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
 	}
 
-	/**
-	 * toggle the value of the state of the model telling whether the
-	 * electricity consumption level has just changed or not; when it changes
-	 * after receiving an external event, an immediate internal transition
-	 * is triggered to update the level of electricity consumption.
-	 * 
-	 * <p><strong>Contract</strong></p>
-	 * 
-	 * <pre>
-	 * pre	{@code true}	// no precondition.
-	 * post	{@code true}	// no postcondition.
-	 * </pre>
-	 *
-	 */
+
 	public void			toggleConsumptionHasChanged()
 	{
 		if (this.consumptionHasChanged) {
@@ -324,9 +336,11 @@ extends		AtomicHIOA
 		this.logMessage("simulation begins.\n");
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -341,9 +355,11 @@ extends		AtomicHIOA
 		this.currentIntensity.initialise(0.0);
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -376,10 +392,14 @@ extends		AtomicHIOA
 			ret = Duration.INFINITY;
 		}
 
+
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.blackBoxInvariants(this)");
+
 
 		return ret;
 	}
@@ -396,12 +416,12 @@ extends		AtomicHIOA
 		Time t = this.getCurrentStateTime();
 		switch (this.currentState)
 		{
-			case OFF : this.currentIntensity.setNewValue(0.0, t); break;
-			case ON :
-				this.currentIntensity.
-							setNewValue(CONSUMPTION/TENSION, t);
-				break;
-			
+		case OFF : this.currentIntensity.setNewValue(0.0, t); break;
+		case ON :
+			this.currentIntensity.
+			setNewValue(CONSUMPTION/TENSION, t);
+			break;
+
 		}
 
 		// Tracing
@@ -415,9 +435,11 @@ extends		AtomicHIOA
 		this.logMessage(message.toString());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -441,8 +463,8 @@ extends		AtomicHIOA
 		// report.
 		this.totalConsumption +=
 				Electricity.computeConsumption(
-									elapsedTime,
-									TENSION*this.currentIntensity.getValue());
+						elapsedTime,
+						TENSION*this.currentIntensity.getValue());
 
 		// Tracing
 		StringBuffer message =
@@ -451,18 +473,18 @@ extends		AtomicHIOA
 		message.append(")\n");
 		this.logMessage(message.toString());
 
-		assert	ce instanceof AbstractMachineCafeEvent :
-				new RuntimeException(
-						ce + " is not an event that an HairDryerElectricityModel"
-						+ " can receive and process.");
+		assert	ce instanceof AbstractMachineCafeEvent ;
+
 		// events have a method execute on to perform their effect on this
 		// model
 		ce.executeOn(this);
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -474,8 +496,8 @@ extends		AtomicHIOA
 		Duration d = endTime.subtract(this.getCurrentStateTime());
 		this.totalConsumption +=
 				Electricity.computeConsumption(
-									d,
-									TENSION*this.currentIntensity.getValue());
+						d,
+						TENSION*this.currentIntensity.getValue());
 
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
@@ -486,25 +508,36 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/** run parameter name for {@code LOW_MODE_CONSUMPTION}.				*/
-	public static final String		CONSUMPTION_RPNAME =
-												URI + ":CONSUMPTION";
+	public static final String		CONSUMPTION_RPNAME = "CONSUMPTION";
 
 	/** run parameter name for {@code TENSION}.								*/
-	public static final String		TENSION_RPNAME = URI + ":TENSION";
+	public static final String		TENSION_RPNAME = "TENSION";
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#setSimulationRunParameters(Map)
 	 */
 	@Override
 	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws MissingRunParameterException
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
 
+		// this gets the reference on the owner component which is required
+		// to have simulation models able to make the component perform some
+		// operations or tasks or to get the value of variables held by the
+		// component when necessary.
+		if (simParams.containsKey(
+				AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+			// by the following, all of the logging will appear in the owner
+			// component logger
+			this.getSimulationEngine().setLogger(
+					AtomicSimulatorPlugin.createComponentLogger(simParams));
+		}
+
 		String consumptionName =
-			ModelI.createRunParameterName(getURI(),
-					CONSUMPTION_RPNAME);
+				ModelI.createRunParameterName(getURI(),
+						CONSUMPTION_RPNAME);
 		if (simParams.containsKey(consumptionName)) {
 			CONSUMPTION = (double) simParams.get(consumptionName);
 		}
@@ -515,9 +548,11 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"MachineCafeElectricityModel.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -554,9 +589,9 @@ extends		AtomicHIOA
 		protected double	totalConsumption; // in kwh
 
 		public				MachineCafeElectricityReport(
-			String modelURI,
-			double totalConsumption
-			)
+				String modelURI,
+				double totalConsumption
+				)
 		{
 			super();
 			this.modelURI = modelURI;
@@ -595,7 +630,7 @@ extends		AtomicHIOA
 		public String	toString()
 		{
 			return this.printout("");
-			
+
 		}
 	}
 
@@ -606,7 +641,7 @@ extends		AtomicHIOA
 	public SimulationReportI	getFinalReport()
 	{
 		return new MachineCafeElectricityReport(this.getURI(),
-											  this.totalConsumption);
+				this.totalConsumption);
 	}
 }
 // -----------------------------------------------------------------------------

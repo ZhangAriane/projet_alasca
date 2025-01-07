@@ -37,9 +37,11 @@ import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import org.apache.commons.math3.random.RandomDataGenerator;
 
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.devs_simulation.es.events.ES_EventI;
 import fr.sorbonne_u.devs_simulation.es.models.AtomicES_Model;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.ModelI;
@@ -121,9 +123,20 @@ extends		AtomicES_Model
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L;
-	/** URI for an instance model; works as long as only one instance is
-	 *  created.															*/
-	public static final String	URI = MachineCafeUserModel.class.getSimpleName();
+
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.										*/
+	public static final String	MIL_URI = MachineCafeUserModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for an instance model in MIL real time simulations; works as
+	 *  long as only one instance is created.								*/
+	public static final String	MIL_RT_URI = MachineCafeUserModel.class.
+			getSimpleName() + "-MIL_RT";
+	/** URI for an instance model in SIL simulations; works as long as
+	 *  only one instance is created.										*/
+	public static final String	SIL_URI = MachineCafeUserModel.class.
+			getSimpleName() + "-SIL";
+
 
 	/** time interval between event outputs in hours.						*/
 	protected static double		STEP_MEAN_DURATION = 5.0/60.0; // 5 minutes
@@ -153,7 +166,8 @@ extends		AtomicES_Model
 	protected static boolean	glassBoxInvariants(MachineCafeUserModel instance)
 	{
 		assert	instance != null :
-			new AssertionError("Precondition violation: instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
@@ -190,14 +204,25 @@ extends		AtomicES_Model
 	protected static boolean	blackBoxInvariants(MachineCafeUserModel instance)
 	{
 		assert	instance != null :
-			new AssertionError("Precondition violation: instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				URI != null && !URI.isEmpty(),
+				MIL_URI != null && !MIL_URI.isEmpty(),
 				MachineCafeUserModel.class,
 				instance,
-				"URI != null && !URI.isEmpty()");
+				"MIL_URI != null && !MIL_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
+				MachineCafeUserModel.class,
+				instance,
+				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				SIL_URI != null && !SIL_URI.isEmpty(),
+				MachineCafeUserModel.class,
+				instance,
+				"SIL_URI != null && !SIL_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MEAN_STEP_RPNAME != null && !MEAN_STEP_RPNAME.isEmpty(),
 				MachineCafeUserModel.class,
@@ -249,10 +274,13 @@ extends		AtomicES_Model
 		this.getSimulationEngine().setLogger(new StandardLogger());
 
 		assert	glassBoxInvariants(this) :
-			new AssertionError("Glass-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeUserModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-			new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"MachineCafeUserModel.blackBoxInvariants(this)");
 	}
+
 
 	// -------------------------------------------------------------------------
 	// Methods
@@ -293,6 +321,8 @@ extends		AtomicES_Model
 			// switch on
 			nextEvent = new SwitchOffMachineCafe(t2);
 		}
+		this.logMessage("MachineCafeUserModel emits "
+				+ nextEvent.getClass().getSimpleName() + ".");
 		// schedule the event to be executed by this model
 		this.scheduleEvent(nextEvent);
 	}
@@ -424,6 +454,18 @@ extends		AtomicES_Model
 			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
+
+		// this gets the reference on the owner component which is required
+		// to have simulation models able to make the component perform some
+		// operations or tasks or to get the value of variables held by the
+		// component when necessary.
+		if (simParams.containsKey(
+				AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+			// by the following, all of the logging will appear in the owner
+			// component logger
+			this.getSimulationEngine().setLogger(
+					AtomicSimulatorPlugin.createComponentLogger(simParams));
+		}
 
 		String stepName =
 				ModelI.createRunParameterName(getURI(), MEAN_STEP_RPNAME);

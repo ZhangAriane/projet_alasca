@@ -1,4 +1,4 @@
-package etape3.equipments.hairdryer.mil;
+package projet_alasca.equipements.machineCafe.mil;
 
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
@@ -37,12 +37,6 @@ import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
-import etape3.equipments.hairdryer.mil.HairDryerElectricityModel.State;
-import etape3.equipments.hairdryer.mil.events.AbstractHairDryerEvent;
-import etape3.equipments.hairdryer.mil.events.SetHighHairDryer;
-import etape3.equipments.hairdryer.mil.events.SetLowHairDryer;
-import etape3.equipments.hairdryer.mil.events.SwitchOffHairDryer;
-import etape3.equipments.hairdryer.mil.events.SwitchOnHairDryer;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
 import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
@@ -53,6 +47,10 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeElectricityModel.State;
+import projet_alasca.equipements.machineCafe.mil.events.AbstractMachineCafeEvent;
+import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
+import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
 
 // -----------------------------------------------------------------------------
 /**
@@ -112,15 +110,13 @@ import fr.sorbonne_u.exceptions.InvariantChecking;
  */
 // -----------------------------------------------------------------------------
 @ModelExternalEvents(
-	imported = {SwitchOnHairDryer.class,SwitchOffHairDryer.class,
-				SetLowHairDryer.class,SetHighHairDryer.class},
-	exported = {SwitchOnHairDryer.class,SwitchOffHairDryer.class,
-				SetLowHairDryer.class,SetHighHairDryer.class}
+	imported = {SwitchOnMachineCafe.class,SwitchOffMachineCafe.class},
+	exported = {SwitchOnMachineCafe.class,SwitchOffMachineCafe.class}
 	)
 // -----------------------------------------------------------------------------
-public class			HairDryerStateModel
+public class			MachineCafeStateModel
 extends		AtomicModel
-implements	HairDryerOperationI
+implements	MachineCafeOperationI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -129,22 +125,22 @@ implements	HairDryerOperationI
 	private static final long serialVersionUID = 1L;
 	/** URI for an instance model in MIL simulations; works as long as
 	 *  only one instance is created.										*/
-	public static final String	MIL_URI = HairDryerStateModel.class.
+	public static final String	MIL_URI = MachineCafeStateModel.class.
 												getSimpleName() + "-MIL";
 	/** URI for an instance model in MIL real time simulations; works as
 	 *  long as only one instance is created.								*/
-	public static final String	MIL_RT_URI = HairDryerStateModel.class.
+	public static final String	MIL_RT_URI = MachineCafeStateModel.class.
 												getSimpleName() + "-MIL/SIL_RT";
 	/** URI for an instance model in SIL simulations; works as long as
 	 *  only one instance is created. It is the same value as for MIL
 	 *  real time simulations as the same models are used in both cases.	*/
-	public static final String	SIL_URI = HairDryerStateModel.class.
+	public static final String	SIL_URI = MachineCafeStateModel.class.
 												getSimpleName() + "-MIL/SIL_RT";
 
 	/** current state of the hair dryer.									*/
 	protected State						currentState;
 	/** last received event or null if none.								*/
-	protected AbstractHairDryerEvent	lastReceived;
+	protected AbstractMachineCafeEvent	lastReceived;
 
 	// -------------------------------------------------------------------------
 	// Invariants
@@ -163,7 +159,7 @@ implements	HairDryerOperationI
 	 * @param instance	instance to be tested.
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
-	protected static boolean	glassBoxInvariants(HairDryerStateModel instance)
+	protected static boolean	glassBoxInvariants(MachineCafeStateModel instance)
 	{
 		assert	instance != null :
 				new NeoSim4JavaException("Precondition violation: "
@@ -186,7 +182,7 @@ implements	HairDryerOperationI
 	 * @param instance	instance to be tested.
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
-	protected static boolean	blackBoxInvariants(HairDryerStateModel instance)
+	protected static boolean	blackBoxInvariants(MachineCafeStateModel instance)
 	{
 		assert	instance != null :
 				new NeoSim4JavaException("Precondition violation: "
@@ -195,17 +191,17 @@ implements	HairDryerOperationI
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MIL_URI != null && !MIL_URI.isEmpty(),
-				HairDryerStateModel.class,
+				MachineCafeStateModel.class,
 				instance,
 				"MIL_URI != null && !MIL_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
-				HairDryerStateModel.class,
+				MachineCafeStateModel.class,
 				instance,
 				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				SIL_URI != null && !SIL_URI.isEmpty(),
-				HairDryerStateModel.class,
+				MachineCafeStateModel.class,
 				instance,
 				"SIL_URI != null && !SIL_URI.isEmpty()");
 		return ret;
@@ -237,7 +233,7 @@ implements	HairDryerOperationI
 	 * @param simulationEngine	simulation engine to which the model is attached.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public				HairDryerStateModel(
+	public				MachineCafeStateModel(
 		String uri,
 		TimeUnit simulatedTimeUnit,
 		AtomicSimulatorI simulationEngine
@@ -249,10 +245,10 @@ implements	HairDryerOperationI
 
 		assert	glassBoxInvariants(this) :
 				new NeoSim4JavaException(
-						"HairDryerStateModel.glassBoxInvariants(this)");
+						"MachineCafeStateModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
 				new NeoSim4JavaException(
-						"HairDryerStateModel.blackBoxInvariants(this)");
+						"MachineCafeStateModel.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -265,9 +261,9 @@ implements	HairDryerOperationI
 	@Override
 	public void			turnOn()
 	{
-		if (this.currentState == HairDryerElectricityModel.State.OFF) {
+		if (this.currentState == MachineCafeElectricityModel.State.OFF) {
 			// then put it in the state LOW
-			this.currentState = HairDryerElectricityModel.State.LOW;
+			this.currentState = MachineCafeElectricityModel.State.ON;
 		}
 	}
 
@@ -279,39 +275,12 @@ implements	HairDryerOperationI
 	{
 		// a SwitchOff event can be executed when the state of the hair
 		// dryer model is *not* in the state OFF
-		if (this.currentState != HairDryerElectricityModel.State.OFF) {
+		if (this.currentState != MachineCafeElectricityModel.State.ON) {
 			// then put it in the state OFF
-			this.currentState = HairDryerElectricityModel.State.OFF;
+			this.currentState = MachineCafeElectricityModel.State.OFF;
 		}
 	}
 
-	/**
-	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#setHigh()
-	 */
-	@Override
-	public void			setHigh()
-	{
-		// a SetHigh event can only be executed when the state of the hair
-		// dryer model is in the state LOW
-		if (this.currentState == HairDryerElectricityModel.State.LOW) {
-			// then put it in the state HIGH
-			this.currentState = HairDryerElectricityModel.State.HIGH;
-		}
-	}
-
-	/**
-	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#setLow()
-	 */
-	@Override
-	public void			setLow()
-	{
-		// a SetLow event can only be executed when the state of the hair
-		// dryer model is in the state HIGH
-		if (this.currentState == HairDryerElectricityModel.State.HIGH) {
-			// then put it in the state LOW
-			this.currentState = HairDryerElectricityModel.State.LOW;
-		}
-	}
 
 	// -------------------------------------------------------------------------
 	// DEVS simulation protocol
@@ -377,7 +346,7 @@ implements	HairDryerOperationI
 		// on the model state except to put lastReceived to null again, but
 		// this will also trigger output and the sending of the event to
 		// the electricity model to also change its state
-		this.lastReceived = (AbstractHairDryerEvent) currentEvents.get(0);
+		this.lastReceived = (AbstractMachineCafeEvent) currentEvents.get(0);
 
 		// tracing
 		StringBuffer message = new StringBuffer(this.uri);

@@ -376,7 +376,7 @@ implements	HairDryerOperationI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.hairdryer.mil.HairDryerOperationI#turnOn()
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOn()
 	 */
 	@Override
 	public void			turnOn()
@@ -391,7 +391,7 @@ implements	HairDryerOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.hairdryer.mil.HairDryerOperationI#turnOff()
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOff()
 	 */
 	@Override
 	public void			turnOff()
@@ -408,7 +408,7 @@ implements	HairDryerOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.hairdryer.mil.HairDryerOperationI#setHigh()
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#setHigh()
 	 */
 	@Override
 	public void			setHigh()
@@ -425,7 +425,7 @@ implements	HairDryerOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.hairdryer.mil.HairDryerOperationI#setLow()
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#setLow()
 	 */
 	@Override
 	public void			setLow()

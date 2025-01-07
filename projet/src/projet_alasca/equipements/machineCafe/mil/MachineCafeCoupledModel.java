@@ -34,6 +34,7 @@ package projet_alasca.equipements.machineCafe.mil;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
 import fr.sorbonne_u.devs_simulation.models.CoupledModel;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
@@ -80,8 +81,18 @@ extends		CoupledModel
 	private static final long serialVersionUID = 1L;
 	/** URI for an instance model; works as long as only one instance is
 	 *  created.															*/
-	public static final String	URI = MachineCafeCoupledModel.class.
-																getSimpleName();
+	
+	public static final String	MIL_URI = MachineCafeCoupledModel.class.
+			getSimpleName() + "-MIL";
+/** URI for an instance model in MIL simulations; works as long as
+*  only one instance is created.										*/
+public static final String	MIL_RT_URI = MachineCafeCoupledModel.class.
+			getSimpleName() + "-MIL_RT";
+/** URI for an instance model in MIL simulations; works as long as
+*  only one instance is created. It is the same value as for MIL
+*  real time simulations as the same models are used in both cases.	*/
+public static final String	SIL_URI = MachineCafeCoupledModel.class.
+			getSimpleName() + "-MIL_RT";
 
 	// -------------------------------------------------------------------------
 	// Constructors

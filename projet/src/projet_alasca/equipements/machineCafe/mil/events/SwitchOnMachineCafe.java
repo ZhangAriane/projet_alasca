@@ -1,5 +1,7 @@
 package projet_alasca.equipements.machineCafe.mil.events;
 
+
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -35,7 +37,7 @@ package projet_alasca.equipements.machineCafe.mil.events;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeElectricityModel;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeOperationI;
 
 // -----------------------------------------------------------------------------
 /**
@@ -112,21 +114,12 @@ extends		AbstractMachineCafeEvent
 	@Override
 	public void				executeOn(AtomicModelI model)
 	{
-		assert	model instanceof MachineCafeElectricityModel :
-				new AssertionError(
-						"Precondition violation: model instanceof "
-						+ "MachineCafeElectricityModel");
+		// by using the interface HairDryerOperationI, the event can be executed
+		// on both HairDryerElectricityModel and HairDryerStateModel as they
+		// both implement this interface
+		assert	model instanceof MachineCafeOperationI;
 
-		// a SwitchOnHairDryer event can be executed when the state of the hair
-		// dryer model is in the state OFF
-		MachineCafeElectricityModel m = (MachineCafeElectricityModel)model;
-		if (m.getState() == MachineCafeElectricityModel.State.OFF) {
-			// then put it in the state LOW
-			m.setState(MachineCafeElectricityModel.State.ON);
-			// trigger an internal transition by toggling the electricity
-			// consumption changed boolean to true
-			m.toggleConsumptionHasChanged();
-		}
+		((MachineCafeOperationI)model).turnOn();
 	}
 }
 // -----------------------------------------------------------------------------

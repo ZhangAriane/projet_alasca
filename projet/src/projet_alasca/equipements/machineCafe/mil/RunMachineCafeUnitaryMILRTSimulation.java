@@ -1,10 +1,12 @@
 package projet_alasca.equipements.machineCafe.mil;
 
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
-// This software is a computer program whose purpose is to implement a mock-up
-// of household energy management system.
+// This software is a computer program whose purpose is to provide a
+// basic component programming model to program with components
+// real time distributed applications in the Java programming language.
 //
 // This software is governed by the CeCILL-C license under French law and
 // abiding by the rules of distribution of free software.  You can use,
@@ -39,12 +41,13 @@ import java.util.Set;
 import java.util.concurrent.TimeUnit;
 
 
-import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.architectures.ArchitectureI;
-import fr.sorbonne_u.devs_simulation.hioa.architectures.AtomicHIOA_Descriptor;
+import fr.sorbonne_u.devs_simulation.architectures.RTArchitecture;
+import fr.sorbonne_u.devs_simulation.hioa.architectures.RTAtomicHIOA_Descriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDescriptor;
-import fr.sorbonne_u.devs_simulation.models.architectures.AtomicModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor;
+import fr.sorbonne_u.devs_simulation.models.architectures.RTAtomicModelDescriptor;
+import fr.sorbonne_u.devs_simulation.models.architectures.RTCoupledModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
@@ -57,21 +60,45 @@ import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>RunHairDryerUnitarySimulation</code> is the main class used
- * to run simulations on the example models of the hair dryer in isolation.
+ * The class <code>RunHairDryerUnitaryMILRTSimulation</code> tests the MIL
+ * real time simulation architecture for the hair dryer by executing the
+ * simulation in a stand alone way.
  *
  * <p><strong>Description</strong></p>
  * 
  * <p>
+ * This simulation execution class creates the following simulation architecture
+ * and then executes it for one run:
+ * </p>
+ * <p><img src="../../../../../../../../images/hem-2024-e3/HairDryerMILModel.png"/></p> 
+ * <p>
+ * In this simulation architecture, the hair dryer simulator consists of three
+ * atomic models:
+ * </p>
+ * <ol>
+ * <li>The <code>HairDryerStateModel</code> keeps track of the state (switched
+ *   on, switched off, etc.) of the hair dryer. The state changes are triggered
+ *   by the reception of external events; whenever a state change occurs, the
+ *   triggering event is emitted towards the
+ *   <code>HairDryerElectricityModel</code></li>.
+ * <li>The <code>HairDryerElectricityModel</code> keeps track of the electric
+ *   power consumed by the hair dryer in a variable
+ *   <code>currentIntensity</code> which is exported but not used in this
+ *   simulation of the hair dryer in isolation.</li>
+ * <li>The <code>HairDryerUserModel</code> simulates a hair dryer user by
+ *   emitting state changing events towards the
+ *   <code>HairDryerStateModel.</code></li>
+ * </ol>
+ * <p>
  * This class shows how to use simulation model descriptors to create the
- * description of a simulation architecture and then create an instance of this
- * architecture by instantiating and connecting the models. Note how models
- * are described by atomic model descriptors and coupled model descriptors and
- * then the connections between coupled models and their submodels as well as
- * exported events to imported ones are described by different maps. In this
- * example, only connections between models within this architecture are
- * necessary, but when creating coupled models, they can also import and export
- * events consumed and produced by their submodels.
+ * description of the above simulation architecture and then create an instance
+ * of this architecture by instantiating and connecting the models. Note how
+ * models are described by atomic model descriptors and coupled model
+ * descriptors and then the connections between coupled models and their
+ * submodels as well as exported events to imported ones are described by
+ * different maps. In this example, only connections between models within this
+ * architecture are necessary, but when creating coupled models, they can also
+ * import and export events consumed and produced by their submodels.
  * </p>
  * <p>
  * The architecture object is the root of this description and it provides
@@ -90,24 +117,26 @@ import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
  * <p><strong>Glass-box Invariants</strong></p>
  * 
  * <pre>
- * invariant	{@code true}	// no more invariant
+ * invariant	{@code true}	// no invariant
  * </pre>
  * 
  * <p><strong>Black-box Invariants</strong></p>
  * 
  * <pre>
- * invariant	{@code true}	// no more invariant
+ * invariant	{@code ACCELERATION_FACTOR > 0.0}
  * </pre>
  * 
- * <p>Created on : 2023-09-29</p>
+ * <p>Created on : 2023-11-15</p>
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-public class			RunMachineCafeUnitaryMILSimulation
+public class			RunMachineCafeUnitaryMILRTSimulation
 {
-	/** the time unit used in the MIL simulations.						 	*/
+	/** the time unit used in the real time MIL simulations.			 	*/
 	public static final TimeUnit	TIME_UNIT = TimeUnit.HOURS;
-	
+	/** the acceleration factor used in the real time MIL simulations.	 	*/
+	public static final double		ACCELERATION_FACTOR = 3600.0;
+
 	public static void	main(String[] args)
 	{
 		Time.setPrintPrecision(4);
@@ -122,27 +151,31 @@ public class			RunMachineCafeUnitaryMILSimulation
 			// the hair dyer model simulating its electricity consumption, an
 			// atomic HIOA model hence we use an AtomicHIOA_Descriptor
 			atomicModelDescriptors.put(
-					MachineCafeElectricityModel.MIL_URI,
-					AtomicHIOA_Descriptor.create(
+					MachineCafeElectricityModel.MIL_RT_URI,
+					RTAtomicHIOA_Descriptor.create(
 							MachineCafeElectricityModel.class,
-							MachineCafeElectricityModel.MIL_URI,
-							TimeUnit.HOURS,
-							null));
-			// for atomic model, we use an AtomicModelDescriptor
-			atomicModelDescriptors.put(
-					MachineCafeStateModel.MIL_URI,
-					AtomicModelDescriptor.create(
-							MachineCafeStateModel.class,
-							MachineCafeStateModel.MIL_URI,
-							TimeUnit.HOURS,
-							null));
-			atomicModelDescriptors.put(
-					MachineCafeUserModel.MIL_URI,
-					AtomicModelDescriptor.create(
-							MachineCafeUserModel.class,
-							MachineCafeUserModel.MIL_URI,
+							MachineCafeElectricityModel.MIL_RT_URI,
 							TIME_UNIT,
-							null));
+							null,
+							ACCELERATION_FACTOR));
+			// for atomic models, we use an AtomicModelDescriptor
+			atomicModelDescriptors.put(
+					MachineCafeStateModel.MIL_RT_URI,
+					RTAtomicModelDescriptor.create(
+							MachineCafeStateModel.class,
+							MachineCafeStateModel.MIL_RT_URI,
+							TIME_UNIT,
+							null,
+							ACCELERATION_FACTOR));
+
+			atomicModelDescriptors.put(
+					MachineCafeUserModel.MIL_RT_URI,
+					RTAtomicModelDescriptor.create(
+							MachineCafeUserModel.class,
+							MachineCafeUserModel.MIL_RT_URI,
+							TIME_UNIT,
+							null,
+							ACCELERATION_FACTOR));
 
 			// map that will contain the coupled model descriptors to construct
 			// the simulation architecture
@@ -151,9 +184,9 @@ public class			RunMachineCafeUnitaryMILSimulation
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(MachineCafeElectricityModel.MIL_URI);
-			submodels.add(MachineCafeStateModel.MIL_URI);
-			submodels.add(MachineCafeUserModel.MIL_URI);
+			submodels.add(MachineCafeElectricityModel.MIL_RT_URI);
+			submodels.add(MachineCafeStateModel.MIL_RT_URI);
+			submodels.add(MachineCafeUserModel.MIL_RT_URI);
 
 			// event exchanging connections between exporting and importing
 			// models
@@ -161,52 +194,56 @@ public class			RunMachineCafeUnitaryMILSimulation
 										new HashMap<EventSource,EventSink[]>();
 
 			connections.put(
-					new EventSource(MachineCafeUserModel.MIL_URI, SwitchOnMachineCafe.class),
-					new EventSink[] {
-							new EventSink(MachineCafeStateModel.MIL_URI,
-										  SwitchOnMachineCafe.class)
-					});
+				new EventSource(MachineCafeUserModel.MIL_RT_URI,
+								SwitchOnMachineCafe.class),
+				new EventSink[] {
+					new EventSink(MachineCafeStateModel.MIL_RT_URI,
+								  SwitchOnMachineCafe.class)
+				});
 			connections.put(
-					new EventSource(MachineCafeUserModel.MIL_URI, SwitchOffMachineCafe.class),
-					new EventSink[] {
-							new EventSink(MachineCafeStateModel.MIL_URI,
-										  SwitchOffMachineCafe.class)
-					});
+				new EventSource(MachineCafeUserModel.MIL_RT_URI,
+								SwitchOffMachineCafe.class),
+				new EventSink[] {
+					new EventSink(MachineCafeStateModel.MIL_RT_URI,
+								  SwitchOffMachineCafe.class)
+				});
 			
 			connections.put(
-					new EventSource(MachineCafeStateModel.MIL_URI,
-							SwitchOnMachineCafe.class),
-					new EventSink[] {
-							new EventSink(MachineCafeElectricityModel.MIL_URI,
-									SwitchOnMachineCafe.class)
-					});
+				new EventSource(MachineCafeStateModel.MIL_RT_URI,
+								SwitchOnMachineCafe.class),
+				new EventSink[] {
+					new EventSink(MachineCafeElectricityModel.MIL_RT_URI,
+								  SwitchOnMachineCafe.class)
+				});
 			connections.put(
-					new EventSource(MachineCafeStateModel.MIL_URI,
-							SwitchOffMachineCafe.class),
-					new EventSink[] {
-							new EventSink(MachineCafeElectricityModel.MIL_URI,
-									SwitchOffMachineCafe.class)
-					});
+				new EventSource(MachineCafeStateModel.MIL_RT_URI,
+								SwitchOffMachineCafe.class),
+				new EventSink[] {
+					new EventSink(MachineCafeElectricityModel.MIL_RT_URI,
+								  SwitchOffMachineCafe.class)
+				});
+			
 
 			// coupled model descriptor
 			coupledModelDescriptors.put(
-					MachineCafeCoupledModel.MIL_URI,
-					new CoupledModelDescriptor(
+					MachineCafeCoupledModel.MIL_RT_URI,
+					new RTCoupledModelDescriptor(
 							MachineCafeCoupledModel.class,
-							MachineCafeCoupledModel.MIL_URI,
+							MachineCafeCoupledModel.MIL_RT_URI,
 							submodels,
 							null,
 							null,
 							connections,
-							null));
+							null,
+							ACCELERATION_FACTOR));
 
 			// simulation architecture
 			ArchitectureI architecture =
-					new Architecture(
-							MachineCafeCoupledModel.MIL_URI,
+					new RTArchitecture(
+							MachineCafeCoupledModel.MIL_RT_URI,
 							atomicModelDescriptors,
 							coupledModelDescriptors,
-							TimeUnit.HOURS);
+							TIME_UNIT);
 
 			// create the simulator from the simulation architecture
 			SimulatorI se = architecture.constructSimulator();
@@ -215,9 +252,19 @@ public class			RunMachineCafeUnitaryMILSimulation
 			SimulationEngine.SIMULATION_STEP_SLEEP_TIME = 0L;
 			// run a simulation with the simulation beginning at 0.0 and
 			// ending at 24.0
-			se.doStandAloneSimulation(0.0, 24.0);
+			// run a simulation with the simulation beginning at 0.0 and
+			// ending at 24.0
+			long start = System.currentTimeMillis() + 100;
+			double simulationDuration = 24.0;
+			se.startRTSimulation(start, 0.0, simulationDuration);
+			long executionDuration =					
+				new Double(TIME_UNIT.toMillis(1)*
+									(simulationDuration/ACCELERATION_FACTOR)).
+																	longValue();
+			Thread.sleep(executionDuration + 2000L);
 			SimulationReportI sr = se.getSimulatedModel().getFinalReport();
 			System.out.println(sr);
+			Thread.sleep(10000L);
 			System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

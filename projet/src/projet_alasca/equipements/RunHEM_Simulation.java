@@ -243,17 +243,17 @@ public class			RunHEM_Simulation
 
 			// machine cafe models
 			atomicModelDescriptors.put(
-					MachineCafeElectricityModel.URI,
+					MachineCafeElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							MachineCafeElectricityModel.class,
-							MachineCafeElectricityModel.URI,
+							MachineCafeElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					MachineCafeUserModel.URI,
+					MachineCafeUserModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							MachineCafeUserModel.class,
-							MachineCafeUserModel.URI,
+							MachineCafeUserModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -344,8 +344,8 @@ public class			RunHEM_Simulation
 			submodels.add(VentilateurElectricityModel.URI);
 			submodels.add(VentilateurUserModel.URI);
 			//machine cafe
-			submodels.add(MachineCafeElectricityModel.URI);
-			submodels.add(MachineCafeUserModel.URI);
+			submodels.add(MachineCafeElectricityModel.MIL_URI);
+			submodels.add(MachineCafeUserModel.MIL_URI);
 
 			//refrigerateur
 			submodels.add(RefrigerateurElectricityModel.URI);
@@ -463,15 +463,15 @@ public class			RunHEM_Simulation
 							});
 					//machine cafe
 					connections.put(
-							new EventSource(MachineCafeUserModel.URI, SwitchOnMachineCafe.class),
+							new EventSource(MachineCafeUserModel.MIL_URI, SwitchOnMachineCafe.class),
 							new EventSink[] {
-									new EventSink(MachineCafeElectricityModel.URI,
+									new EventSink(MachineCafeElectricityModel.MIL_URI,
 											SwitchOnMachineCafe.class)
 							});
 					connections.put(
-							new EventSource(MachineCafeUserModel.URI, SwitchOffMachineCafe.class),
+							new EventSource(MachineCafeUserModel.MIL_URI, SwitchOffMachineCafe.class),
 							new EventSink[] {
-									new EventSink(MachineCafeElectricityModel.URI,
+									new EventSink(MachineCafeElectricityModel.MIL_URI,
 											SwitchOffMachineCafe.class)
 							});
 
@@ -684,7 +684,7 @@ public class			RunHEM_Simulation
 							bindings.put(
 									new VariableSource("currentIntensity",
 											Double.class,
-											MachineCafeElectricityModel.URI),
+											MachineCafeElectricityModel.MIL_URI),
 									new VariableSink[] {
 											new VariableSink("currentIntensity",
 													Double.class,
@@ -806,15 +806,15 @@ public class			RunHEM_Simulation
 							//machine cafe
 							simParams.put(
 									ModelI.createRunParameterName(
-											MachineCafeElectricityModel.URI,
+											MachineCafeElectricityModel.MIL_URI,
 											MachineCafeElectricityModel.CONSUMPTION_RPNAME),
 									1320.0);
 							simParams.put(ModelI.createRunParameterName(
-									MachineCafeUserModel.URI,
+									MachineCafeUserModel.MIL_URI,
 									MachineCafeUserModel.MEAN_STEP_RPNAME),
 									0.05);
 							simParams.put(ModelI.createRunParameterName(
-									MachineCafeUserModel.URI,
+									MachineCafeUserModel.MIL_URI,
 									MachineCafeUserModel.MEAN_DELAY_RPNAME),
 									2.0);
 
