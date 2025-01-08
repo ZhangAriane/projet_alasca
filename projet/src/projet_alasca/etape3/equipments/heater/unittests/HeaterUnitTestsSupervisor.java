@@ -1,4 +1,4 @@
-package projet_alasca.equipements.machineCafe.mil.unittests;
+package projet_alasca.etape3.equipments.heater.unittests;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -63,21 +63,23 @@ import fr.sorbonne_u.exceptions.InvariantChecking;
 import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
-import projet_alasca.equipements.machineCafe.MachineCafe;
-import projet_alasca.equipements.machineCafe.MachineCafeUser;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeCoupledModel;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
-import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
-import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
-import projet_alasca.etape3.CVMIntegrationTest;
 import projet_alasca.etape3.CoordinatorComponent;
 import projet_alasca.etape3.GlobalCoupledModel;
+import projet_alasca.etape3.equipments.heater.Heater;
+import projet_alasca.etape3.equipments.heater.HeaterUser;
+import projet_alasca.etape3.equipments.heater.mil.HeaterCoupledModel;
+import projet_alasca.etape3.equipments.heater.mil.HeaterUnitTesterModel;
+import projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat;
+import projet_alasca.etape3.equipments.heater.mil.events.Heat;
+import projet_alasca.etape3.equipments.heater.mil.events.SetPowerHeater;
+import projet_alasca.etape3.equipments.heater.mil.events.SwitchOffHeater;
+import projet_alasca.etape3.equipments.heater.mil.events.SwitchOnHeater;
 import projet_alasca.etape3.utils.SimulationType;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>HairDryerUnitTestsSupervisor</code> implements the supervisor
- * component for simulated runs of the hair dryer unit tests.
+ * The class <code>HeaterUnitTestsSupervisor</code> implements the supervisor
+ * component for simulated runs of the heater appliance.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -88,35 +90,23 @@ import projet_alasca.etape3.utils.SimulationType;
  * architecture using models disseminated into the different application
  * components.
  * </p>
- * <p>
- * This component is used in test execution types in conjunction with simulation
- * types other than {@code NO_SIMULATION}. Specifically for the hair dryer, only
- * MIL and MIL real time simulations use a supervisor component because in SIL
- * simulations only the {@code HairDryer} component runs a simulator which it
- * starts by itself without the need for a supervisor (and a coordinator)
- * component.
- * </p>
  * 
  * <p><strong>Glass-box Invariants</strong></p>
  * 
  * <pre>
- * invariant	{@code currentSimulationType != null}
- * invariant	{@code !currentSimulationType.isSimulated() || (simArchitectureURI != null && !simArchitectureURI.isEmpty())}
- * invariant	{@code !currentSimulationType.isSimulated() || simulatedStartTime >= 0.0}
- * invariant	{@code !currentSimulationType.isSimulated() || simulationDuration > simulatedStartTime}
- * invariant	{@code !currentSimulationType.isSimulated() || simulationTimeUnit != null}
- * invariant	{@code !currentSimulationType.isMILRTSimulation() && !currentSimulationType.isSILSimulation() || accelerationFactor > 0.0}
+ * invariant	{@code true}	// no more invariant
  * </pre>
  * 
  * <p><strong>Black-box Invariants</strong></p>
  * 
  * <pre>
- * invariant	{@code DELAY_TO_GET_REPORT > 0 && DELAY_TO_GET_REPORT < CVM_HairDryerUnitTest.DELAY_TO_STOP}
  * invariant	{@code MIL_ARCHITECTURE_URI != null && !MIL_ARCHITECTURE_URI.isEmpty()}
  * invariant	{@code MIL_RT_ARCHITECTURE_URI != null && !MIL_RT_ARCHITECTURE_URI.isEmpty()}
  * invariant	{@code SIL_ARCHITECTURE_URI != null && !SIL_ARCHITECTURE_URI.isEmpty()}
  * invariant	{@code X_RELATIVE_POSITION >= 0}
  * invariant	{@code Y_RELATIVE_POSITION #= 0}
+ * invariant	{@code currentSimulationType != null}
+ * invariant	{@code !currentSimulationType.isSimulated() || (simArchitectureURI != null && !simArchitectureURI.isEmpty())}
  * </pre>
  * 
  * <p>Created on : 2023-11-13</p>
@@ -124,30 +114,25 @@ import projet_alasca.etape3.utils.SimulationType;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 @RequiredInterfaces(required = {ClocksServerWithSimulationCI.class})
-public class			MachineCafeUnitTestsSupervisor
+public class			HeaterUnitTestsSupervisor
 extends		AbstractCyPhyComponent
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
-	/** delay after the end of the simulation execution before getting the
-	 *  simulation reports in real time simulation to let the simulators
-	 *  perform their catering activities ending the simulation.		 	*/
-	public static final long		DELAY_TO_GET_REPORT = 1000L;
-
 	/** URI of the simulation architecture when a MIL simulation is
 	 *  executed.															*/
 	public static final String		MIL_ARCHITECTURE_URI =
-			"hair-dryer-mil-simulator";
+												"heater-mil-simulator";
 	/** URI of the simulation architecture when a MIL real time
 	 *  simulation is executed.												*/
 	public static final String		MIL_RT_ARCHITECTURE_URI =
-			"hair-dryer-mil-rt-simulator";
+												"heater-mil-rt-simulator";
 	/** URI of the simulation architecture when a SIL simulation is
 	 *  executed.															*/
 	public static final String		SIL_ARCHITECTURE_URI =
-			"hair-dryer-sil-simulator";
+												"heater-sil-simulator";
 
 	/** when true, methods trace their actions.								*/
 	public static boolean			VERBOSE = false;
@@ -182,15 +167,41 @@ extends		AbstractCyPhyComponent
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	glassBoxInvariants(
-			MachineCafeUnitTestsSupervisor instance
-			)
+		HeaterUnitTestsSupervisor instance
+		)
 	{
 		assert instance != null : new PreconditionException("instance != null");
 
 		boolean ret = true;
-		// The glass-box invariants are ensured by the fact that the fields are
-		// final and that the constructor verifies the same  assertions as
-		// preconditions
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+					MIL_ARCHITECTURE_URI != null && 
+											!MIL_ARCHITECTURE_URI.isEmpty(),
+					HeaterUnitTestsSupervisor.class, instance,
+					"MIL_ARCHITECTURE_URI != null && "
+					+ "!MIL_ARCHITECTURE_URI.isEmpty()");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+					MIL_RT_ARCHITECTURE_URI != null && 
+											!MIL_RT_ARCHITECTURE_URI.isEmpty(),
+					HeaterUnitTestsSupervisor.class, instance,
+					"MIL_RT_ARCHITECTURE_URI != null && "
+					+ "!MIL_RT_ARCHITECTURE_URI.isEmpty()");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+					SIL_ARCHITECTURE_URI != null && 
+											!SIL_ARCHITECTURE_URI.isEmpty(),
+					HeaterUnitTestsSupervisor.class, instance,
+					"SIL_ARCHITECTURE_URI != null && "
+					+ "!SIL_ARCHITECTURE_URI.isEmpty()");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+					X_RELATIVE_POSITION >= 0,
+					HeaterUnitTestsSupervisor.class, instance,
+					"X_RELATIVE_POSITION >= 0");
+		ret &= InvariantChecking.checkGlassBoxInvariant(
+					Y_RELATIVE_POSITION >= 0,
+					HeaterUnitTestsSupervisor.class, instance,
+					"Y_RELATIVE_POSITION >= 0");
+		// The other glass-box invariants are ensured by the fact that the
+		// fields are final and that the constructor verifies the same 
+		// assertions as preconditions
 		return ret;
 	}
 
@@ -208,45 +219,12 @@ extends		AbstractCyPhyComponent
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	blackBoxInvariants(
-			MachineCafeUnitTestsSupervisor instance
-			)
+		HeaterUnitTestsSupervisor instance
+		)
 	{
 		assert instance != null : new PreconditionException("instance != null");
 
 		boolean ret = true;
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-				DELAY_TO_GET_REPORT > 0 &&
-				DELAY_TO_GET_REPORT <
-				CVM_MachineCafeUnitTest.DELAY_TO_STOP,
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"DELAY_TO_GET_REPORT > 0 && DELAY_TO_GET_REPORT < "
-						+ "CVM_HairDryerUnitTest.DELAY_TO_STOP");
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-				MIL_ARCHITECTURE_URI != null && 
-				!MIL_ARCHITECTURE_URI.isEmpty(),
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"MIL_ARCHITECTURE_URI != null && "
-						+ "!MIL_ARCHITECTURE_URI.isEmpty()");
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-				MIL_RT_ARCHITECTURE_URI != null && 
-				!MIL_RT_ARCHITECTURE_URI.isEmpty(),
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"MIL_RT_ARCHITECTURE_URI != null && "
-						+ "!MIL_RT_ARCHITECTURE_URI.isEmpty()");
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-				SIL_ARCHITECTURE_URI != null && 
-				!SIL_ARCHITECTURE_URI.isEmpty(),
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"SIL_ARCHITECTURE_URI != null && "
-						+ "!SIL_ARCHITECTURE_URI.isEmpty()");
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-				X_RELATIVE_POSITION >= 0,
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"X_RELATIVE_POSITION >= 0");
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-				Y_RELATIVE_POSITION >= 0,
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"Y_RELATIVE_POSITION >= 0");
 		return ret;
 	}
 
@@ -263,45 +241,49 @@ extends		AbstractCyPhyComponent
 	 * pre	{@code !(this instanceof ComponentInterface)}
 	 * pre	{@code currentSimulationType != null}
 	 * pre	{@code !currentSimulationType.isSimulated() || (simArchitectureURI != null && !simArchitectureURI.isEmpty())}
+	 * pre	{@code !currentSimulationType.isSimulated() || simulatedStartTime >= 0.0}
+	 * pre	{@code !currentSimulationType.isSimulated() || simulationDuration > simulatedStartTime}
+	 * pre	{@code !currentSimulationType.isSimulated() || simulationTimeUnit != null}
+	 * pre	{@code !currentSimulationType.isMILRTSimulation() && !currentSimulationType.isSILSimulation() || accelerationFactor > 0.0}
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
 	 * @param currentSimulationType	simulation type for the next run.
 	 * @param simArchitectureURI	URI of the simulation architecture to be created or the empty string if the component does not execute as a simulation.
 	 */
-	protected			MachineCafeUnitTestsSupervisor(
-			SimulationType currentSimulationType,
-			String simArchitectureURI
-			)
+	protected			HeaterUnitTestsSupervisor(
+		SimulationType currentSimulationType,
+		String simArchitectureURI
+		)
 	{
 		// one standard thread for execute, one standard for report reception
 		// and one schedulable thread to schedule the start of MIL simulations
 		super(2, 1);
-
+		
 		assert	currentSimulationType != null :
-			new PreconditionException("currentExecutionType != null");
+				new PreconditionException("currentExecutionType != null");
 		assert	!currentSimulationType.isSimulated() || 
-		(simArchitectureURI != null &&
-		!simArchitectureURI.isEmpty()) :
-			new PreconditionException(
+										(simArchitectureURI != null &&
+												!simArchitectureURI.isEmpty()) :
+				new PreconditionException(
 					"!currentExecutionType.isSimulated() ||  "
-							+ "(simArchitectureURI != null && "
-							+ "!simArchitectureURI.isEmpty())");
+					+ "(simArchitectureURI != null && "
+					+ "!simArchitectureURI.isEmpty())");
 
 		this.currentSimulationType = currentSimulationType;
 		this.simArchitectureURI = simArchitectureURI;
 
-		this.tracer.get().setTitle("HairDryer unit test supervisor");
+		this.tracer.get().setTitle("Heater unit test supervisor");
 		this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
-				Y_RELATIVE_POSITION);
+											  Y_RELATIVE_POSITION);
 		this.toggleTracing();
 
-		assert	MachineCafeUnitTestsSupervisor.glassBoxInvariants(this) :
-			new ImplementationInvariantException(
-					"MachineCafeUnitTestsSupervisor.glassBoxInvariants(this)");
-		assert	MachineCafeUnitTestsSupervisor.blackBoxInvariants(this) :
-			new InvariantException(
-					"MachineCafeUnitTestsSupervisor.blackBoxInvariants(this)");
+		assert	HeaterUnitTestsSupervisor.glassBoxInvariants(this) :
+				new ImplementationInvariantException(
+						"HeaterUnitTestsSupervisor.glassBoxInvariants(this)");
+		assert	HeaterUnitTestsSupervisor.blackBoxInvariants(this) :
+				new InvariantException(
+						"HeaterUnitTestsSupervisor.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -324,10 +306,10 @@ extends		AbstractCyPhyComponent
 				clocksServerOutboundPort.getPortURI(),
 				ClocksServer.STANDARD_INBOUNDPORT_URI,
 				ClocksServerWithSimulationConnector.class.getCanonicalName());
-		this.logMessage("HairDryerUnitTestsSupervisor gets the clock.");
+		this.logMessage("HeaterUnitTestsSupervisor gets the clock.");
 		AcceleratedAndSimulationClock acceleratedClock =
 				clocksServerOutboundPort.getClockWithSimulation(
-						CVMIntegrationTest.CLOCK_URI);
+												CVM_HeaterUnitTest.CLOCK_URI);
 		this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
 		clocksServerOutboundPort.unpublishPort();
 		clocksServerOutboundPort.destroyPort();
@@ -338,23 +320,23 @@ extends		AbstractCyPhyComponent
 		// in the CVM class launching this execution 
 		long simulationStartTimeInMillis = 
 				TimeUnit.NANOSECONDS.toMillis(
-						acceleratedClock.getSimulationStartEpochNanos());
-
-		this.logMessage("HairDryerUnitTestsSupervisor waits until start time.");
+							acceleratedClock.getSimulationStartEpochNanos());
+		
+		this.logMessage("HeaterUnitTestsSupervisor waits until start time.");
 		acceleratedClock.waitUntilStart();
-		this.logMessage("HairDryerUnitTestsSupervisor starts.");
+		this.logMessage("HeaterUnitTestsSupervisor starts.");
 
 		switch (this.currentSimulationType) {
 		case MIL_SIMULATION:
 			// create the global simulation architecture given the type of
 			// simulation for the current run
 			ComponentModelArchitecture cma =
-			createMILComponentSimulationArchitectures(
-					this.simArchitectureURI,
-					acceleratedClock.getSimulatedTimeUnit());
+					createMILComponentSimulationArchitectures(
+										this.simArchitectureURI,
+										acceleratedClock.getSimulatedTimeUnit());
 			// create and install the supervisor plug-in
 			SupervisorPlugin sp = new SupervisorPlugin(cma);
-			sp.setPluginURI(MachineCafeUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
+			sp.setPluginURI(HeaterUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
 			this.installPlugin(sp);
 			this.logMessage("plug-in installed.");
 			// construct the global simulator
@@ -363,23 +345,23 @@ extends		AbstractCyPhyComponent
 			// initialise the simulation run parameters (it will set the model
 			// logger to the component logger)
 			sp.setSimulationRunParameters(new HashMap<>());
-			// execute the MIL simulation
 			acceleratedClock.waitUntilSimulationStart();
-			logMessage("simulation begins.");
-			sp.doStandAloneSimulation(
-					0.0, acceleratedClock.getSimulatedDuration());
-			logMessage("simulation ends.");				
+			// execute the MIL simulation
+			sp.doStandAloneSimulation(0.0,
+									  acceleratedClock.getSimulatedDuration());
+			this.logMessage(sp.getFinalReport().toString());
+			this.logMessage("simulation ends.");				
 			break;
 		case MIL_RT_SIMULATION:
 			// create the global simulation architecture given the type of
 			// simulation for the current run
 			cma = createMILRTComponentSimulationArchitectures(
-					this.simArchitectureURI,
-					acceleratedClock.getSimulatedTimeUnit(),
-					acceleratedClock.getAccelerationFactor());
+									this.simArchitectureURI,
+									acceleratedClock.getSimulatedTimeUnit(),
+									acceleratedClock.getAccelerationFactor());
 			// create and install the supervisor plug-in
 			sp = new SupervisorPlugin(cma);
-			sp.setPluginURI(MachineCafeUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
+			sp.setPluginURI(HeaterUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
 			this.installPlugin(sp);
 			this.logMessage("plug-in installed.");
 			// construct the global simulator
@@ -390,61 +372,28 @@ extends		AbstractCyPhyComponent
 			sp.setSimulationRunParameters(new HashMap<>());
 			// start the MIL real time simulation
 			assert	simulationStartTimeInMillis > System.currentTimeMillis() :
-				new BCMException(
-						"simulationStartTimeInMillis > "
-								+ "System.currentTimeMillis()");
+					new BCMException(
+							"simulationStartTimeInMillis > "
+							+ "System.currentTimeMillis()");
 			sp.startRTSimulation(simulationStartTimeInMillis,
-					acceleratedClock.getSimulatedStartTime(),
-					acceleratedClock.getSimulatedDuration());
-			// wait until the end of the simulation
+								 acceleratedClock.getSimulatedStartTime(),
+								 acceleratedClock.getSimulatedDuration());
 			acceleratedClock.waitUntilSimulationEnd();
-			// give some time for the end of simulation catering tasks
-			Thread.sleep(200L);
+			Thread.sleep(250L);
 			this.logMessage(sp.getFinalReport().toString());
+			this.logMessage("simulation ends.");				
 			break;
 		case SIL_SIMULATION:
-			// For SIL simulations in hair dryer unit tests, there is only one
-			// component, HairDryer, that executes a simulation; the component
+			// For SIL simulations in heater unit tests, there is only one
+			// component, Heater, that executes a simulation; the component
 			// starts it itself in its execute method
 		default:
 		}		
 	}
 
-	// -------------------------------------------------------------------------
-	// Methods
-	// -------------------------------------------------------------------------
-
 	/**
-	 * create the MIL component simulation architecture for the hair dryer
+	 * create the MIL component simulation architecture for the heater
 	 * unit tests.
-	 * 
-	 * <p><strong>Description</strong></p>
-	 * 
-	 * <p>
-	 * In hair dryer unit tests, the component assembly has two components:
-	 * {@code HairDryer} and {@code HairDryerUser}. The unit test component
-	 * MIL simulation architecture is:
-	 * </p>
-	 * <p><img src="../../../../../../../../images/hem-2024-e3/HairDryerUnitTestMILComponentArchitecture.png"/></p>
-	 * <p>
-	 * Compared to the MIL simulation architecture, the
-	 * {@code HairDryerUserModel} becomes the sole atomic model in the
-	 * {@code HairDryerUser} local simulation architecture while the
-	 * {@code HairDryer} local architecture sees its
-	 * {@code HairDryerCoupledModel} import the hair dryer events and transmit
-	 * them to a new atomic model {@code HairDryerStateModel}. This latter model
-	 * is introduced in preparation for the integration testing SIL simulation
-	 * where the {@code HairDryerElectricityModel} will have to be co-localised
-	 * with the {@code ElectricMeterElectricityModel} in the
-	 * {@code ElectricMeter} component. It keeps track of the hair dryer state
-	 * and mode as well as forwarding the hair dryer events to the
-	 * {@code HairDryerElectricityModel}.
-	 * </p>
-	 * <p>
-	 * The {@code HairDryerUnitTestSupervisor} is introduced to compose and
-	 * supervise the global simulation architecture. This method creates the
-	 * component simulation architecture 
-	 * </p>
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -453,125 +402,126 @@ extends		AbstractCyPhyComponent
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param architectureURI	URI of the component model architecture to be created.
+	 * @param architectureURI	URI of the component simulation architecture to be created.
 	 * @param simulatedTimeUnit	simulated time unit used in the architecture.
-	 * @return					the global MIL simulation  architecture for the hair dryer.
+	 * @return					the global MIL simulation  architecture for the heater unit tests.
 	 * @throws Exception		<i>to do</i>.
 	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
-	createMILComponentSimulationArchitectures(
-			String architectureURI, 
-			TimeUnit simulatedTimeUnit
-			) throws Exception
+									createMILComponentSimulationArchitectures(
+		String architectureURI, 
+		TimeUnit simulatedTimeUnit
+		) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
-		// The HairDryer simulator is the composition of two atomic models, the
-		// HairDryerStateModel and the HairDryerElectricityModel, to get the
-		// HairDryerCoupledModel. In the overall unit test component simulation
-		// model, this coupled model is seen as an atomic model, hiding the
-		// internal local simulation architecture of the HairDryer behind the
-		// closure of DEVS models composition principle (a coupled model can be
-		// seen as an atomic model).
 		atomicModelDescriptors.put(
-				MachineCafeCoupledModel.MIL_URI,
+				HeaterCoupledModel.MIL_URI,
 				ComponentAtomicModelDescriptor.create(
-						MachineCafeCoupledModel.MIL_URI,
+						HeaterCoupledModel.MIL_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class
-						},
+							SwitchOnHeater.class,
+							SwitchOffHeater.class,
+							SetPowerHeater.class,
+							Heat.class,
+							DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						simulatedTimeUnit,
-						MachineCafe.REFLECTION_INBOUND_PORT_URI
+						Heater.REFLECTION_INBOUND_PORT_URI
 						));
-		// The HairDryerUser simulator is made of only one atomic model, which
-		// is therefore seen as an atomic model also at the component simulation
-		// architecture level.
 		atomicModelDescriptors.put(
-				MachineCafeUserModel.MIL_URI,
+				HeaterUnitTesterModel.MIL_URI,
 				ComponentAtomicModelDescriptor.create(
-						MachineCafeUserModel.MIL_URI,
+						HeaterUnitTesterModel.MIL_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class
-						},
+							SwitchOnHeater.class,
+							SwitchOffHeater.class,
+							SetPowerHeater.class,
+							Heat.class,
+							DoNotHeat.class},
 						simulatedTimeUnit,
-						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+						HeaterUser.REFLECTION_INBOUND_PORT_URI));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
-		submodels.add(MachineCafeCoupledModel.MIL_URI);
-		submodels.add(MachineCafeUserModel.MIL_URI);
+		submodels.add(HeaterCoupledModel.MIL_URI);
+		submodels.add(HeaterUnitTesterModel.MIL_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
 		Map<EventSource,EventSink[]> connections =
-				new HashMap<EventSource,EventSink[]>();
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_URI,
-								SwitchOnMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_URI,
-										SwitchOnMachineCafe.class)
-						});
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_URI,
-								SwitchOffMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_URI,
-										SwitchOffMachineCafe.class)
-						});
+									new HashMap<EventSource,EventSink[]>();
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_URI,
+							SwitchOnHeater.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_URI,
+							  SwitchOnHeater.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_URI,
+							SwitchOffHeater.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_URI,
+							  SwitchOffHeater.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_URI,
+							SetPowerHeater.class),
+				new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_URI,
+							  SetPowerHeater.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_URI, Heat.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_URI, Heat.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_URI, DoNotHeat.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_URI, DoNotHeat.class)
+			});
 
-
-				// coupled model descriptor
-				coupledModelDescriptors.put(
+		// coupled model descriptor
+		coupledModelDescriptors.put(
+				GlobalCoupledModel.MIL_URI,
+				ComponentCoupledModelDescriptor.create(
+						GlobalCoupledModel.class,
 						GlobalCoupledModel.MIL_URI,
-						ComponentCoupledModelDescriptor.create(
-								GlobalCoupledModel.class,
-								GlobalCoupledModel.MIL_URI,
-								submodels,
-								null,
-								null,
-								connections,
-								null,
-								CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
-								CoordinatorPlugin.class,
-								null));
+						submodels,
+						null,
+						null,
+						connections,
+						null,
+						CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
+						CoordinatorPlugin.class,
+						null));
 
-				ComponentModelArchitecture architecture =
-						new ComponentModelArchitecture(
-								architectureURI,
-								GlobalCoupledModel.MIL_URI,
-								atomicModelDescriptors,
-								coupledModelDescriptors,
-								simulatedTimeUnit);
+		ComponentModelArchitecture architecture =
+				new ComponentModelArchitecture(
+						architectureURI,
+						GlobalCoupledModel.MIL_URI,
+						atomicModelDescriptors,
+						coupledModelDescriptors,
+						simulatedTimeUnit);
 
-				return architecture;
+		return architecture;
 	}
 
 	/**
-	 * create the MIL real time component simulation architecture for the hair
-	 * dryer unit tests.
-	 * 
-	 * <p><strong>Description</strong></p>
-	 * 
-	 * <p>
-	 * The unit test component MIL real time simulation architecture is the
-	 * same as the component MIL simulation architecture created by
-	 * {@code createMILComponentSimulationArchitectures} except that they
-	 * are real time. 
-	 * </p>
+	 * create the MIL real time component simulation architecture for the heater
+	 * unit tests.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -580,112 +530,124 @@ extends		AbstractCyPhyComponent
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param architectureURI		URI of the component model architecture to be created.
+	 * @param architectureURI		URI of the component simulation architecture to be created.
 	 * @param simulatedTimeUnit		simulated time unit used in the architecture.
 	 * @param accelerationFactor	acceleration factor for this run.
-	 * @return						the global MIL real time component simulation architecture for the hair dryer unit tests.
+	 * @return						the global MIL real time component simulation architecture for the heater unit tests.
 	 * @throws Exception			<i>to do</i>.
 	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
-	createMILRTComponentSimulationArchitectures(
-			String architectureURI, 
-			TimeUnit simulatedTimeUnit,
-			double accelerationFactor
-			) throws Exception
+									createMILRTComponentSimulationArchitectures(
+		String architectureURI, 
+		TimeUnit simulatedTimeUnit,
+		double accelerationFactor
+		) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
-		// The HairDryer simulator is the composition of two atomic models, the
-		// HairDryerStateModel and the HairDryerElectricityModel, to get the
-		// HairDryerCoupledModel. In the overall unit test component simulation
-		// model, this coupled model is seen as an atomic model, hiding the
-		// internal local simulation architecture of the HairDryer behind the
-		// closure of DEVS models composition principle (a coupled model can be
-		// seen as an atomic model).
 		atomicModelDescriptors.put(
-				MachineCafeCoupledModel.MIL_RT_URI,
+				HeaterCoupledModel.MIL_RT_URI,
 				RTComponentAtomicModelDescriptor.create(
-						MachineCafeCoupledModel.MIL_RT_URI,
+						HeaterCoupledModel.MIL_RT_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class
-						},
+							SwitchOnHeater.class,
+							SwitchOffHeater.class,
+							SetPowerHeater.class,
+							Heat.class,
+							DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						simulatedTimeUnit,
-						MachineCafe.REFLECTION_INBOUND_PORT_URI
+						Heater.REFLECTION_INBOUND_PORT_URI
 						));
-		// The HairDryerUser simulator is made of only one atomic model, which
-		// is therefore seen as an atomic model also at the component simulation
-		// architecture level.
 		atomicModelDescriptors.put(
-				MachineCafeUserModel.MIL_RT_URI,
+				HeaterUnitTesterModel.MIL_RT_URI,
 				RTComponentAtomicModelDescriptor.create(
-						MachineCafeUserModel.MIL_RT_URI,
+						HeaterUnitTesterModel.MIL_RT_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class},
+							SwitchOnHeater.class,
+							SwitchOffHeater.class,
+							SetPowerHeater.class,
+							Heat.class,
+							DoNotHeat.class},
 						simulatedTimeUnit,
-						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+						HeaterUser.REFLECTION_INBOUND_PORT_URI));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
-		submodels.add(MachineCafeCoupledModel.MIL_RT_URI);
-		submodels.add(MachineCafeUserModel.MIL_RT_URI);
+		submodels.add(HeaterCoupledModel.MIL_RT_URI);
+		submodels.add(HeaterUnitTesterModel.MIL_RT_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
 		Map<EventSource,EventSink[]> connections =
-				new HashMap<EventSource,EventSink[]>();
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_RT_URI,
-								SwitchOnMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_RT_URI,
-										SwitchOnMachineCafe.class)
-						});
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_RT_URI,
-								SwitchOffMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_RT_URI,
-										SwitchOffMachineCafe.class)
-						});
+									new HashMap<EventSource,EventSink[]>();
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+							SwitchOnHeater.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_RT_URI,
+							  SwitchOnHeater.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+							SwitchOffHeater.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_RT_URI,
+							  SwitchOffHeater.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+							SetPowerHeater.class),
+				new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_RT_URI,
+							  SetPowerHeater.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_RT_URI, Heat.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_RT_URI, Heat.class)
+			});
+		connections.put(
+			new EventSource(HeaterUnitTesterModel.MIL_RT_URI, DoNotHeat.class),
+			new EventSink[] {
+				new EventSink(HeaterCoupledModel.MIL_RT_URI, DoNotHeat.class)
+			});
 
-				// coupled model descriptor
-				coupledModelDescriptors.put(
+		// coupled model descriptor
+		coupledModelDescriptors.put(
+				GlobalCoupledModel.MIL_RT_URI,
+				RTComponentCoupledModelDescriptor.create(
+						GlobalCoupledModel.class,
 						GlobalCoupledModel.MIL_RT_URI,
-						RTComponentCoupledModelDescriptor.create(
-								GlobalCoupledModel.class,
-								GlobalCoupledModel.MIL_RT_URI,
-								submodels,
-								null,
-								null,
-								connections,
-								null,
-								CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
-								CoordinatorPlugin.class,
-								null,
-								accelerationFactor));
+						submodels,
+						null,
+						null,
+						connections,
+						null,
+						CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
+						CoordinatorPlugin.class,
+						null,
+						accelerationFactor));
 
-				ComponentModelArchitecture architecture =
-						new RTComponentModelArchitecture(
-								architectureURI,
-								GlobalCoupledModel.MIL_RT_URI,
-								atomicModelDescriptors,
-								coupledModelDescriptors,
-								simulatedTimeUnit);
+		ComponentModelArchitecture architecture =
+				new RTComponentModelArchitecture(
+						architectureURI,
+						GlobalCoupledModel.MIL_RT_URI,
+						atomicModelDescriptors,
+						coupledModelDescriptors,
+						simulatedTimeUnit);
 
-				return architecture;
+		return architecture;
 	}
 }
 // -----------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package projet_alasca.equipements.machineCafe;
+package projet_alasca.etape3.equipments.hairdryer;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -43,15 +43,19 @@ import fr.sorbonne_u.components.cyphy.utils.aclocks.ClocksServerWithSimulationOu
 import fr.sorbonne_u.components.exceptions.BCMException;
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
+import fr.sorbonne_u.components.hem2024e1.equipments.hairdryer.HairDryerConnector;
+import fr.sorbonne_u.components.hem2024e1.equipments.hairdryer.HairDryerOutboundPort;
+import fr.sorbonne_u.components.hem2024e1.equipments.hairdryer.HairDryerUserCI;
+import fr.sorbonne_u.components.hem2024e1.equipments.hairdryer.HairDryerImplementationI.HairDryerMode;
+import fr.sorbonne_u.components.hem2024e1.equipments.hairdryer.HairDryerImplementationI.HairDryerState;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.exceptions.ImplementationInvariantException;
 import fr.sorbonne_u.exceptions.InvariantChecking;
 import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
-import projet_alasca.equipements.machineCafe.MachineCafeImplementationI.CoffeeMachineState;
-import projet_alasca.equipements.machineCafe.mil.LocalSimulationArchitectures;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeOperationI;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerOperationI;
+import projet_alasca.etape3.equipments.hairdryer.mil.LocalSimulationArchitectures;
 import projet_alasca.etape3.utils.ExecutionType;
 import projet_alasca.etape3.utils.SimulationType;
 
@@ -146,11 +150,11 @@ import java.util.concurrent.TimeUnit;
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-@RequiredInterfaces(required = {MachineCafeUserCI.class,
-		ClocksServerWithSimulationCI.class})
-public class			MachineCafeUser
+@RequiredInterfaces(required = {HairDryerUserCI.class,
+								ClocksServerWithSimulationCI.class})
+public class			HairDryerUser
 extends		AbstractCyPhyComponent
-implements	MachineCafeOperationI
+implements	HairDryerOperationI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -166,12 +170,12 @@ implements	MachineCafeOperationI
 	/** standard reflection, inbound port URI for the {@code HairDryerUser}
 	 *  component.															*/
 	public static final String			REFLECTION_INBOUND_PORT_URI =
-			"MACHINE-CAFE-USER-RIP-URI";
+													"HAIR-DRYER-USER-RIP-URI";
 
 	/** outbound port to connect to the {@code HairDryer} component.		*/
-	protected MachineCafeOutboundPort		mcop;
+	protected HairDryerOutboundPort		hdop;
 	/** service inbound port URI of the {@code HairDryer} component.		*/
-	protected String					machineCafeInboundPortURI;
+	protected String					hairDryerInboundPortURI;
 
 	// Execution/Simulation
 
@@ -210,64 +214,64 @@ implements	MachineCafeOperationI
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param mc	instance to be tested.
+	 * @param hd	instance to be tested.
 	 * @return		true if the glass-box invariants are observed, false otherwise.
 	 */
-	protected static boolean	glassBoxInvariants(MachineCafeUser mc)
+	protected static boolean	glassBoxInvariants(HairDryerUser hd)
 	{
-		assert 	mc != null : new PreconditionException("hd != null");
+		assert 	hd != null : new PreconditionException("hd != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				REFLECTION_INBOUND_PORT_URI != null &&
-				!REFLECTION_INBOUND_PORT_URI.isEmpty(),
-				MachineCafeUser.class, mc,
-				"REFLECTION_INBOUND_PORT_URI != null && "
-						+ "!REFLECTION_INBOUND_PORT_URI.isEmpty()");
+					REFLECTION_INBOUND_PORT_URI != null &&
+									!REFLECTION_INBOUND_PORT_URI.isEmpty(),
+					HairDryerUser.class, hd,
+					"REFLECTION_INBOUND_PORT_URI != null && "
+								+ "!REFLECTION_INBOUND_PORT_URI.isEmpty()");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				X_RELATIVE_POSITION >= 0,
-				MachineCafeUser.class, mc,
-				"X_RELATIVE_POSITION >= 0");
+					X_RELATIVE_POSITION >= 0,
+					HairDryerUser.class, hd,
+					"X_RELATIVE_POSITION >= 0");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				Y_RELATIVE_POSITION >= 0,
-				MachineCafeUser.class, mc,
-				"Y_RELATIVE_POSITION >= 0");		
+					Y_RELATIVE_POSITION >= 0,
+					HairDryerUser.class, hd,
+					"Y_RELATIVE_POSITION >= 0");		
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				mc.currentExecutionType != null,
-				MachineCafeUser.class, mc,
-				"currentExecutionType != null");
+					hd.currentExecutionType != null,
+					HairDryerUser.class, hd,
+					"currentExecutionType != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				mc.currentSimulationType != null,
-				MachineCafeUser.class, mc,
-				"hcurrentSimulationType != null");
+					hd.currentSimulationType != null,
+					HairDryerUser.class, hd,
+					"hcurrentSimulationType != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				!mc.currentExecutionType.isStandard() ||
-				mc.currentSimulationType.isNoSimulation(),
-				MachineCafeUser.class, mc,
-				"!currentExecutionType.isStandard() || "
-						+ "currentSimulationType.isNoSimulation()");
+					!hd.currentExecutionType.isStandard() ||
+								hd.currentSimulationType.isNoSimulation(),
+					HairDryerUser.class, hd,
+					"!currentExecutionType.isStandard() || "
+					+ "currentSimulationType.isNoSimulation()");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				mc.currentSimulationType.isNoSimulation() ||
-				(mc.globalArchitectureURI != null &&
-				!mc.globalArchitectureURI.isEmpty()),
-				MachineCafeUser.class, mc,
-				"currentSimulationType.isNoSimulation() || "
-						+ "(globalArchitectureURI != null && "
-						+ "!globalArchitectureURI.isEmpty())");
+					hd.currentSimulationType.isNoSimulation() ||
+							(hd.globalArchitectureURI != null &&
+										!hd.globalArchitectureURI.isEmpty()),
+					HairDryerUser.class, hd,
+					"currentSimulationType.isNoSimulation() || "
+					+ "(globalArchitectureURI != null && "
+					+ "!globalArchitectureURI.isEmpty())");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				mc.currentSimulationType.isNoSimulation() ||
-				(mc.localArchitectureURI != null &&
-				!mc.localArchitectureURI.isEmpty()),
-				MachineCafeUser.class, mc,
-				"currentSimulationType.isNoSimulation() || "
-						+ "(localArchitectureURI != null && "
-						+ "!localArchitectureURI.isEmpty())");
+					hd.currentSimulationType.isNoSimulation() ||
+							(hd.localArchitectureURI != null &&
+										!hd.localArchitectureURI.isEmpty()),
+					HairDryerUser.class, hd,
+					"currentSimulationType.isNoSimulation() || "
+					+ "(localArchitectureURI != null && "
+					+ "!localArchitectureURI.isEmpty())");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-				!mc.currentSimulationType.isSILSimulation() ||
-				mc.accFactor > 0.0,
-				MachineCafeUser.class, mc,
-				"!mc.currentSimulationType.isSILSimulation() || "
-						+ "mc.accFactor > 0.0");
+					!hd.currentSimulationType.isSILSimulation() ||
+														hd.accFactor > 0.0,
+					HairDryerUser.class, hd,
+					"!hd.currentSimulationType.isSILSimulation() || "
+					+ "hd.accFactor > 0.0");
 		return ret;
 	}
 
@@ -284,9 +288,9 @@ implements	MachineCafeOperationI
 	 * @param hd	instance to be tested.
 	 * @return		true if the black-box invariants are observed, false otherwise.
 	 */
-	protected static boolean	blackBoxInvariants(MachineCafeUser mc)
+	protected static boolean	blackBoxInvariants(HairDryerUser hd)
 	{
-		assert 	mc != null : new PreconditionException("mc != null");
+		assert 	hd != null : new PreconditionException("hd != null");
 
 		boolean ret = true;
 		return ret;
@@ -308,9 +312,9 @@ implements	MachineCafeOperationI
 	 *
 	 * @throws Exception	<i>to do</i>.
 	 */
-	protected			MachineCafeUser() throws Exception
+	protected			HairDryerUser() throws Exception
 	{
-		this(MachineCafe.INBOUND_PORT_URI);
+		this(HairDryer.INBOUND_PORT_URI);
 	}
 
 	/**
@@ -325,13 +329,13 @@ implements	MachineCafeOperationI
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param machineCafeInboundPortURI	URI of the hair dryer inbound port.
+	 * @param hairDryerInboundPortURI	URI of the hair dryer inbound port.
 	 * @throws Exception				<i>to do</i>.
 	 */
-	protected			MachineCafeUser(String machineCafeInboundPortURI) 
-			throws Exception
+	protected			HairDryerUser(String hairDryerInboundPortURI) 
+	throws Exception
 	{
-		this(machineCafeInboundPortURI, ExecutionType.STANDARD);
+		this(hairDryerInboundPortURI, ExecutionType.STANDARD);
 	}
 
 	/**
@@ -344,21 +348,21 @@ implements	MachineCafeOperationI
 	 * post	{@code true}	// no postcondition.
 	 * </pre>
 	 *
-	 * @param machineCafeInboundPortURI	URI of the hair dryer inbound port.
+	 * @param hairDryerInboundPortURI	URI of the hair dryer inbound port.
 	 * @param currentExecutionType		execution type for the next run.
 	 * @throws Exception				<i>to do</i>.
 	 */
-	protected			MachineCafeUser(
-			String machineCafeInboundPortURI,
-			ExecutionType currentExecutionType
-			) throws Exception
+	protected			HairDryerUser(
+		String hairDryerInboundPortURI,
+		ExecutionType currentExecutionType
+		) throws Exception
 	{
-		this(REFLECTION_INBOUND_PORT_URI, machineCafeInboundPortURI,
-				currentExecutionType, SimulationType.NO_SIMULATION,
-				null, null, null, 0.0, null);
+		this(REFLECTION_INBOUND_PORT_URI, hairDryerInboundPortURI,
+			 currentExecutionType, SimulationType.NO_SIMULATION,
+			 null, null, null, 0.0, null);
 
 		assert	currentExecutionType.isTest() :
-			new PreconditionException("currentExecutionType.isTest()");
+				new PreconditionException("currentExecutionType.isTest()");
 	}
 
 	/**
@@ -376,7 +380,7 @@ implements	MachineCafeOperationI
 	 * </pre>
 	 *
 	 * @param reflectionInboundPortURI	URI of the reflection inbound port of the component.
-	 * @param machineCafeInboundPortURI	URI of the hair dryer inbound port.
+	 * @param hairDryerInboundPortURI	URI of the hair dryer inbound port.
 	 * @param currentExecutionType		execution type for the next run.
 	 * @param currentSimulationType		simulation type for the next run.
 	 * @param globalArchitectureURI		URI of the global simulation architecture to be created or the empty string if the component does not execute as a simulation.
@@ -385,60 +389,60 @@ implements	MachineCafeOperationI
 	 * @param accFactor					acceleration factor for the simulation.
 	 * @throws Exception				<i>to do</i>.
 	 */
-	protected			MachineCafeUser(
-			String reflectionInboundPortURI,
-			String machineCafeInboundPortURI,
-			ExecutionType currentExecutionType,
-			SimulationType currentSimulationType,
-			String globalArchitectureURI,
-			String localArchitectureURI,
-			TimeUnit simulationTimeUnit,
-			double accFactor,
-			String clockURI
-			) throws Exception
+	protected			HairDryerUser(
+		String reflectionInboundPortURI,
+		String hairDryerInboundPortURI,
+		ExecutionType currentExecutionType,
+		SimulationType currentSimulationType,
+		String globalArchitectureURI,
+		String localArchitectureURI,
+		TimeUnit simulationTimeUnit,
+		double accFactor,
+		String clockURI
+		) throws Exception
 	{
 		// one thread for execute and one schedulable for SIL scenarios
 		super(reflectionInboundPortURI, 1, 1);
 
-		assert	machineCafeInboundPortURI != null &&
-				!machineCafeInboundPortURI.isEmpty() :
-					new PreconditionException(
-							"machineCafeInboundPortURI != null && "
-									+ "!machineCafeInboundPortURI.isEmpty()");
+		assert	hairDryerInboundPortURI != null &&
+										!hairDryerInboundPortURI.isEmpty() :
+				new PreconditionException(
+						"hairDryerInboundPortURI != null && "
+						+ "!hairDryerInboundPortURI.isEmpty()");
 		assert	currentExecutionType != null :
-			new PreconditionException("currentExecutionType != null");
+				new PreconditionException("currentExecutionType != null");
 		assert	currentExecutionType.isStandard() ||
-		clockURI != null && !clockURI.isEmpty() :
-			new PreconditionException(
-					"currentExecutionType.isStandard() || "
-							+ "clockURI != null && !clockURI.isEmpty()");
+								clockURI != null && !clockURI.isEmpty() :
+				new PreconditionException(
+						"currentExecutionType.isStandard() || "
+						+ "clockURI != null && !clockURI.isEmpty()");
 		assert	!currentExecutionType.isStandard() ||
-		currentSimulationType.isNoSimulation() :
-			new PreconditionException(
-					"!currentExecutionType.isStandard() || "
-							+ "currentSimulationType.isNoSimulation()");
+										currentSimulationType.isNoSimulation() :
+				new PreconditionException(
+						"!currentExecutionType.isStandard() || "
+						+ "currentSimulationType.isNoSimulation()");
 		assert	currentSimulationType.isNoSimulation() ||
-		(globalArchitectureURI != null &&
-		!globalArchitectureURI.isEmpty()) :
-			new PreconditionException(
-					"currentSimulationType.isNoSimulation() ||  "
-							+ "(globalArchitectureURI != null && "
-							+ "!globalArchitectureURI.isEmpty())");
+								(globalArchitectureURI != null &&
+											!globalArchitectureURI.isEmpty()) :
+				new PreconditionException(
+						"currentSimulationType.isNoSimulation() ||  "
+						+ "(globalArchitectureURI != null && "
+						+ "!globalArchitectureURI.isEmpty())");
 		assert	currentSimulationType.isNoSimulation() ||
-		(localArchitectureURI != null &&
-		!localArchitectureURI.isEmpty()) :
-			new PreconditionException(
-					"currentSimulationType.isNoSimulation() ||  "
-							+ "(localArchitectureURI != null && "
-							+ "!localArchitectureURI.isEmpty())");
+								(localArchitectureURI != null &&
+											!localArchitectureURI.isEmpty()) :
+				new PreconditionException(
+						"currentSimulationType.isNoSimulation() ||  "
+						+ "(localArchitectureURI != null && "
+						+ "!localArchitectureURI.isEmpty())");
 		assert	!currentSimulationType.isSILSimulation() || accFactor > 0.0 :
-			new PreconditionException(
-					"!currentSimulationType.isSILSimulation() || "
-							+ "accFactor > 0.0");
+				new PreconditionException(
+						"!currentSimulationType.isSILSimulation() || "
+						+ "accFactor > 0.0");
 
 		if (currentExecutionType.isStandard()) {
 			throw new RuntimeException(
-					"MachineCafeUser: standard execution is not implemented.");
+					"HairDryerUser: standard execution is not implemented.");
 		}
 
 		this.currentExecutionType = currentExecutionType;
@@ -449,13 +453,13 @@ implements	MachineCafeOperationI
 		this.accFactor = accFactor;
 		this.clockURI = clockURI;
 
-		this.initialise(machineCafeInboundPortURI);
+		this.initialise(hairDryerInboundPortURI);
 
-		assert	MachineCafeUser.glassBoxInvariants(this) :
-			new ImplementationInvariantException(
-					"MachineCafeUser.glassBoxInvariants(this)");
-		assert	MachineCafeUser.blackBoxInvariants(this) :
-			new InvariantException("MachineCafeUser.blackBoxInvariants(this)");
+		assert	HairDryerUser.glassBoxInvariants(this) :
+				new ImplementationInvariantException(
+						"HairDryerUser.glassBoxInvariants(this)");
+		assert	HairDryerUser.blackBoxInvariants(this) :
+				new InvariantException("HairDryerUser.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -472,47 +476,47 @@ implements	MachineCafeOperationI
 	 * @throws Exception				<i>to do</i>.
 	 */
 	protected void		initialise(
-			String machineCafeInboundPortURI
-			) throws Exception
+		String hairDryerInboundPortURI
+		) throws Exception
 	{
-		this.machineCafeInboundPortURI = machineCafeInboundPortURI;
-		this.mcop = new MachineCafeOutboundPort(this);
-		this.mcop.publishPort();
+		this.hairDryerInboundPortURI = hairDryerInboundPortURI;
+		this.hdop = new HairDryerOutboundPort(this);
+		this.hdop.publishPort();
 
 		// create the local simulation architecture given the type of
 		// simulation for the current run
 		switch (this.currentSimulationType) {
 		case MIL_SIMULATION:
 			Architecture architecture =
-			LocalSimulationArchitectures.
-			createHairDryerUserMIL_Architecture(
-					this.localArchitectureURI,
-					this.simulationTimeUnit);
+					LocalSimulationArchitectures.
+						createHairDryerUserMIL_Architecture(
+											this.localArchitectureURI,
+											this.simulationTimeUnit);
 			assert	architecture.getRootModelURI().
-			equals(this.localArchitectureURI) :
-				new AssertionError(
-						"local simulation architecture "
-								+ this.localArchitectureURI
-								+ " does not exist!");
+										equals(this.localArchitectureURI) :
+					new AssertionError(
+							"local simulation architecture "
+							+ this.localArchitectureURI
+							+ " does not exist!");
 			this.addLocalSimulatorArchitecture(architecture);
 			this.global2localSimulationArchitectureURIS.
-			put(this.globalArchitectureURI, this.localArchitectureURI);
+					put(this.globalArchitectureURI, this.localArchitectureURI);
 			break;
 		case MIL_RT_SIMULATION:
 			architecture =
-			LocalSimulationArchitectures.
-			createHairDryerUserMIL_RT_Architecture(
-					this.localArchitectureURI,
-					this.simulationTimeUnit,
-					this.accFactor);
+					LocalSimulationArchitectures.
+						createHairDryerUserMIL_RT_Architecture(
+											this.localArchitectureURI,
+											this.simulationTimeUnit,
+											this.accFactor);
 			assert	architecture.getRootModelURI().equals(
-					this.localArchitectureURI) :
-						new BCMException(
-								"local simulator " + this.localArchitectureURI
-								+ " does not exist!");
+												this.localArchitectureURI) :
+					new BCMException(
+							"local simulator " + this.localArchitectureURI
+							+ " does not exist!");
 			this.addLocalSimulatorArchitecture(architecture);
 			this.global2localSimulationArchitectureURIS.
-			put(this.globalArchitectureURI, this.localArchitectureURI);
+					put(this.globalArchitectureURI, this.localArchitectureURI);
 			break;
 		case SIL_SIMULATION:
 		case NO_SIMULATION:
@@ -522,9 +526,9 @@ implements	MachineCafeOperationI
 		}		
 
 		if (VERBOSE) {
-			this.tracer.get().setTitle("Machine cafe user component");
+			this.tracer.get().setTitle("Hair dryer user component");
 			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
-					Y_RELATIVE_POSITION);
+												  Y_RELATIVE_POSITION);
 			this.toggleTracing();
 		}
 	}
@@ -533,7 +537,6 @@ implements	MachineCafeOperationI
 	// Component internal testing method triggered by the SIL simulator
 	// -------------------------------------------------------------------------
 
-
 	/**
 	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOn()
 	 */
@@ -541,10 +544,10 @@ implements	MachineCafeOperationI
 	public void			turnOn()
 	{
 		if (VERBOSE) {
-			this.logMessage("MachineCafeUser#turnOn().");
+			this.logMessage("HairDryerUser#turnOn().");
 		}
 		try {
-			this.mcop.turnOn();
+			this.hdop.turnOn();
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}
@@ -560,13 +563,43 @@ implements	MachineCafeOperationI
 			this.logMessage("HairDryerUser#turnOff().");
 		}
 		try {
-			this.mcop.turnOff();
+			this.hdop.turnOff();
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;
 		}
 	}
 
+	/**
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#setHigh()
+	 */
+	@Override
+	public void			setHigh()
+	{
+		if (VERBOSE) {
+			this.logMessage("HairDryerUser#setHigh().");
+		}
+		try {
+			this.hdop.setHigh();
+		} catch (Exception e) {
+			throw new RuntimeException(e) ;
+		}
+	}
 
+	/**
+	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#setLow()
+	 */
+	@Override
+	public void			setLow()
+	{
+		if (VERBOSE) {
+			this.logMessage("HairDryerUser#setLow().");
+		}
+		try {
+			this.hdop.setLow();
+		} catch (Exception e) {
+			throw new RuntimeException(e) ;
+		}
+	}
 
 	// -------------------------------------------------------------------------
 	// Component internal tests
@@ -576,7 +609,7 @@ implements	MachineCafeOperationI
 	{
 		this.logMessage("testGetState()... ");
 		try {
-			assertEquals(CoffeeMachineState.OFF, this.mcop.getState());
+			assertEquals(HairDryerState.OFF, this.hdop.getState());
 		} catch (Exception e) {
 			this.logMessage("...KO.");
 			assertTrue(false);
@@ -584,43 +617,93 @@ implements	MachineCafeOperationI
 		this.logMessage("...done.");
 	}
 
-
-	public void			testTurnOnOff()
+	public void			testGetMode()
 	{
-		this.logMessage("testTurnOnOff()... ");
+		this.logMessage("testGetMode()... ");
 		try {
-			assertEquals(CoffeeMachineState.OFF, this.mcop.getState());
-			this.mcop.turnOn();
-			assertEquals(CoffeeMachineState.ON, this.mcop.getState());
-		} catch (Exception e) {
-			assertTrue(false);
-		}
-		try {
-			assertThrows(ExecutionException.class,
-					() -> this.mcop.turnOn());
-		} catch (Exception e) {
-			assertTrue(false);
-		}
-		try {
-			this.mcop.turnOff();
-			assertEquals(CoffeeMachineState.OFF, this.mcop.getState());
-		} catch (Exception e) {
-			assertTrue(false);
-		}
-		try {
-			assertThrows(ExecutionException.class,
-					() -> this.mcop.turnOff());
+			assertEquals(HairDryerMode.LOW, this.hdop.getMode());
 		} catch (Exception e) {
 			assertTrue(false);
 		}
 		this.logMessage("...done.");
 	}
 
+	public void			testTurnOnOff()
+	{
+		this.logMessage("testTurnOnOff()... ");
+		try {
+			assertEquals(HairDryerState.OFF, this.hdop.getState());
+			this.hdop.turnOn();
+			assertEquals(HairDryerState.ON, this.hdop.getState());
+			assertEquals(HairDryerMode.LOW, this.hdop.getMode());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			assertThrows(ExecutionException.class,
+						 () -> this.hdop.turnOn());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			this.hdop.turnOff();
+			assertEquals(HairDryerState.OFF, this.hdop.getState());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			assertThrows(ExecutionException.class,
+						 () -> this.hdop.turnOff());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		this.logMessage("...done.");
+	}
+
+	public void			testSetLowHigh()
+	{
+		this.logMessage("testSetLowHigh()... ");
+		try {
+			this.hdop.turnOn();
+			this.hdop.setHigh();
+			assertEquals(HairDryerState.ON, this.hdop.getState());
+			assertEquals(HairDryerMode.HIGH, this.hdop.getMode());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			assertThrows(ExecutionException.class,
+						 () -> this.hdop.setHigh());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			this.hdop.setLow();
+			assertEquals(HairDryerState.ON, this.hdop.getState());
+			assertEquals(HairDryerMode.LOW, this.hdop.getMode());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			assertThrows(ExecutionException.class,
+						 () -> this.hdop.setLow());
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		try {
+			this.hdop.turnOff();
+		} catch (Exception e) {
+			assertTrue(false);
+		}
+		this.logMessage("...done.");
+	}
 
 	protected void			runAllTests()
 	{
 		this.testGetState();
+		this.testGetMode();
 		this.testTurnOnOff();
+		this.testSetLowHigh();
 	}
 
 	// -------------------------------------------------------------------------
@@ -632,24 +715,24 @@ implements	MachineCafeOperationI
 	 */
 	@Override
 	public synchronized void	start()
-			throws ComponentStartException
+	throws ComponentStartException
 	{
 		super.start();
 
-
+		
 		try {
 			this.doPortConnection(
-					this.mcop.getPortURI(),
-					this.machineCafeInboundPortURI,
-					MachineCafeConnector.class.getCanonicalName());
+					this.hdop.getPortURI(),
+					this.hairDryerInboundPortURI,
+					HairDryerConnector.class.getCanonicalName());
 
 			switch (this.currentSimulationType) {
 			case MIL_SIMULATION:
 				AtomicSimulatorPlugin asp = new AtomicSimulatorPlugin();
 				String uri = this.global2localSimulationArchitectureURIS.
-						get(this.globalArchitectureURI);
+												get(this.globalArchitectureURI);
 				Architecture architecture =
-						(Architecture) this.localSimulationArchitectures.get(uri);
+					(Architecture) this.localSimulationArchitectures.get(uri);
 				asp.setPluginURI(uri);
 				asp.setSimulationArchitecture(architecture);
 				this.installPlugin(asp);
@@ -657,9 +740,9 @@ implements	MachineCafeOperationI
 			case MIL_RT_SIMULATION:
 				RTAtomicSimulatorPlugin rtasp = new RTAtomicSimulatorPlugin();
 				uri = this.global2localSimulationArchitectureURIS.
-						get(this.globalArchitectureURI);
+											get(this.globalArchitectureURI);
 				architecture =
-						(Architecture) this.localSimulationArchitectures.get(uri);
+					(Architecture) this.localSimulationArchitectures.get(uri);
 				rtasp.setPluginURI(uri);
 				rtasp.setSimulationArchitecture(architecture);
 				this.installPlugin(rtasp);
@@ -681,39 +764,39 @@ implements	MachineCafeOperationI
 	@Override
 	public synchronized void execute() throws Exception
 	{
-		this.logMessage("MachineCafeUser executes.");
+		this.logMessage("HairDryerUser executes.");
 		if (this.currentExecutionType.isTest() &&
 				(this.currentSimulationType.isNoSimulation() ||
-						this.currentSimulationType.isSILSimulation())) {
+							this.currentSimulationType.isSILSimulation())) {
 			// First, the component must synchronise with other components
 			// to start the execution of the test scenario; we use a
 			// time-triggered synchronisation scheme with the accelerated clock
 			ClocksServerWithSimulationOutboundPort clocksServerOutboundPort =
-					new ClocksServerWithSimulationOutboundPort(this);
+							new ClocksServerWithSimulationOutboundPort(this);
 			clocksServerOutboundPort.publishPort();
 			this.doPortConnection(
 					clocksServerOutboundPort.getPortURI(),
 					ClocksServer.STANDARD_INBOUNDPORT_URI,
 					ClocksServerWithSimulationConnector.class.getCanonicalName());
-			this.logMessage("MachineCafeUser gets the clock.");
+			this.logMessage("HairDryerUser gets the clock.");
 			AcceleratedAndSimulationClock acceleratedClock =
-					clocksServerOutboundPort.getClockWithSimulation(this.clockURI);
+				clocksServerOutboundPort.getClockWithSimulation(this.clockURI);
 			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
 			clocksServerOutboundPort.unpublishPort();
 
 			// Now, wait for the other components synchronising on the
 			// accelerated clock
-			this.logMessage("MachineCafeUser waits until start time.");
+			this.logMessage("HairDryerUser waits until start time.");
 			acceleratedClock.waitUntilStart();
-			this.logMessage("MachineCafeUser starts.");
+			this.logMessage("HairDryerUser starts.");
 
 			if (this.currentSimulationType.isNoSimulation()) {
 				// In test execution types with no simulation, the component
 				// executes a series of calls to the hair dryer to test all of
 				// its methods.
-				this.logMessage("MachineCafeUser tests begin without simulation.");
+				this.logMessage("HairDryerUser tests begin without simulation.");
 				this.runAllTests();
-				this.logMessage("MachineCafeUser tests end.");
+				this.logMessage("HairDryerUser tests end.");
 			} else {
 				// synchronise with the start of the SIL simulation
 				acceleratedClock.waitUntilSimulationStart();
@@ -729,7 +812,7 @@ implements	MachineCafeOperationI
 	@Override
 	public synchronized void	finalise() throws Exception
 	{
-		this.doPortDisconnection(this.mcop.getPortURI());
+		this.doPortDisconnection(this.hdop.getPortURI());
 
 		super.finalise();
 	}
@@ -741,7 +824,7 @@ implements	MachineCafeOperationI
 	public synchronized void	shutdown() throws ComponentShutdownException
 	{
 		try {
-			this.mcop.unpublishPort();
+			this.hdop.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}
@@ -766,16 +849,18 @@ implements	MachineCafeOperationI
 	 *
 	 */
 	protected void			silTestScenario(
-			AcceleratedAndSimulationClock acceleratedClock
-			)
+		AcceleratedAndSimulationClock acceleratedClock
+		)
 	{
 		assert	!acceleratedClock.simulationStartTimeNotReached() :
-			new BCMException("!acceleratedClock.startTimeNotReached()");
+				new BCMException("!acceleratedClock.startTimeNotReached()");
 
 		// Define the instants of the different actions in the scenario.
 		Instant simulationStartInstant =
-				acceleratedClock.getSimulationStartInstant();
+								acceleratedClock.getSimulationStartInstant();
 		Instant switchOn = simulationStartInstant.plusSeconds(3600L);
+		Instant setHigh = simulationStartInstant.plusSeconds(4500L);
+		Instant setLow = simulationStartInstant.plusSeconds(6300L);
 		Instant switchOff = simulationStartInstant.plusSeconds(7200L);
 
 		// For each action, compute the waiting time for this action using the
@@ -783,28 +868,47 @@ implements	MachineCafeOperationI
 		// perform the action at the appropriate time.
 		long delayInNanos = acceleratedClock.nanoDelayUntilInstant(switchOn);
 		this.logMessage(
-				"MachineCafe#silTestScenario waits for " + delayInNanos
+				"HairDryer#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
-				+ " " + TimeUnit.MILLISECONDS
+												+ " " + TimeUnit.MILLISECONDS
 				+ " to reach " + switchOn);
 		this.scheduleTask(
-				o -> { logMessage("MachineCafeUser SIL test scenario begins.");
-				((MachineCafeUser)o).turnOn();
-				},
+				o -> { logMessage("HairDryerUser SIL test scenario begins.");
+					   ((HairDryerUser)o).turnOn();
+					 },
 				delayInNanos, TimeUnit.NANOSECONDS);
-
-		delayInNanos = acceleratedClock.nanoDelayUntilInstant(switchOff);
+		delayInNanos = acceleratedClock.nanoDelayUntilInstant(setHigh);
 		this.logMessage(
-				"MachineCafe#silTestScenario waits for " + delayInNanos
+				"HairDryer#silTestScenario waits for " + delayInNanos
 				+ " " + TimeUnit.NANOSECONDS + " i.e., "
 				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
-				+ " " + TimeUnit.MILLISECONDS
+												+ " " + TimeUnit.MILLISECONDS
+				+ " to reach " + setHigh);
+		this.scheduleTask(
+				o -> ((HairDryerUser)o).setHigh(),
+				delayInNanos, TimeUnit.NANOSECONDS);
+		delayInNanos = acceleratedClock.nanoDelayUntilInstant(setLow);
+		this.logMessage(
+				"HairDryer#silTestScenario waits for " + delayInNanos
+				+ " " + TimeUnit.NANOSECONDS + " i.e., "
+				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
+												+ " " + TimeUnit.MILLISECONDS
+				+ " to reach " + setLow);
+		this.scheduleTask(
+				o -> ((HairDryerUser)o).setLow(),
+				delayInNanos, TimeUnit.NANOSECONDS);
+		delayInNanos = acceleratedClock.nanoDelayUntilInstant(switchOff);
+		this.logMessage(
+				"HairDryer#silTestScenario waits for " + delayInNanos
+				+ " " + TimeUnit.NANOSECONDS + " i.e., "
+				+ TimeUnit.NANOSECONDS.toMillis(delayInNanos)
+												+ " " + TimeUnit.MILLISECONDS
 				+ " to reach " + switchOff);
 		this.scheduleTask(
-				o -> { ((MachineCafeUser)o).turnOff() ;
-				logMessage("MachineCafeUser SIL test scenario ends.");
-				},
+				o -> { ((HairDryerUser)o).turnOff() ;
+					   logMessage("HairDryerUser SIL test scenario ends.");
+					 },
 				delayInNanos, TimeUnit.NANOSECONDS);
 	}
 }

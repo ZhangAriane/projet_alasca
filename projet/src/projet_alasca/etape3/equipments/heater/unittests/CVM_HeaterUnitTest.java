@@ -1,4 +1,4 @@
-package projet_alasca.equipements.machineCafe.mil.unittests;
+package projet_alasca.etape3.equipments.heater.unittests;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -41,24 +41,26 @@ import fr.sorbonne_u.components.cyphy.utils.aclocks.ClocksServerWithSimulation;
 import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.exceptions.VerboseException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
-import projet_alasca.equipements.machineCafe.MachineCafe;
-import projet_alasca.equipements.machineCafe.MachineCafeUser;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeCoupledModel;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
 import projet_alasca.etape3.CoordinatorComponent;
+import projet_alasca.etape3.equipments.heater.Heater;
+import projet_alasca.etape3.equipments.heater.HeaterController;
+import projet_alasca.etape3.equipments.heater.HeaterUser;
+import projet_alasca.etape3.equipments.heater.HeaterController.ControlMode;
+import projet_alasca.etape3.equipments.heater.mil.HeaterCoupledModel;
+import projet_alasca.etape3.equipments.heater.mil.HeaterUnitTesterModel;
 import projet_alasca.etape3.utils.ExecutionType;
 import projet_alasca.etape3.utils.SimulationType;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>CVM_HairDryerUnitTest</code> defines an execution CVM script
- * to test the hair dryer appliance in isolation.
+ * The class <code>CVM_HeaterUnitTest</code> defines an execution CVM script
+ * to test the heater appliance in isolation.
  *
  * <p><strong>Description</strong></p>
  * 
  * <p>
  * Appliances unit tests can be performed in different execution and simulation
- * types that {@code CVM_HairDryerUnitTest} must organise. Basically, the
+ * types that {@code CVM_HeaterUnitTest} must organise. Basically, the
  * execution must organise the following steps:
  * </p>
  * <ol>
@@ -115,19 +117,19 @@ import projet_alasca.etape3.utils.SimulationType;
  * <p>Simulation architectures</p>
  * 
  * <p>
- * For the hair dryer unit tests, there are two component simulation
+ * For the heater unit tests, there are two component simulation
  * architectures that can be used. The one for MIL and MIL real time simulations
  * is:
  * </p>
- * <p><img src="../../../../../../../../images/hem-2024-e3/HairDryerUnitTestMILComponentArchitecture.png"/></p>
+ * <p><img src="../../../../../../../../images/hem-2024-e3/HeaterUnitTestMILComponentArchitecture.png"/></p>
  * <p>
- * See {@code HairDryerUnitTestsSupervisor} for the explanations. The second
+ * See {@code HeaterUnitTestsSupervisor} for the explanations. The second
  * component simulation architecture is for SIL simulations where there is no
- * longer a need for a simulator in {@code HairDryerUser} as it will rather
- * execute its code directly to test {@code HairDryer}. There is no need either
+ * longer a need for a simulator in {@code HeaterUser} as it will rather
+ * execute its code directly to test {@code Heater}. There is no need either
  * then for a supervisor component:
  * </p>
- * <p><img src="../../../../../../../../images/hem-2024-e3/HairDryerUnitTestSILComponentArchitecture.png"/></p>
+ * <p><img src="../../../../../../../../images/hem-2024-e3/HeaterUnitTestSILComponentArchitecture.png"/></p>
  * 
  * <p><strong>Glass-box Invariants</strong></p>
  * 
@@ -145,7 +147,7 @@ import projet_alasca.etape3.utils.SimulationType;
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-public class			CVM_MachineCafeUnitTest
+public class			CVM_HeaterUnitTest
 extends		AbstractCVM
 {
 	// -------------------------------------------------------------------------
@@ -190,15 +192,17 @@ extends		AbstractCVM
 	/** the type of execution, to select among the values of the
 	 *  enumeration {@code ExecutionType}.									*/
 	public static ExecutionType		CURRENT_EXECUTION_TYPE =
-			//ExecutionType.STANDARD;
-			ExecutionType.UNIT_TEST;
+											//ExecutionType.STANDARD;
+											ExecutionType.UNIT_TEST;
 	/** the type of execution, to select among the values of the
 	 *  enumeration {@code ExecutionType}.									*/
 	public static SimulationType	CURRENT_SIMULATION_TYPE =
-			//SimulationType.NO_SIMULATION;
-			SimulationType.MIL_SIMULATION;
-	//SimulationType.MIL_RT_SIMULATION;
-	//SimulationType.SIL_SIMULATION;
+											//SimulationType.NO_SIMULATION;
+											//SimulationType.MIL_SIMULATION;
+											//SimulationType.MIL_RT_SIMULATION;
+											SimulationType.SIL_SIMULATION;
+	/** the control mode of the heater controller for the next run.			*/
+	public static ControlMode		CONTROL_MODE = ControlMode.PUSH;
 
 	/** for unit tests and SIL simulation tests, a {@code Clock} is
 	 *  used to get a time-triggered synchronisation of the actions of
@@ -223,24 +227,27 @@ extends		AbstractCVM
 	 *
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public				CVM_MachineCafeUnitTest() throws Exception
+	public				CVM_HeaterUnitTest() throws Exception
 	{
 		ClocksServer.VERBOSE = true;
 		ClocksServer.X_RELATIVE_POSITION = 0;
 		ClocksServer.Y_RELATIVE_POSITION = 0;
-		MachineCafeUnitTestsSupervisor.VERBOSE = true;
-		MachineCafeUnitTestsSupervisor.X_RELATIVE_POSITION = 1;
-		MachineCafeUnitTestsSupervisor.Y_RELATIVE_POSITION = 0;
+		HeaterUnitTestsSupervisor.VERBOSE = true;
+		HeaterUnitTestsSupervisor.X_RELATIVE_POSITION = 1;
+		HeaterUnitTestsSupervisor.Y_RELATIVE_POSITION = 0;
 		CoordinatorComponent.VERBOSE = true;
 		CoordinatorComponent.X_RELATIVE_POSITION = 2;
 		CoordinatorComponent.Y_RELATIVE_POSITION = 0;
 
-		MachineCafe.VERBOSE = true;
-		MachineCafe.X_RELATIVE_POSITION = 1;
-		MachineCafe.Y_RELATIVE_POSITION = 1;
-		MachineCafeUser.VERBOSE = true;
-		MachineCafeUser.X_RELATIVE_POSITION = 0;
-		MachineCafeUser.Y_RELATIVE_POSITION = 1;
+		Heater.VERBOSE = true;
+		Heater.X_RELATIVE_POSITION = 1;
+		Heater.Y_RELATIVE_POSITION = 1;
+		HeaterController.VERBOSE = true;
+		HeaterController.X_RELATIVE_POSITION = 2;
+		HeaterController.Y_RELATIVE_POSITION = 1;
+		HeaterUser.VERBOSE = true;
+		HeaterUser.X_RELATIVE_POSITION = 0;
+		HeaterUser.Y_RELATIVE_POSITION = 1;
 	}
 
 	// -------------------------------------------------------------------------
@@ -254,26 +261,26 @@ extends		AbstractCVM
 	public void			deploy() throws Exception
 	{
 		assert	!CURRENT_EXECUTION_TYPE.isIntegrationTest() :
-			new RuntimeException(
-					"!CURRENT_EXECUTION_TYPE.isIntegrationTest()");
+				new RuntimeException(
+						"!CURRENT_EXECUTION_TYPE.isIntegrationTest()");
 		assert	!CURRENT_EXECUTION_TYPE.isStandard() ||
-		CURRENT_SIMULATION_TYPE.isNoSimulation() :
-			new RuntimeException(
-					"!CURRENT_EXECUTION_TYPE.isStandard() || "
-							+ "CURRENT_SIMULATION_TYPE.isNoSimulation()");
+									CURRENT_SIMULATION_TYPE.isNoSimulation() :
+				new RuntimeException(
+						"!CURRENT_EXECUTION_TYPE.isStandard() || "
+						+ "CURRENT_SIMULATION_TYPE.isNoSimulation()");
 
 		// Set the main execution run parameters, depending on the type of
 		// execution that is required.
 
 		// URI of the global simulation architecture for the current run,
 		// if relevant.
-		String architectureURI = "";
+		String globalArchitectureURI = "";
 		// URI of the HairDryer local simulation architecture for the current
 		// run, if relevant.
-		String machineCafeLocalArchitectureURI = "";
+		String heaterLocalArchitectureURI = "";
 		// URI of the HairDryerUser local simulation architecture for the
 		// current run, if relevant.
-		String machineCafeUserLocalArchitectureURI = "";
+		String heaterUserLocalArchitectureURI = "";
 
 		long current = System.currentTimeMillis();
 		// start time of the components in Unix epoch time in milliseconds.
@@ -285,19 +292,19 @@ extends		AbstractCVM
 		// at the same time, hence avoiding confusion among them.
 		switch (CURRENT_SIMULATION_TYPE) {
 		case MIL_SIMULATION:
-			architectureURI = MachineCafeUnitTestsSupervisor.MIL_ARCHITECTURE_URI;
-			machineCafeLocalArchitectureURI = MachineCafeCoupledModel.MIL_URI;
-			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_URI;
+			globalArchitectureURI = HeaterUnitTestsSupervisor.MIL_ARCHITECTURE_URI;
+			heaterLocalArchitectureURI = HeaterCoupledModel.MIL_URI;
+			heaterUserLocalArchitectureURI = HeaterUnitTesterModel.MIL_URI;
 			break;
 		case MIL_RT_SIMULATION:
-			architectureURI = MachineCafeUnitTestsSupervisor.MIL_RT_ARCHITECTURE_URI;
-			machineCafeLocalArchitectureURI = MachineCafeCoupledModel.MIL_RT_URI;
-			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_RT_URI;
+			globalArchitectureURI = HeaterUnitTestsSupervisor.MIL_RT_ARCHITECTURE_URI;
+			heaterLocalArchitectureURI = HeaterCoupledModel.MIL_RT_URI;
+			heaterUserLocalArchitectureURI = HeaterUnitTesterModel.MIL_RT_URI;
 			break;
 		case SIL_SIMULATION:
-			architectureURI = MachineCafeUnitTestsSupervisor.SIL_ARCHITECTURE_URI;
-			machineCafeLocalArchitectureURI =  MachineCafeCoupledModel.SIL_URI;
-			machineCafeUserLocalArchitectureURI = "not-used";
+			globalArchitectureURI = HeaterUnitTestsSupervisor.SIL_ARCHITECTURE_URI;
+			heaterLocalArchitectureURI =  HeaterCoupledModel.SIL_URI;
+			heaterUserLocalArchitectureURI = "not-used";
 			break;
 		case NO_SIMULATION:
 		default:
@@ -306,31 +313,43 @@ extends		AbstractCVM
 		// Deploy the components
 
 		AbstractComponent.createComponent(
-				MachineCafe.class.getCanonicalName(),
-				new Object[]{MachineCafe.REFLECTION_INBOUND_PORT_URI,
-						MachineCafe.INBOUND_PORT_URI,
-						CURRENT_EXECUTION_TYPE,
-						CURRENT_SIMULATION_TYPE,
-						architectureURI,
-						machineCafeLocalArchitectureURI,
-						SIMULATION_TIME_UNIT,
-						ACCELERATION_FACTOR,
-						CLOCK_URI});
+				Heater.class.getCanonicalName(),
+				new Object[]{Heater.REFLECTION_INBOUND_PORT_URI,
+							 Heater.USER_INBOUND_PORT_URI,
+							 Heater.INTERNAL_CONTROL_INBOUND_PORT_URI,
+							 Heater.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+							 Heater.SENSOR_INBOUND_PORT_URI,
+							 Heater.ACTUATOR_INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 globalArchitectureURI,
+							 heaterLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
 		AbstractComponent.createComponent(
-				MachineCafeUser.class.getCanonicalName(),
-				new Object[]{MachineCafeUser.REFLECTION_INBOUND_PORT_URI,
-						MachineCafe.INBOUND_PORT_URI,
-						CURRENT_EXECUTION_TYPE,
-						CURRENT_SIMULATION_TYPE,
-						architectureURI,
-						machineCafeUserLocalArchitectureURI,
-						SIMULATION_TIME_UNIT,
-						ACCELERATION_FACTOR,
-						CLOCK_URI});
+				HeaterController.class.getCanonicalName(),
+				new Object[]{Heater.SENSOR_INBOUND_PORT_URI,
+							 Heater.ACTUATOR_INBOUND_PORT_URI,
+							 HeaterController.STANDARD_HYSTERESIS,
+							 HeaterController.STANDARD_CONTROL_PERIOD,
+							 CONTROL_MODE,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 CLOCK_URI});
+		AbstractComponent.createComponent(
+				HeaterUser.class.getCanonicalName(),
+				new Object[]{Heater.USER_INBOUND_PORT_URI,
+							 Heater.INTERNAL_CONTROL_INBOUND_PORT_URI,
+							 Heater.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 globalArchitectureURI,
+							 heaterUserLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
 
-		// a clock server with simulation is created even if there is no
-		// simulation for simplicity, but simulaiton values are not used if
-		// there is no simulation
 		AbstractComponent.createComponent(
 				ClocksServerWithSimulation.class.getCanonicalName(),
 				new Object[]{
@@ -338,7 +357,7 @@ extends		AbstractCVM
 						CLOCK_URI,
 						// start time in Unix epoch time
 						TimeUnit.MILLISECONDS.toNanos(
-								unixEpochStartTimeInMillis),
+										 		unixEpochStartTimeInMillis),
 						// start instant synchronised with the start time
 						Instant.parse(START_INSTANT),
 						ACCELERATION_FACTOR,
@@ -348,7 +367,7 @@ extends		AbstractCVM
 						SIMULATION_TIME_UNIT});
 
 		if (CURRENT_SIMULATION_TYPE.isMilSimulation() ||
-				CURRENT_SIMULATION_TYPE.isMILRTSimulation()) {
+								CURRENT_SIMULATION_TYPE.isMILRTSimulation()) {
 			// A supervisor component and a coordinator component are only
 			// needed for MIL and MIL real time simulation because for the
 			// hair dryer unit tests with SIL simulation executes only one
@@ -359,9 +378,9 @@ extends		AbstractCVM
 					CoordinatorComponent.class.getCanonicalName(),
 					new Object[]{});
 			AbstractComponent.createComponent(
-					MachineCafeUnitTestsSupervisor.class.getCanonicalName(),
+					HeaterUnitTestsSupervisor.class.getCanonicalName(),
 					new Object[]{CURRENT_SIMULATION_TYPE,
-							architectureURI});
+								 globalArchitectureURI});
 		}
 
 		super.deploy();
@@ -388,7 +407,7 @@ extends		AbstractCVM
 		NeoSim4JavaException.PRINT_STACK_TRACE = true;
 
 		try {
-			CVM_MachineCafeUnitTest cvm = new CVM_MachineCafeUnitTest();
+			CVM_HeaterUnitTest cvm = new CVM_HeaterUnitTest();
 			// compute the execution duration in milliseconds from the
 			// simulation duration in hours and the acceleration factor
 			// i.e., the simulation duration times 3600 seconds per hour
@@ -401,8 +420,8 @@ extends		AbstractCVM
 				// is sufficient to use EXECUTION_DURATION as the duration of
 				// the application execution
 				executionDurationInMillis =
-				DELAY_TO_START + DELAY_TO_START_SIMULATION 
-				+ EXECUTION_DURATION + DELAY_TO_STOP;
+					DELAY_TO_START + DELAY_TO_START_SIMULATION 
+										+ EXECUTION_DURATION + DELAY_TO_STOP;
 				break;
 			case MIL_RT_SIMULATION:
 			case SIL_SIMULATION:
@@ -416,14 +435,14 @@ extends		AbstractCVM
 				// 60 will take one minute execution time converted to 60000
 				// milliseconds.
 				executionDurationInMillis =
-				DELAY_TO_START + DELAY_TO_START_SIMULATION
-				+ ((long)(((double)SIMULATION_TIME_UNIT.toMillis(1))
-						* (SIMULATION_DURATION/ACCELERATION_FACTOR)))
-				+ DELAY_TO_STOP;
+					DELAY_TO_START + DELAY_TO_START_SIMULATION
+						+ ((long)(((double)SIMULATION_TIME_UNIT.toMillis(1))
+								* (SIMULATION_DURATION/ACCELERATION_FACTOR)))
+						+ DELAY_TO_STOP;
 				break;
 			case NO_SIMULATION:
 				executionDurationInMillis =
-				DELAY_TO_START + EXECUTION_DURATION + DELAY_TO_STOP;
+					DELAY_TO_START + EXECUTION_DURATION + DELAY_TO_STOP;
 				break;
 			default:
 			}

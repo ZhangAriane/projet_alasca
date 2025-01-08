@@ -1,4 +1,4 @@
-package projet_alasca.equipements.machineCafe.mil.unittests;
+package projet_alasca.etape3.equipments.hairdryer.unittests;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -63,15 +63,17 @@ import fr.sorbonne_u.exceptions.InvariantChecking;
 import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
-import projet_alasca.equipements.machineCafe.MachineCafe;
-import projet_alasca.equipements.machineCafe.MachineCafeUser;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeCoupledModel;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
-import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
-import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
 import projet_alasca.etape3.CVMIntegrationTest;
 import projet_alasca.etape3.CoordinatorComponent;
 import projet_alasca.etape3.GlobalCoupledModel;
+import projet_alasca.etape3.equipments.hairdryer.HairDryer;
+import projet_alasca.etape3.equipments.hairdryer.HairDryerUser;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerCoupledModel;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerUserModel;
+import projet_alasca.etape3.equipments.hairdryer.mil.events.SetHighHairDryer;
+import projet_alasca.etape3.equipments.hairdryer.mil.events.SetLowHairDryer;
+import projet_alasca.etape3.equipments.hairdryer.mil.events.SwitchOffHairDryer;
+import projet_alasca.etape3.equipments.hairdryer.mil.events.SwitchOnHairDryer;
 import projet_alasca.etape3.utils.SimulationType;
 
 // -----------------------------------------------------------------------------
@@ -124,7 +126,7 @@ import projet_alasca.etape3.utils.SimulationType;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 @RequiredInterfaces(required = {ClocksServerWithSimulationCI.class})
-public class			MachineCafeUnitTestsSupervisor
+public class			HairDryerUnitTestsSupervisor
 extends		AbstractCyPhyComponent
 {
 	// -------------------------------------------------------------------------
@@ -139,15 +141,15 @@ extends		AbstractCyPhyComponent
 	/** URI of the simulation architecture when a MIL simulation is
 	 *  executed.															*/
 	public static final String		MIL_ARCHITECTURE_URI =
-			"hair-dryer-mil-simulator";
+												"hair-dryer-mil-simulator";
 	/** URI of the simulation architecture when a MIL real time
 	 *  simulation is executed.												*/
 	public static final String		MIL_RT_ARCHITECTURE_URI =
-			"hair-dryer-mil-rt-simulator";
+												"hair-dryer-mil-rt-simulator";
 	/** URI of the simulation architecture when a SIL simulation is
 	 *  executed.															*/
 	public static final String		SIL_ARCHITECTURE_URI =
-			"hair-dryer-sil-simulator";
+												"hair-dryer-sil-simulator";
 
 	/** when true, methods trace their actions.								*/
 	public static boolean			VERBOSE = false;
@@ -182,8 +184,8 @@ extends		AbstractCyPhyComponent
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	glassBoxInvariants(
-			MachineCafeUnitTestsSupervisor instance
-			)
+		HairDryerUnitTestsSupervisor instance
+		)
 	{
 		assert instance != null : new PreconditionException("instance != null");
 
@@ -208,45 +210,45 @@ extends		AbstractCyPhyComponent
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	blackBoxInvariants(
-			MachineCafeUnitTestsSupervisor instance
-			)
+		HairDryerUnitTestsSupervisor instance
+		)
 	{
 		assert instance != null : new PreconditionException("instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				DELAY_TO_GET_REPORT > 0 &&
-				DELAY_TO_GET_REPORT <
-				CVM_MachineCafeUnitTest.DELAY_TO_STOP,
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"DELAY_TO_GET_REPORT > 0 && DELAY_TO_GET_REPORT < "
-						+ "CVM_HairDryerUnitTest.DELAY_TO_STOP");
+					DELAY_TO_GET_REPORT > 0 &&
+						DELAY_TO_GET_REPORT <
+										CVM_HairDryerUnitTest.DELAY_TO_STOP,
+					HairDryerUnitTestsSupervisor.class, instance,
+					"DELAY_TO_GET_REPORT > 0 && DELAY_TO_GET_REPORT < "
+					+ "CVM_HairDryerUnitTest.DELAY_TO_STOP");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				MIL_ARCHITECTURE_URI != null && 
-				!MIL_ARCHITECTURE_URI.isEmpty(),
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"MIL_ARCHITECTURE_URI != null && "
-						+ "!MIL_ARCHITECTURE_URI.isEmpty()");
+					MIL_ARCHITECTURE_URI != null && 
+										!MIL_ARCHITECTURE_URI.isEmpty(),
+					HairDryerUnitTestsSupervisor.class, instance,
+					"MIL_ARCHITECTURE_URI != null && "
+					+ "!MIL_ARCHITECTURE_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				MIL_RT_ARCHITECTURE_URI != null && 
-				!MIL_RT_ARCHITECTURE_URI.isEmpty(),
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"MIL_RT_ARCHITECTURE_URI != null && "
-						+ "!MIL_RT_ARCHITECTURE_URI.isEmpty()");
+					MIL_RT_ARCHITECTURE_URI != null && 
+										!MIL_RT_ARCHITECTURE_URI.isEmpty(),
+					HairDryerUnitTestsSupervisor.class, instance,
+					"MIL_RT_ARCHITECTURE_URI != null && "
+					+ "!MIL_RT_ARCHITECTURE_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				SIL_ARCHITECTURE_URI != null && 
-				!SIL_ARCHITECTURE_URI.isEmpty(),
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"SIL_ARCHITECTURE_URI != null && "
-						+ "!SIL_ARCHITECTURE_URI.isEmpty()");
+					SIL_ARCHITECTURE_URI != null && 
+										!SIL_ARCHITECTURE_URI.isEmpty(),
+					HairDryerUnitTestsSupervisor.class, instance,
+					"SIL_ARCHITECTURE_URI != null && "
+					+ "!SIL_ARCHITECTURE_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				X_RELATIVE_POSITION >= 0,
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"X_RELATIVE_POSITION >= 0");
+					X_RELATIVE_POSITION >= 0,
+					HairDryerUnitTestsSupervisor.class, instance,
+					"X_RELATIVE_POSITION >= 0");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				Y_RELATIVE_POSITION >= 0,
-				MachineCafeUnitTestsSupervisor.class, instance,
-				"Y_RELATIVE_POSITION >= 0");
+					Y_RELATIVE_POSITION >= 0,
+					HairDryerUnitTestsSupervisor.class, instance,
+					"Y_RELATIVE_POSITION >= 0");
 		return ret;
 	}
 
@@ -269,39 +271,39 @@ extends		AbstractCyPhyComponent
 	 * @param currentSimulationType	simulation type for the next run.
 	 * @param simArchitectureURI	URI of the simulation architecture to be created or the empty string if the component does not execute as a simulation.
 	 */
-	protected			MachineCafeUnitTestsSupervisor(
-			SimulationType currentSimulationType,
-			String simArchitectureURI
-			)
+	protected			HairDryerUnitTestsSupervisor(
+		SimulationType currentSimulationType,
+		String simArchitectureURI
+		)
 	{
 		// one standard thread for execute, one standard for report reception
 		// and one schedulable thread to schedule the start of MIL simulations
 		super(2, 1);
-
+		
 		assert	currentSimulationType != null :
-			new PreconditionException("currentExecutionType != null");
+				new PreconditionException("currentExecutionType != null");
 		assert	!currentSimulationType.isSimulated() || 
-		(simArchitectureURI != null &&
-		!simArchitectureURI.isEmpty()) :
-			new PreconditionException(
+										(simArchitectureURI != null &&
+												!simArchitectureURI.isEmpty()) :
+				new PreconditionException(
 					"!currentExecutionType.isSimulated() ||  "
-							+ "(simArchitectureURI != null && "
-							+ "!simArchitectureURI.isEmpty())");
+					+ "(simArchitectureURI != null && "
+					+ "!simArchitectureURI.isEmpty())");
 
 		this.currentSimulationType = currentSimulationType;
 		this.simArchitectureURI = simArchitectureURI;
 
 		this.tracer.get().setTitle("HairDryer unit test supervisor");
 		this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
-				Y_RELATIVE_POSITION);
+											  Y_RELATIVE_POSITION);
 		this.toggleTracing();
 
-		assert	MachineCafeUnitTestsSupervisor.glassBoxInvariants(this) :
-			new ImplementationInvariantException(
-					"MachineCafeUnitTestsSupervisor.glassBoxInvariants(this)");
-		assert	MachineCafeUnitTestsSupervisor.blackBoxInvariants(this) :
-			new InvariantException(
-					"MachineCafeUnitTestsSupervisor.blackBoxInvariants(this)");
+		assert	HairDryerUnitTestsSupervisor.glassBoxInvariants(this) :
+				new ImplementationInvariantException(
+						"HairDryerUnitTestsSupervisor.glassBoxInvariants(this)");
+		assert	HairDryerUnitTestsSupervisor.blackBoxInvariants(this) :
+				new InvariantException(
+						"HairDryerUnitTestsSupervisor.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -318,7 +320,7 @@ extends		AbstractCyPhyComponent
 		// to start the execution of the test scenario; we use a
 		// time-triggered synchronisation scheme with the accelerated clock
 		ClocksServerWithSimulationOutboundPort clocksServerOutboundPort =
-				new ClocksServerWithSimulationOutboundPort(this);
+							new ClocksServerWithSimulationOutboundPort(this);
 		clocksServerOutboundPort.publishPort();
 		this.doPortConnection(
 				clocksServerOutboundPort.getPortURI(),
@@ -326,8 +328,8 @@ extends		AbstractCyPhyComponent
 				ClocksServerWithSimulationConnector.class.getCanonicalName());
 		this.logMessage("HairDryerUnitTestsSupervisor gets the clock.");
 		AcceleratedAndSimulationClock acceleratedClock =
-				clocksServerOutboundPort.getClockWithSimulation(
-						CVMIntegrationTest.CLOCK_URI);
+			clocksServerOutboundPort.getClockWithSimulation(
+												CVMIntegrationTest.CLOCK_URI);
 		this.doPortDisconnection(clocksServerOutboundPort.getPortURI());
 		clocksServerOutboundPort.unpublishPort();
 		clocksServerOutboundPort.destroyPort();
@@ -339,7 +341,7 @@ extends		AbstractCyPhyComponent
 		long simulationStartTimeInMillis = 
 				TimeUnit.NANOSECONDS.toMillis(
 						acceleratedClock.getSimulationStartEpochNanos());
-
+		
 		this.logMessage("HairDryerUnitTestsSupervisor waits until start time.");
 		acceleratedClock.waitUntilStart();
 		this.logMessage("HairDryerUnitTestsSupervisor starts.");
@@ -349,12 +351,12 @@ extends		AbstractCyPhyComponent
 			// create the global simulation architecture given the type of
 			// simulation for the current run
 			ComponentModelArchitecture cma =
-			createMILComponentSimulationArchitectures(
-					this.simArchitectureURI,
-					acceleratedClock.getSimulatedTimeUnit());
+					createMILComponentSimulationArchitectures(
+										this.simArchitectureURI,
+										acceleratedClock.getSimulatedTimeUnit());
 			// create and install the supervisor plug-in
 			SupervisorPlugin sp = new SupervisorPlugin(cma);
-			sp.setPluginURI(MachineCafeUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
+			sp.setPluginURI(HairDryerUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
 			this.installPlugin(sp);
 			this.logMessage("plug-in installed.");
 			// construct the global simulator
@@ -367,19 +369,19 @@ extends		AbstractCyPhyComponent
 			acceleratedClock.waitUntilSimulationStart();
 			logMessage("simulation begins.");
 			sp.doStandAloneSimulation(
-					0.0, acceleratedClock.getSimulatedDuration());
+								0.0, acceleratedClock.getSimulatedDuration());
 			logMessage("simulation ends.");				
 			break;
 		case MIL_RT_SIMULATION:
 			// create the global simulation architecture given the type of
 			// simulation for the current run
 			cma = createMILRTComponentSimulationArchitectures(
-					this.simArchitectureURI,
-					acceleratedClock.getSimulatedTimeUnit(),
-					acceleratedClock.getAccelerationFactor());
+									this.simArchitectureURI,
+									acceleratedClock.getSimulatedTimeUnit(),
+									acceleratedClock.getAccelerationFactor());
 			// create and install the supervisor plug-in
 			sp = new SupervisorPlugin(cma);
-			sp.setPluginURI(MachineCafeUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
+			sp.setPluginURI(HairDryerUnitTestsSupervisor.MIL_ARCHITECTURE_URI);
 			this.installPlugin(sp);
 			this.logMessage("plug-in installed.");
 			// construct the global simulator
@@ -390,12 +392,12 @@ extends		AbstractCyPhyComponent
 			sp.setSimulationRunParameters(new HashMap<>());
 			// start the MIL real time simulation
 			assert	simulationStartTimeInMillis > System.currentTimeMillis() :
-				new BCMException(
-						"simulationStartTimeInMillis > "
-								+ "System.currentTimeMillis()");
+					new BCMException(
+							"simulationStartTimeInMillis > "
+							+ "System.currentTimeMillis()");
 			sp.startRTSimulation(simulationStartTimeInMillis,
-					acceleratedClock.getSimulatedStartTime(),
-					acceleratedClock.getSimulatedDuration());
+								 acceleratedClock.getSimulatedStartTime(),
+								 acceleratedClock.getSimulatedDuration());
 			// wait until the end of the simulation
 			acceleratedClock.waitUntilSimulationEnd();
 			// give some time for the end of simulation catering tasks
@@ -460,15 +462,15 @@ extends		AbstractCyPhyComponent
 	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
-	createMILComponentSimulationArchitectures(
-			String architectureURI, 
-			TimeUnit simulatedTimeUnit
-			) throws Exception
+									createMILComponentSimulationArchitectures(
+		String architectureURI, 
+		TimeUnit simulatedTimeUnit
+		) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
 		// The HairDryer simulator is the composition of two atomic models, the
 		// HairDryerStateModel and the HairDryerElectricityModel, to get the
@@ -478,86 +480,101 @@ extends		AbstractCyPhyComponent
 		// closure of DEVS models composition principle (a coupled model can be
 		// seen as an atomic model).
 		atomicModelDescriptors.put(
-				MachineCafeCoupledModel.MIL_URI,
+				HairDryerCoupledModel.MIL_URI,
 				ComponentAtomicModelDescriptor.create(
-						MachineCafeCoupledModel.MIL_URI,
+						HairDryerCoupledModel.MIL_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class
-						},
+							SwitchOnHairDryer.class,
+							SwitchOffHairDryer.class,
+							SetLowHairDryer.class,
+							SetHighHairDryer.class},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						simulatedTimeUnit,
-						MachineCafe.REFLECTION_INBOUND_PORT_URI
+						HairDryer.REFLECTION_INBOUND_PORT_URI
 						));
 		// The HairDryerUser simulator is made of only one atomic model, which
 		// is therefore seen as an atomic model also at the component simulation
 		// architecture level.
 		atomicModelDescriptors.put(
-				MachineCafeUserModel.MIL_URI,
+				HairDryerUserModel.MIL_URI,
 				ComponentAtomicModelDescriptor.create(
-						MachineCafeUserModel.MIL_URI,
+						HairDryerUserModel.MIL_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class
-						},
+							SwitchOnHairDryer.class,
+							SwitchOffHairDryer.class,
+							SetLowHairDryer.class,
+							SetHighHairDryer.class},
 						simulatedTimeUnit,
-						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+						HairDryerUser.REFLECTION_INBOUND_PORT_URI));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
-		submodels.add(MachineCafeCoupledModel.MIL_URI);
-		submodels.add(MachineCafeUserModel.MIL_URI);
+		submodels.add(HairDryerCoupledModel.MIL_URI);
+		submodels.add(HairDryerUserModel.MIL_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
 		Map<EventSource,EventSink[]> connections =
-				new HashMap<EventSource,EventSink[]>();
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_URI,
-								SwitchOnMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_URI,
-										SwitchOnMachineCafe.class)
-						});
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_URI,
-								SwitchOffMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_URI,
-										SwitchOffMachineCafe.class)
-						});
+									new HashMap<EventSource,EventSink[]>();
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_URI,
+							SwitchOnHairDryer.class),
+			new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_URI,
+							  SwitchOnHairDryer.class)
+			});
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_URI,
+							SwitchOffHairDryer.class),
+			new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_URI,
+							  SwitchOffHairDryer.class)
+			});
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_URI,
+							SetLowHairDryer.class),
+				new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_URI,
+							  SetLowHairDryer.class)
+			});
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_URI,
+							SetHighHairDryer.class),
+			new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_URI,
+							  SetHighHairDryer.class)
+			});
 
-
-				// coupled model descriptor
-				coupledModelDescriptors.put(
+		// coupled model descriptor
+		coupledModelDescriptors.put(
+				GlobalCoupledModel.MIL_URI,
+				ComponentCoupledModelDescriptor.create(
+						GlobalCoupledModel.class,
 						GlobalCoupledModel.MIL_URI,
-						ComponentCoupledModelDescriptor.create(
-								GlobalCoupledModel.class,
-								GlobalCoupledModel.MIL_URI,
-								submodels,
-								null,
-								null,
-								connections,
-								null,
-								CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
-								CoordinatorPlugin.class,
-								null));
+						submodels,
+						null,
+						null,
+						connections,
+						null,
+						CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
+						CoordinatorPlugin.class,
+						null));
 
-				ComponentModelArchitecture architecture =
-						new ComponentModelArchitecture(
-								architectureURI,
-								GlobalCoupledModel.MIL_URI,
-								atomicModelDescriptors,
-								coupledModelDescriptors,
-								simulatedTimeUnit);
+		ComponentModelArchitecture architecture =
+				new ComponentModelArchitecture(
+						architectureURI,
+						GlobalCoupledModel.MIL_URI,
+						atomicModelDescriptors,
+						coupledModelDescriptors,
+						simulatedTimeUnit);
 
-				return architecture;
+		return architecture;
 	}
 
 	/**
@@ -588,16 +605,16 @@ extends		AbstractCyPhyComponent
 	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
-	createMILRTComponentSimulationArchitectures(
-			String architectureURI, 
-			TimeUnit simulatedTimeUnit,
-			double accelerationFactor
-			) throws Exception
+									createMILRTComponentSimulationArchitectures(
+		String architectureURI, 
+		TimeUnit simulatedTimeUnit,
+		double accelerationFactor
+		) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
 		// The HairDryer simulator is the composition of two atomic models, the
 		// HairDryerStateModel and the HairDryerElectricityModel, to get the
@@ -607,85 +624,102 @@ extends		AbstractCyPhyComponent
 		// closure of DEVS models composition principle (a coupled model can be
 		// seen as an atomic model).
 		atomicModelDescriptors.put(
-				MachineCafeCoupledModel.MIL_RT_URI,
+				HairDryerCoupledModel.MIL_RT_URI,
 				RTComponentAtomicModelDescriptor.create(
-						MachineCafeCoupledModel.MIL_RT_URI,
+						HairDryerCoupledModel.MIL_RT_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class
-						},
+							SwitchOnHairDryer.class,
+							SwitchOffHairDryer.class,
+							SetLowHairDryer.class,
+							SetHighHairDryer.class},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						simulatedTimeUnit,
-						MachineCafe.REFLECTION_INBOUND_PORT_URI
+						HairDryer.REFLECTION_INBOUND_PORT_URI
 						));
 		// The HairDryerUser simulator is made of only one atomic model, which
 		// is therefore seen as an atomic model also at the component simulation
 		// architecture level.
 		atomicModelDescriptors.put(
-				MachineCafeUserModel.MIL_RT_URI,
+				HairDryerUserModel.MIL_RT_URI,
 				RTComponentAtomicModelDescriptor.create(
-						MachineCafeUserModel.MIL_RT_URI,
+						HairDryerUserModel.MIL_RT_URI,
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnMachineCafe.class,
-							SwitchOffMachineCafe.class},
+							SwitchOnHairDryer.class,
+							SwitchOffHairDryer.class,
+							SetLowHairDryer.class,
+							SetHighHairDryer.class},
 						simulatedTimeUnit,
-						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+						HairDryerUser.REFLECTION_INBOUND_PORT_URI));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-				new HashMap<>();
+															new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
-		submodels.add(MachineCafeCoupledModel.MIL_RT_URI);
-		submodels.add(MachineCafeUserModel.MIL_RT_URI);
+		submodels.add(HairDryerCoupledModel.MIL_RT_URI);
+		submodels.add(HairDryerUserModel.MIL_RT_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
 		Map<EventSource,EventSink[]> connections =
-				new HashMap<EventSource,EventSink[]>();
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_RT_URI,
-								SwitchOnMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_RT_URI,
-										SwitchOnMachineCafe.class)
-						});
-				connections.put(
-						new EventSource(MachineCafeUserModel.MIL_RT_URI,
-								SwitchOffMachineCafe.class),
-						new EventSink[] {
-								new EventSink(MachineCafeCoupledModel.MIL_RT_URI,
-										SwitchOffMachineCafe.class)
-						});
+									new HashMap<EventSource,EventSink[]>();
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_RT_URI,
+							SwitchOnHairDryer.class),
+			new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_RT_URI,
+							  SwitchOnHairDryer.class)
+			});
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_RT_URI,
+							SwitchOffHairDryer.class),
+			new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_RT_URI,
+							  SwitchOffHairDryer.class)
+			});
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_RT_URI,
+							SetLowHairDryer.class),
+				new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_RT_URI,
+							  SetLowHairDryer.class)
+			});
+		connections.put(
+			new EventSource(HairDryerUserModel.MIL_RT_URI,
+							SetHighHairDryer.class),
+			new EventSink[] {
+				new EventSink(HairDryerCoupledModel.MIL_RT_URI,
+							  SetHighHairDryer.class)
+			});
 
-				// coupled model descriptor
-				coupledModelDescriptors.put(
+		// coupled model descriptor
+		coupledModelDescriptors.put(
+				GlobalCoupledModel.MIL_RT_URI,
+				RTComponentCoupledModelDescriptor.create(
+						GlobalCoupledModel.class,
 						GlobalCoupledModel.MIL_RT_URI,
-						RTComponentCoupledModelDescriptor.create(
-								GlobalCoupledModel.class,
-								GlobalCoupledModel.MIL_RT_URI,
-								submodels,
-								null,
-								null,
-								connections,
-								null,
-								CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
-								CoordinatorPlugin.class,
-								null,
-								accelerationFactor));
+						submodels,
+						null,
+						null,
+						connections,
+						null,
+						CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
+						CoordinatorPlugin.class,
+						null,
+						accelerationFactor));
 
-				ComponentModelArchitecture architecture =
-						new RTComponentModelArchitecture(
-								architectureURI,
-								GlobalCoupledModel.MIL_RT_URI,
-								atomicModelDescriptors,
-								coupledModelDescriptors,
-								simulatedTimeUnit);
+		ComponentModelArchitecture architecture =
+				new RTComponentModelArchitecture(
+						architectureURI,
+						GlobalCoupledModel.MIL_RT_URI,
+						atomicModelDescriptors,
+						coupledModelDescriptors,
+						simulatedTimeUnit);
 
-				return architecture;
+		return architecture;
 	}
 }
 // -----------------------------------------------------------------------------

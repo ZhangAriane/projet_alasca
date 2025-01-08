@@ -1,4 +1,4 @@
-package projet_alasca.equipements.machineCafe.mil.unittests;
+package projet_alasca.etape3.equipments.hairdryer.unittests;
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
@@ -41,11 +41,11 @@ import fr.sorbonne_u.components.cyphy.utils.aclocks.ClocksServerWithSimulation;
 import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.exceptions.VerboseException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
-import projet_alasca.equipements.machineCafe.MachineCafe;
-import projet_alasca.equipements.machineCafe.MachineCafeUser;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeCoupledModel;
-import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
 import projet_alasca.etape3.CoordinatorComponent;
+import projet_alasca.etape3.equipments.hairdryer.HairDryer;
+import projet_alasca.etape3.equipments.hairdryer.HairDryerUser;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerCoupledModel;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerUserModel;
 import projet_alasca.etape3.utils.ExecutionType;
 import projet_alasca.etape3.utils.SimulationType;
 
@@ -145,7 +145,7 @@ import projet_alasca.etape3.utils.SimulationType;
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-public class			CVM_MachineCafeUnitTest
+public class			CVM_HairDryerUnitTest
 extends		AbstractCVM
 {
 	// -------------------------------------------------------------------------
@@ -190,15 +190,15 @@ extends		AbstractCVM
 	/** the type of execution, to select among the values of the
 	 *  enumeration {@code ExecutionType}.									*/
 	public static ExecutionType		CURRENT_EXECUTION_TYPE =
-			//ExecutionType.STANDARD;
-			ExecutionType.UNIT_TEST;
+											//ExecutionType.STANDARD;
+											ExecutionType.UNIT_TEST;
 	/** the type of execution, to select among the values of the
 	 *  enumeration {@code ExecutionType}.									*/
 	public static SimulationType	CURRENT_SIMULATION_TYPE =
-			//SimulationType.NO_SIMULATION;
-			SimulationType.MIL_SIMULATION;
-	//SimulationType.MIL_RT_SIMULATION;
-	//SimulationType.SIL_SIMULATION;
+											//SimulationType.NO_SIMULATION;
+											SimulationType.MIL_SIMULATION;
+											//SimulationType.MIL_RT_SIMULATION;
+											//SimulationType.SIL_SIMULATION;
 
 	/** for unit tests and SIL simulation tests, a {@code Clock} is
 	 *  used to get a time-triggered synchronisation of the actions of
@@ -223,24 +223,24 @@ extends		AbstractCVM
 	 *
 	 * @throws Exception	<i>to do</i>.
 	 */
-	public				CVM_MachineCafeUnitTest() throws Exception
+	public				CVM_HairDryerUnitTest() throws Exception
 	{
 		ClocksServer.VERBOSE = true;
 		ClocksServer.X_RELATIVE_POSITION = 0;
 		ClocksServer.Y_RELATIVE_POSITION = 0;
-		MachineCafeUnitTestsSupervisor.VERBOSE = true;
-		MachineCafeUnitTestsSupervisor.X_RELATIVE_POSITION = 1;
-		MachineCafeUnitTestsSupervisor.Y_RELATIVE_POSITION = 0;
+		HairDryerUnitTestsSupervisor.VERBOSE = true;
+		HairDryerUnitTestsSupervisor.X_RELATIVE_POSITION = 1;
+		HairDryerUnitTestsSupervisor.Y_RELATIVE_POSITION = 0;
 		CoordinatorComponent.VERBOSE = true;
 		CoordinatorComponent.X_RELATIVE_POSITION = 2;
 		CoordinatorComponent.Y_RELATIVE_POSITION = 0;
 
-		MachineCafe.VERBOSE = true;
-		MachineCafe.X_RELATIVE_POSITION = 1;
-		MachineCafe.Y_RELATIVE_POSITION = 1;
-		MachineCafeUser.VERBOSE = true;
-		MachineCafeUser.X_RELATIVE_POSITION = 0;
-		MachineCafeUser.Y_RELATIVE_POSITION = 1;
+		HairDryer.VERBOSE = true;
+		HairDryer.X_RELATIVE_POSITION = 1;
+		HairDryer.Y_RELATIVE_POSITION = 1;
+		HairDryerUser.VERBOSE = true;
+		HairDryerUser.X_RELATIVE_POSITION = 0;
+		HairDryerUser.Y_RELATIVE_POSITION = 1;
 	}
 
 	// -------------------------------------------------------------------------
@@ -254,13 +254,13 @@ extends		AbstractCVM
 	public void			deploy() throws Exception
 	{
 		assert	!CURRENT_EXECUTION_TYPE.isIntegrationTest() :
-			new RuntimeException(
-					"!CURRENT_EXECUTION_TYPE.isIntegrationTest()");
+				new RuntimeException(
+						"!CURRENT_EXECUTION_TYPE.isIntegrationTest()");
 		assert	!CURRENT_EXECUTION_TYPE.isStandard() ||
-		CURRENT_SIMULATION_TYPE.isNoSimulation() :
-			new RuntimeException(
-					"!CURRENT_EXECUTION_TYPE.isStandard() || "
-							+ "CURRENT_SIMULATION_TYPE.isNoSimulation()");
+									CURRENT_SIMULATION_TYPE.isNoSimulation() :
+				new RuntimeException(
+						"!CURRENT_EXECUTION_TYPE.isStandard() || "
+						+ "CURRENT_SIMULATION_TYPE.isNoSimulation()");
 
 		// Set the main execution run parameters, depending on the type of
 		// execution that is required.
@@ -270,10 +270,10 @@ extends		AbstractCVM
 		String architectureURI = "";
 		// URI of the HairDryer local simulation architecture for the current
 		// run, if relevant.
-		String machineCafeLocalArchitectureURI = "";
+		String hairDryerLocalArchitectureURI = "";
 		// URI of the HairDryerUser local simulation architecture for the
 		// current run, if relevant.
-		String machineCafeUserLocalArchitectureURI = "";
+		String hairDryerUserLocalArchitectureURI = "";
 
 		long current = System.currentTimeMillis();
 		// start time of the components in Unix epoch time in milliseconds.
@@ -285,19 +285,19 @@ extends		AbstractCVM
 		// at the same time, hence avoiding confusion among them.
 		switch (CURRENT_SIMULATION_TYPE) {
 		case MIL_SIMULATION:
-			architectureURI = MachineCafeUnitTestsSupervisor.MIL_ARCHITECTURE_URI;
-			machineCafeLocalArchitectureURI = MachineCafeCoupledModel.MIL_URI;
-			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_URI;
+			architectureURI = HairDryerUnitTestsSupervisor.MIL_ARCHITECTURE_URI;
+			hairDryerLocalArchitectureURI = HairDryerCoupledModel.MIL_URI;
+			hairDryerUserLocalArchitectureURI = HairDryerUserModel.MIL_URI;
 			break;
 		case MIL_RT_SIMULATION:
-			architectureURI = MachineCafeUnitTestsSupervisor.MIL_RT_ARCHITECTURE_URI;
-			machineCafeLocalArchitectureURI = MachineCafeCoupledModel.MIL_RT_URI;
-			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_RT_URI;
+			architectureURI = HairDryerUnitTestsSupervisor.MIL_RT_ARCHITECTURE_URI;
+			hairDryerLocalArchitectureURI = HairDryerCoupledModel.MIL_RT_URI;
+			hairDryerUserLocalArchitectureURI = HairDryerUserModel.MIL_RT_URI;
 			break;
 		case SIL_SIMULATION:
-			architectureURI = MachineCafeUnitTestsSupervisor.SIL_ARCHITECTURE_URI;
-			machineCafeLocalArchitectureURI =  MachineCafeCoupledModel.SIL_URI;
-			machineCafeUserLocalArchitectureURI = "not-used";
+			architectureURI = HairDryerUnitTestsSupervisor.SIL_ARCHITECTURE_URI;
+			hairDryerLocalArchitectureURI =  HairDryerCoupledModel.SIL_URI;
+			hairDryerUserLocalArchitectureURI = "not-used";
 			break;
 		case NO_SIMULATION:
 		default:
@@ -306,27 +306,27 @@ extends		AbstractCVM
 		// Deploy the components
 
 		AbstractComponent.createComponent(
-				MachineCafe.class.getCanonicalName(),
-				new Object[]{MachineCafe.REFLECTION_INBOUND_PORT_URI,
-						MachineCafe.INBOUND_PORT_URI,
-						CURRENT_EXECUTION_TYPE,
-						CURRENT_SIMULATION_TYPE,
-						architectureURI,
-						machineCafeLocalArchitectureURI,
-						SIMULATION_TIME_UNIT,
-						ACCELERATION_FACTOR,
-						CLOCK_URI});
+				HairDryer.class.getCanonicalName(),
+				new Object[]{HairDryer.REFLECTION_INBOUND_PORT_URI,
+							 HairDryer.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 architectureURI,
+							 hairDryerLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
 		AbstractComponent.createComponent(
-				MachineCafeUser.class.getCanonicalName(),
-				new Object[]{MachineCafeUser.REFLECTION_INBOUND_PORT_URI,
-						MachineCafe.INBOUND_PORT_URI,
-						CURRENT_EXECUTION_TYPE,
-						CURRENT_SIMULATION_TYPE,
-						architectureURI,
-						machineCafeUserLocalArchitectureURI,
-						SIMULATION_TIME_UNIT,
-						ACCELERATION_FACTOR,
-						CLOCK_URI});
+				HairDryerUser.class.getCanonicalName(),
+				new Object[]{HairDryerUser.REFLECTION_INBOUND_PORT_URI,
+							 HairDryer.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 architectureURI,
+							 hairDryerUserLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
 
 		// a clock server with simulation is created even if there is no
 		// simulation for simplicity, but simulaiton values are not used if
@@ -338,7 +338,7 @@ extends		AbstractCVM
 						CLOCK_URI,
 						// start time in Unix epoch time
 						TimeUnit.MILLISECONDS.toNanos(
-								unixEpochStartTimeInMillis),
+										 		unixEpochStartTimeInMillis),
 						// start instant synchronised with the start time
 						Instant.parse(START_INSTANT),
 						ACCELERATION_FACTOR,
@@ -348,7 +348,7 @@ extends		AbstractCVM
 						SIMULATION_TIME_UNIT});
 
 		if (CURRENT_SIMULATION_TYPE.isMilSimulation() ||
-				CURRENT_SIMULATION_TYPE.isMILRTSimulation()) {
+								CURRENT_SIMULATION_TYPE.isMILRTSimulation()) {
 			// A supervisor component and a coordinator component are only
 			// needed for MIL and MIL real time simulation because for the
 			// hair dryer unit tests with SIL simulation executes only one
@@ -359,9 +359,9 @@ extends		AbstractCVM
 					CoordinatorComponent.class.getCanonicalName(),
 					new Object[]{});
 			AbstractComponent.createComponent(
-					MachineCafeUnitTestsSupervisor.class.getCanonicalName(),
+					HairDryerUnitTestsSupervisor.class.getCanonicalName(),
 					new Object[]{CURRENT_SIMULATION_TYPE,
-							architectureURI});
+								 architectureURI});
 		}
 
 		super.deploy();
@@ -388,7 +388,7 @@ extends		AbstractCVM
 		NeoSim4JavaException.PRINT_STACK_TRACE = true;
 
 		try {
-			CVM_MachineCafeUnitTest cvm = new CVM_MachineCafeUnitTest();
+			CVM_HairDryerUnitTest cvm = new CVM_HairDryerUnitTest();
 			// compute the execution duration in milliseconds from the
 			// simulation duration in hours and the acceleration factor
 			// i.e., the simulation duration times 3600 seconds per hour
@@ -401,8 +401,8 @@ extends		AbstractCVM
 				// is sufficient to use EXECUTION_DURATION as the duration of
 				// the application execution
 				executionDurationInMillis =
-				DELAY_TO_START + DELAY_TO_START_SIMULATION 
-				+ EXECUTION_DURATION + DELAY_TO_STOP;
+					DELAY_TO_START + DELAY_TO_START_SIMULATION 
+										+ EXECUTION_DURATION + DELAY_TO_STOP;
 				break;
 			case MIL_RT_SIMULATION:
 			case SIL_SIMULATION:
@@ -416,14 +416,14 @@ extends		AbstractCVM
 				// 60 will take one minute execution time converted to 60000
 				// milliseconds.
 				executionDurationInMillis =
-				DELAY_TO_START + DELAY_TO_START_SIMULATION
-				+ ((long)(((double)SIMULATION_TIME_UNIT.toMillis(1))
-						* (SIMULATION_DURATION/ACCELERATION_FACTOR)))
-				+ DELAY_TO_STOP;
+					DELAY_TO_START + DELAY_TO_START_SIMULATION
+						+ ((long)(((double)SIMULATION_TIME_UNIT.toMillis(1))
+								* (SIMULATION_DURATION/ACCELERATION_FACTOR)))
+						+ DELAY_TO_STOP;
 				break;
 			case NO_SIMULATION:
 				executionDurationInMillis =
-				DELAY_TO_START + EXECUTION_DURATION + DELAY_TO_STOP;
+					DELAY_TO_START + EXECUTION_DURATION + DELAY_TO_STOP;
 				break;
 			default:
 			}

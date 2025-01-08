@@ -3,8 +3,6 @@ package projet_alasca.equipements.machineCafe;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
-import etape3.utils.ExecutionType;
-import etape3.utils.SimulationType;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
 import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
@@ -26,6 +24,8 @@ import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import projet_alasca.equipements.machineCafe.mil.LocalSimulationArchitectures;
+import projet_alasca.etape3.utils.ExecutionType;
+import projet_alasca.etape3.utils.SimulationType;
 
 @OfferedInterfaces(offered={MachineCafeUserCI.class})
 @RequiredInterfaces(required = {ClocksServerWithSimulationCI.class})
