@@ -58,6 +58,10 @@ import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.exceptions.VerboseException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import projet_alasca.equipements.machineCafe.MachineCafe;
+import projet_alasca.equipements.machineCafe.MachineCafeUser;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeStateModel;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
 
 // -----------------------------------------------------------------------------
 /**
@@ -269,6 +273,14 @@ extends		AbstractCVM
 		HeaterController.VERBOSE = true;
 		HeaterController.X_RELATIVE_POSITION = 2;
 		HeaterController.Y_RELATIVE_POSITION = 3;
+		
+		//machine cafe
+		MachineCafe.VERBOSE = true;
+		MachineCafe.X_RELATIVE_POSITION = 3;
+		MachineCafe.Y_RELATIVE_POSITION = 2;
+		MachineCafeUser.VERBOSE = true;
+		MachineCafeUser.X_RELATIVE_POSITION = 2;
+		MachineCafeUser.Y_RELATIVE_POSITION = 2;
 	}
 
 	// -------------------------------------------------------------------------
@@ -304,6 +316,10 @@ extends		AbstractCVM
 		// URI of the ElectricMeter local simulation architecture for the
 		// current run, if relevant.
 		String meterLocalArchitectureURI = "";
+		
+		//machine cafe
+		String machineCafeLocalArchitectureURI = "";
+		String machineCafeUserLocalArchitectureURI = "";
 
 		long current = System.currentTimeMillis();
 		// start time of the components in Unix epoch time in milliseconds.
@@ -324,6 +340,9 @@ extends		AbstractCVM
 			heaterLocalArchitectureURI = HeaterCoupledModel.MIL_URI;
 			heaterUserLocalArchitectureURI = HeaterUnitTesterModel.MIL_URI;
 			meterLocalArchitectureURI = ElectricMeterCoupledModel.MIL_URI;
+			//machine cafe
+			machineCafeLocalArchitectureURI = MachineCafeStateModel.MIL_URI;
+			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_URI;
 			break;
 		case MIL_RT_SIMULATION:
 			globalArchitectureURI = GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI;
@@ -332,6 +351,9 @@ extends		AbstractCVM
 			heaterLocalArchitectureURI = HeaterCoupledModel.MIL_RT_URI;
 			heaterUserLocalArchitectureURI = HeaterUnitTesterModel.MIL_RT_URI;
 			meterLocalArchitectureURI = ElectricMeterCoupledModel.MIL_RT_URI;
+			//machine cafe
+			machineCafeLocalArchitectureURI = MachineCafeStateModel.MIL_RT_URI;
+			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_RT_URI;
 			break;
 		case SIL_SIMULATION:
 			globalArchitectureURI = GlobalSupervisor.SIL_SIM_ARCHITECTURE_URI;
@@ -340,6 +362,9 @@ extends		AbstractCVM
 			heaterLocalArchitectureURI = HeaterCoupledModel.SIL_URI;
 			heaterUserLocalArchitectureURI = "not-used";
 			meterLocalArchitectureURI = ElectricMeterCoupledModel.SIL_URI;
+			//machine cafe
+			machineCafeLocalArchitectureURI = MachineCafeStateModel.SIL_URI;
+			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.SIL_URI;
 			break;
 		case NO_SIMULATION:
 		default:
@@ -417,6 +442,30 @@ extends		AbstractCVM
 							 SIMULATION_TIME_UNIT,
 							 ACCELERATION_FACTOR,
 						 	 CLOCK_URI});
+		
+		//machine cafe
+		AbstractComponent.createComponent(
+				MachineCafe.class.getCanonicalName(),
+				new Object[]{MachineCafe.REFLECTION_INBOUND_PORT_URI,
+						MachineCafe.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 globalArchitectureURI,
+							 machineCafeLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
+		AbstractComponent.createComponent(
+				MachineCafeUser.class.getCanonicalName(),
+				new Object[]{MachineCafeUser.REFLECTION_INBOUND_PORT_URI,
+						MachineCafe.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 globalArchitectureURI,
+							 machineCafeUserLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
 
 		AbstractComponent.createComponent(
 				HEM.class.getCanonicalName(),

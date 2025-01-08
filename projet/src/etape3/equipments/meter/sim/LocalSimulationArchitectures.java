@@ -64,6 +64,9 @@ import fr.sorbonne_u.devs_simulation.models.architectures.AbstractAtomicModelDes
 import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeElectricityModel;
+import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
+import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
 
 // -----------------------------------------------------------------------------
 /**
@@ -107,9 +110,9 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public static Architecture	createElectricMeterMILArchitecture4IntegrationTests(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit
-		) throws Exception
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
@@ -144,6 +147,15 @@ public abstract class	LocalSimulationArchitectures
 						simulatedTimeUnit,
 						null));
 
+		//machine cafe
+		atomicModelDescriptors.put(
+				MachineCafeElectricityModel.MIL_URI,
+				AtomicHIOA_Descriptor.create(
+						MachineCafeElectricityModel.class,
+						MachineCafeElectricityModel.MIL_URI,
+						simulatedTimeUnit,
+						null));
+
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
@@ -154,111 +166,138 @@ public abstract class	LocalSimulationArchitectures
 		submodels.add(ElectricMeterElectricityModel.MIL_URI);
 		submodels.add(HairDryerElectricityModel.MIL_URI);
 		submodels.add(HeaterElectricityModel.MIL_URI);
+		//machine cafe
+		submodels.add(MachineCafeElectricityModel.MIL_URI);
 
 		// events imported from the HairDryer component model architecture
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
 		imported.put(
 				SwitchOnHairDryer.class,
 				new EventSink[] {
-					new EventSink(HairDryerElectricityModel.MIL_URI,
-								  SwitchOnHairDryer.class)
+						new EventSink(HairDryerElectricityModel.MIL_URI,
+								SwitchOnHairDryer.class)
 				});
 		imported.put(
 				SwitchOffHairDryer.class,
 				new EventSink[] {
-					new EventSink(HairDryerElectricityModel.MIL_URI,
-								  SwitchOffHairDryer.class)
+						new EventSink(HairDryerElectricityModel.MIL_URI,
+								SwitchOffHairDryer.class)
 				});
 		imported.put(
 				SetLowHairDryer.class,
 				new EventSink[] {
-					new EventSink(HairDryerElectricityModel.MIL_URI,
-								  SetLowHairDryer.class)
+						new EventSink(HairDryerElectricityModel.MIL_URI,
+								SetLowHairDryer.class)
 				});
 		imported.put(
 				SetHighHairDryer.class,
 				new EventSink[] {
-					new EventSink(HairDryerElectricityModel.MIL_URI,
-								  SetHighHairDryer.class)
+						new EventSink(HairDryerElectricityModel.MIL_URI,
+								SetHighHairDryer.class)
 				});
 
 		imported.put(
 				SetPowerHeater.class,
 				new EventSink[] {
 						new EventSink(HeaterElectricityModel.MIL_URI,
-									  SetPowerHeater.class)
+								SetPowerHeater.class)
 				});
 		imported.put(
 				SwitchOnHeater.class,
 				new EventSink[] {
 						new EventSink(HeaterElectricityModel.MIL_URI,
-									  SwitchOnHeater.class)
+								SwitchOnHeater.class)
 				});
 		imported.put(
 				SwitchOffHeater.class,
 				new EventSink[] {
 						new EventSink(HeaterElectricityModel.MIL_URI,
-									  SwitchOffHeater.class)
+								SwitchOffHeater.class)
 				});
 		imported.put(
 				Heat.class,
 				new EventSink[] {
 						new EventSink(HeaterElectricityModel.MIL_URI,
-									  Heat.class)
+								Heat.class)
 				});
 		imported.put(
 				DoNotHeat.class,
 				new EventSink[] {
 						new EventSink(HeaterElectricityModel.MIL_URI,
-									  DoNotHeat.class)
+								DoNotHeat.class)
+				});
+
+		//machine cafe
+		imported.put(
+				SwitchOnMachineCafe.class,
+				new EventSink[] {
+						new EventSink(MachineCafeElectricityModel.MIL_URI,
+								SwitchOnMachineCafe.class)
+				});
+		imported.put(
+				SwitchOffMachineCafe.class,
+				new EventSink[] {
+						new EventSink(MachineCafeElectricityModel.MIL_URI,
+								SwitchOffMachineCafe.class)
 				});
 
 		// variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
-								new HashMap<VariableSource,VariableSink[]>();
-		bindings.put(
-				new VariableSource("currentIntensity",
-								   Double.class,
-								   HairDryerElectricityModel.MIL_URI),
-				new VariableSink[] {
-					new VariableSink("currentHairDryerIntensity",
-									 Double.class,
-									 ElectricMeterElectricityModel.MIL_URI)
-				});
-		bindings.put(
-				new VariableSource("currentIntensity",
-								   Double.class,
-								   HeaterElectricityModel.MIL_URI),
-				new VariableSink[] {
-					new VariableSink("currentHeaterIntensity",
-									 Double.class,
-									 ElectricMeterElectricityModel.MIL_URI)
-				});
+				new HashMap<VariableSource,VariableSink[]>();
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								HairDryerElectricityModel.MIL_URI),
+						new VariableSink[] {
+								new VariableSink("currentHairDryerIntensity",
+										Double.class,
+										ElectricMeterElectricityModel.MIL_URI)
+						});
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								HeaterElectricityModel.MIL_URI),
+						new VariableSink[] {
+								new VariableSink("currentHeaterIntensity",
+										Double.class,
+										ElectricMeterElectricityModel.MIL_URI)
+						});
 
-		coupledModelDescriptors.put(
-				ElectricMeterCoupledModel.MIL_URI,
-				new CoupledHIOA_Descriptor(
-						ElectricMeterCoupledModel.class,
+				//machine cafe
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								MachineCafeElectricityModel.MIL_URI),
+						new VariableSink[] {
+								new VariableSink("currentMachineCafeIntensity",
+										Double.class,
+										ElectricMeterElectricityModel.MIL_URI)
+						});
+
+				coupledModelDescriptors.put(
 						ElectricMeterCoupledModel.MIL_URI,
-						submodels,
-						imported,
-						null,
-						null,
-						null,
-						null,
-						null,
-						bindings,
-						new HIOA_Composer()));
+						new CoupledHIOA_Descriptor(
+								ElectricMeterCoupledModel.class,
+								ElectricMeterCoupledModel.MIL_URI,
+								submodels,
+								imported,
+								null,
+								null,
+								null,
+								null,
+								null,
+								bindings,
+								new HIOA_Composer()));
 
-		Architecture architecture =
-				new Architecture(
-						architectureURI,
-						ElectricMeterCoupledModel.MIL_URI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						simulatedTimeUnit);
+				Architecture architecture =
+						new Architecture(
+								architectureURI,
+								ElectricMeterCoupledModel.MIL_URI,
+								atomicModelDescriptors,
+								coupledModelDescriptors,
+								simulatedTimeUnit);
 
-		return architecture;
+				return architecture;
 	}
 
 	/**
@@ -280,17 +319,19 @@ public abstract class	LocalSimulationArchitectures
 	 * @throws Exception			<i>to do</i>.
 	 */
 	public static Architecture	createElectricMeter_RT_Architecture4IntegrationTests(
-		SimulationType currentSimulationType,
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit,
-		double accelerationFactor
-		) throws Exception
+			SimulationType currentSimulationType,
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit,
+			double accelerationFactor
+			) throws Exception
 	{
 		String electricMeterElectricityModelURI = null;
 		Class<? extends AtomicHIOA> electricMeterElectricityModelClass = null;
 		String hairDryerElectricityModelURI = null;
 		String heaterElectricityModelURI = null;
 		String electricMeterCoupledModelURI = null;
+		//machine cafe
+		String machineCafeElectricityModelURI = null;
 		switch (currentSimulationType) {
 		case MIL_RT_SIMULATION:
 			electricMeterElectricityModelURI = ElectricMeterElectricityModel.MIL_RT_URI;
@@ -298,6 +339,8 @@ public abstract class	LocalSimulationArchitectures
 			hairDryerElectricityModelURI = HairDryerElectricityModel.MIL_RT_URI;
 			heaterElectricityModelURI = HeaterElectricityModel.MIL_RT_URI;
 			electricMeterCoupledModelURI = ElectricMeterCoupledModel.MIL_RT_URI;
+			//machine cafe
+			machineCafeElectricityModelURI = MachineCafeElectricityModel.MIL_RT_URI;
 			break;
 		case SIL_SIMULATION:
 			electricMeterElectricityModelURI = ElectricMeterElectricitySILModel.SIL_URI;
@@ -305,6 +348,8 @@ public abstract class	LocalSimulationArchitectures
 			hairDryerElectricityModelURI = HairDryerElectricityModel.SIL_URI;
 			heaterElectricityModelURI = HeaterElectricityModel.SIL_URI;
 			electricMeterCoupledModelURI = ElectricMeterCoupledModel.SIL_URI;
+			//machine cafe
+			machineCafeElectricityModelURI = MachineCafeElectricityModel.SIL_URI;
 			break;
 		default:
 		}
@@ -344,6 +389,16 @@ public abstract class	LocalSimulationArchitectures
 						simulatedTimeUnit,
 						null,
 						accelerationFactor));
+		
+		//machine cafe
+		atomicModelDescriptors.put(
+				machineCafeElectricityModelURI,
+				RTAtomicHIOA_Descriptor.create(
+						MachineCafeElectricityModel.class,
+						machineCafeElectricityModelURI,
+						simulatedTimeUnit,
+						null,
+						accelerationFactor));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
@@ -355,112 +410,139 @@ public abstract class	LocalSimulationArchitectures
 		submodels.add(electricMeterElectricityModelURI);
 		submodels.add(hairDryerElectricityModelURI);
 		submodels.add(heaterElectricityModelURI);
+		//machine cafe
+		submodels.add(machineCafeElectricityModelURI);
 
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
 		imported.put(
 				SwitchOnHairDryer.class,
 				new EventSink[] {
-					new EventSink(hairDryerElectricityModelURI,
-								  SwitchOnHairDryer.class)
+						new EventSink(hairDryerElectricityModelURI,
+								SwitchOnHairDryer.class)
 				});
 		imported.put(
 				SwitchOffHairDryer.class,
 				new EventSink[] {
-					new EventSink(hairDryerElectricityModelURI,
-								  SwitchOffHairDryer.class)
+						new EventSink(hairDryerElectricityModelURI,
+								SwitchOffHairDryer.class)
 				});
 		imported.put(
 				SetLowHairDryer.class,
 				new EventSink[] {
-					new EventSink(hairDryerElectricityModelURI,
-								  SetLowHairDryer.class)
+						new EventSink(hairDryerElectricityModelURI,
+								SetLowHairDryer.class)
 				});
 		imported.put(
 				SetHighHairDryer.class,
 				new EventSink[] {
-					new EventSink(hairDryerElectricityModelURI,
-								  SetHighHairDryer.class)
+						new EventSink(hairDryerElectricityModelURI,
+								SetHighHairDryer.class)
 				});
 
 		imported.put(
 				SetPowerHeater.class,
 				new EventSink[] {
 						new EventSink(heaterElectricityModelURI,
-									  SetPowerHeater.class)
+								SetPowerHeater.class)
 				});
 		imported.put(
 				SwitchOnHeater.class,
 				new EventSink[] {
 						new EventSink(heaterElectricityModelURI,
-									  SwitchOnHeater.class)
+								SwitchOnHeater.class)
 				});
 		imported.put(
 				SwitchOffHeater.class,
 				new EventSink[] {
 						new EventSink(heaterElectricityModelURI,
-									  SwitchOffHeater.class)
+								SwitchOffHeater.class)
 				});
 		imported.put(
 				Heat.class,
 				new EventSink[] {
 						new EventSink(heaterElectricityModelURI,
-									  Heat.class)
+								Heat.class)
 				});
 		imported.put(
 				DoNotHeat.class,
 				new EventSink[] {
 						new EventSink(heaterElectricityModelURI,
-									  DoNotHeat.class)
+								DoNotHeat.class)
+				});
+		
+		//machine cafe
+		imported.put(
+				SwitchOnMachineCafe.class,
+				new EventSink[] {
+						new EventSink(machineCafeElectricityModelURI,
+								SwitchOnMachineCafe.class)
+				});
+		imported.put(
+				SwitchOffMachineCafe.class,
+				new EventSink[] {
+						new EventSink(machineCafeElectricityModelURI,
+								SwitchOffMachineCafe.class)
 				});
 
 		// variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
-								new HashMap<VariableSource,VariableSink[]>();
-		bindings.put(
-				new VariableSource("currentIntensity",
-								   Double.class,
-								   hairDryerElectricityModelURI),
-				new VariableSink[] {
-					new VariableSink("currentHairDryerIntensity",
-									 Double.class,
-									 electricMeterElectricityModelURI)
-				});
-		bindings.put(
-				new VariableSource("currentIntensity",
-								   Double.class,
-								   heaterElectricityModelURI),
-				new VariableSink[] {
-					new VariableSink("currentHeaterIntensity",
-									 Double.class,
-									 electricMeterElectricityModelURI)
-				});
+				new HashMap<VariableSource,VariableSink[]>();
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								hairDryerElectricityModelURI),
+						new VariableSink[] {
+								new VariableSink("currentHairDryerIntensity",
+										Double.class,
+										electricMeterElectricityModelURI)
+						});
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								heaterElectricityModelURI),
+						new VariableSink[] {
+								new VariableSink("currentHeaterIntensity",
+										Double.class,
+										electricMeterElectricityModelURI)
+						});
+				
+				//machine cafe
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								machineCafeElectricityModelURI),
+						new VariableSink[] {
+								new VariableSink("currentMachineCafeIntensity",
+										Double.class,
+										electricMeterElectricityModelURI)
+						});
 
-		coupledModelDescriptors.put(
-				electricMeterCoupledModelURI,
-				new RTCoupledHIOA_Descriptor(
-						ElectricMeterCoupledModel.class,
+				coupledModelDescriptors.put(
 						electricMeterCoupledModelURI,
-						submodels,
-						imported,
-						null,
-						null,
-						null,
-						null,
-						null,
-						bindings,
-						new HIOA_Composer(),
-						accelerationFactor));
+						new RTCoupledHIOA_Descriptor(
+								ElectricMeterCoupledModel.class,
+								electricMeterCoupledModelURI,
+								submodels,
+								imported,
+								null,
+								null,
+								null,
+								null,
+								null,
+								bindings,
+								new HIOA_Composer(),
+								accelerationFactor));
 
-		Architecture architecture =
-				new RTArchitecture(
-						architectureURI,
-						electricMeterCoupledModelURI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						simulatedTimeUnit,
-						accelerationFactor);
+				Architecture architecture =
+						new RTArchitecture(
+								architectureURI,
+								electricMeterCoupledModelURI,
+								atomicModelDescriptors,
+								coupledModelDescriptors,
+								simulatedTimeUnit,
+								accelerationFactor);
 
-		return architecture;
+				return architecture;
 	}
 }
 // -----------------------------------------------------------------------------

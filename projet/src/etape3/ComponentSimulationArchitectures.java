@@ -68,6 +68,12 @@ import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
+import projet_alasca.equipements.machineCafe.MachineCafe;
+import projet_alasca.equipements.machineCafe.MachineCafeUser;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeStateModel;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
+import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
+import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
 
 // -----------------------------------------------------------------------------
 /**
@@ -112,15 +118,15 @@ public abstract class	ComponentSimulationArchitectures
 	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
-									createMILComponentSimulationArchitectures(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit
-		) throws Exception
+	createMILComponentSimulationArchitectures(
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		atomicModelDescriptors.put(
 				HairDryerStateModel.MIL_URI,
@@ -132,10 +138,10 @@ public abstract class	ComponentSimulationArchitectures
 							SetLowHairDryer.class,
 							SetHighHairDryer.class},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnHairDryer.class,
-							SwitchOffHairDryer.class,
-							SetLowHairDryer.class,
-							SetHighHairDryer.class},
+								SwitchOnHairDryer.class,
+								SwitchOffHairDryer.class,
+								SetLowHairDryer.class,
+								SetHighHairDryer.class},
 						simulatedTimeUnit,
 						HairDryer.REFLECTION_INBOUND_PORT_URI
 						));
@@ -163,11 +169,11 @@ public abstract class	ComponentSimulationArchitectures
 							Heat.class,
 							DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SetPowerHeater.class,
-							SwitchOnHeater.class,
-							SwitchOffHeater.class,
-							Heat.class,
-							DoNotHeat.class},
+								SetPowerHeater.class,
+								SwitchOnHeater.class,
+								SwitchOffHeater.class,
+								Heat.class,
+								DoNotHeat.class},
 						simulatedTimeUnit,
 						Heater.REFLECTION_INBOUND_PORT_URI));
 		atomicModelDescriptors.put(
@@ -183,6 +189,7 @@ public abstract class	ComponentSimulationArchitectures
 							DoNotHeat.class},
 						simulatedTimeUnit,
 						HeaterUser.REFLECTION_INBOUND_PORT_URI));
+
 
 		atomicModelDescriptors.put(
 				ElectricMeterCoupledModel.MIL_URI,
@@ -202,10 +209,36 @@ public abstract class	ComponentSimulationArchitectures
 						simulatedTimeUnit,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
 
+		//machine cafe
+		atomicModelDescriptors.put(
+				MachineCafeStateModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						MachineCafeStateModel.MIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnMachineCafe.class,
+							SwitchOffMachineCafe.class},
+						(Class<? extends EventI>[]) new Class<?>[]{
+								SwitchOnMachineCafe.class,
+								SwitchOffMachineCafe.class},
+						simulatedTimeUnit,
+						MachineCafe.REFLECTION_INBOUND_PORT_URI
+						));
+		atomicModelDescriptors.put(
+				MachineCafeUserModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						MachineCafeUserModel.MIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnMachineCafe.class,
+							SwitchOffMachineCafe.class},
+						simulatedTimeUnit,
+						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+
+
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
@@ -214,165 +247,199 @@ public abstract class	ComponentSimulationArchitectures
 		submodels.add(HeaterCoupledModel.MIL_URI);
 		submodels.add(HeaterUnitTesterModel.MIL_URI);
 		submodels.add(ElectricMeterCoupledModel.MIL_URI);
+		//machine cafe
+		submodels.add(MachineCafeStateModel.MIL_URI);
+		submodels.add(MachineCafeUserModel.MIL_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
 		Map<EventSource,EventSink[]> connections =
-									new HashMap<EventSource,EventSink[]>();
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_URI,
-							SwitchOnHairDryer.class),
-			new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_URI,
-							  SwitchOnHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_URI,
-							SwitchOffHairDryer.class),
-			new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_URI,
-							  SwitchOffHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_URI,
-							SetLowHairDryer.class),
-				new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_URI,
-							  SetLowHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_URI,
-							SetHighHairDryer.class),
-			new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_URI,
-							  SetHighHairDryer.class)
-			});
+				new HashMap<EventSource,EventSink[]>();
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_URI,
+								SwitchOnHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_URI,
+										SwitchOnHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_URI,
+								SwitchOffHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_URI,
+										SwitchOffHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_URI,
+								SetLowHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_URI,
+										SetLowHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_URI,
+								SetHighHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_URI,
+										SetHighHairDryer.class)
+						});
 
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_URI,
-							SwitchOnHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_URI,
-							  SwitchOnHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_URI,
-							SwitchOffHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_URI,
-							  SwitchOffHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_URI,
-							SetLowHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_URI,
-							  SetLowHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_URI,
-							SetHighHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_URI,
-							  SetHighHairDryer.class)
-			});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_URI,
+								SwitchOnHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOnHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_URI,
+								SwitchOffHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOffHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_URI,
+								SetLowHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SetLowHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_URI,
+								SetHighHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SetHighHairDryer.class)
+						});
 
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_URI,
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_URI,
 								SetPowerHeater.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_URI,
-								  SetPowerHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_URI,
+										SetPowerHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_URI,
 								SwitchOnHeater.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_URI,
-								  SwitchOnHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_URI,
+										SwitchOnHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_URI,
 								SwitchOffHeater.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_URI,
-								  SwitchOffHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_URI,
+										SwitchOffHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_URI,
 								Heat.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_URI,
-								  Heat.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_URI,
 								DoNotHeat.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_URI,
-								  DoNotHeat.class)
-				});
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_URI,
+										DoNotHeat.class)
+						});
 
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_URI,
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_URI,
 								SetPowerHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-								  SetPowerHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SetPowerHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_URI,
 								SwitchOnHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-								  SwitchOnHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOnHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_URI,
 								SwitchOffHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-								  SwitchOffHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOffHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_URI,
 								Heat.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-								  Heat.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_URI,
 								DoNotHeat.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_URI,
-								  DoNotHeat.class)
-				});
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										DoNotHeat.class)
+						});
 
-		// coupled model descriptor
-		coupledModelDescriptors.put(
-				GlobalCoupledModel.MIL_URI,
-				ComponentCoupledModelDescriptor.create(
-						GlobalCoupledModel.class,
+				//machine cafe
+				connections.put(
+						new EventSource(MachineCafeUserModel.MIL_URI,
+								SwitchOnMachineCafe.class),
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_URI,
+										SwitchOnMachineCafe.class)
+						});
+				connections.put(
+						new EventSource(MachineCafeUserModel.MIL_URI,
+								SwitchOffMachineCafe.class),
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_URI,
+										SwitchOffMachineCafe.class)
+						});
+
+				connections.put(
+						new EventSource(MachineCafeStateModel.MIL_URI,
+								SwitchOnMachineCafe.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOnMachineCafe.class)
+						});
+				connections.put(
+						new EventSource(MachineCafeStateModel.MIL_URI,
+								SwitchOffMachineCafe.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOffMachineCafe.class)
+						});
+
+				// coupled model descriptor
+				coupledModelDescriptors.put(
 						GlobalCoupledModel.MIL_URI,
-						submodels,
-						null,
-						null,
-						connections,
-						null,
-						CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
-						CoordinatorPlugin.class,
-						null));
+						ComponentCoupledModelDescriptor.create(
+								GlobalCoupledModel.class,
+								GlobalCoupledModel.MIL_URI,
+								submodels,
+								null,
+								null,
+								connections,
+								null,
+								CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
+								CoordinatorPlugin.class,
+								null));
 
-		ComponentModelArchitecture architecture =
-				new ComponentModelArchitecture(
-						GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI,
-						GlobalCoupledModel.MIL_URI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						simulatedTimeUnit);
+				ComponentModelArchitecture architecture =
+						new ComponentModelArchitecture(
+								GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI,
+								GlobalCoupledModel.MIL_URI,
+								atomicModelDescriptors,
+								coupledModelDescriptors,
+								simulatedTimeUnit);
 
-		return architecture;
+				return architecture;
 	}
 
 	/**
@@ -394,16 +461,16 @@ public abstract class	ComponentSimulationArchitectures
 	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
-									createMILRTComponentSimulationArchitectures(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit,
-		double accelerationFactor
-		) throws Exception
+	createMILRTComponentSimulationArchitectures(
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit,
+			double accelerationFactor
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		atomicModelDescriptors.put(
 				HairDryerStateModel.MIL_RT_URI,
@@ -415,10 +482,10 @@ public abstract class	ComponentSimulationArchitectures
 							SetLowHairDryer.class,		// the atomic model
 							SetHighHairDryer.class},	// appear here
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnHairDryer.class,	// notice that the
-							SwitchOffHairDryer.class,	// exported events of
-							SetLowHairDryer.class,		// the atomic model
-							SetHighHairDryer.class},	// appear here
+								SwitchOnHairDryer.class,	// notice that the
+								SwitchOffHairDryer.class,	// exported events of
+								SetLowHairDryer.class,		// the atomic model
+								SetHighHairDryer.class},	// appear here
 						simulatedTimeUnit,
 						HairDryer.REFLECTION_INBOUND_PORT_URI
 						));
@@ -446,11 +513,11 @@ public abstract class	ComponentSimulationArchitectures
 							Heat.class,					// appear here
 							DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SetPowerHeater.class,		// notice that the
-							SwitchOnHeater.class,		// reexported events of
-							SwitchOffHeater.class,		// the coupled model
-							Heat.class,					// appear here
-							DoNotHeat.class},
+								SetPowerHeater.class,		// notice that the
+								SwitchOnHeater.class,		// reexported events of
+								SwitchOffHeater.class,		// the coupled model
+								Heat.class,					// appear here
+								DoNotHeat.class},
 						simulatedTimeUnit,
 						Heater.REFLECTION_INBOUND_PORT_URI));
 		atomicModelDescriptors.put(
@@ -485,10 +552,38 @@ public abstract class	ComponentSimulationArchitectures
 						simulatedTimeUnit,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
 
+		//machine cafe
+		atomicModelDescriptors.put(
+				MachineCafeStateModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						MachineCafeStateModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnMachineCafe.class,	// notice that the
+							SwitchOffMachineCafe.class	// imported events of
+						},	// appear here
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnMachineCafe.class,	// notice that the
+							SwitchOffMachineCafe.class	// exported events of
+						},	// appear here
+						simulatedTimeUnit,
+						MachineCafe.REFLECTION_INBOUND_PORT_URI
+						));
+		atomicModelDescriptors.put(
+				MachineCafeUserModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						MachineCafeUserModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnMachineCafe.class,	// notice that the
+							SwitchOffMachineCafe.class	// exported events of
+						},	// appear here
+						simulatedTimeUnit,
+						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
@@ -497,166 +592,200 @@ public abstract class	ComponentSimulationArchitectures
 		submodels.add(HeaterCoupledModel.MIL_RT_URI);
 		submodels.add(HeaterUnitTesterModel.MIL_RT_URI);
 		submodels.add(ElectricMeterCoupledModel.MIL_RT_URI);
+		//machine cafe
+		//		submodels.add(MachineCafeStateModel.MIL_RT_URI);
+		//		submodels.add(MachineCafeUserModel.MIL_RT_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
 		Map<EventSource,EventSink[]> connections =
-									new HashMap<EventSource,EventSink[]>();
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_RT_URI,
-							SwitchOnHairDryer.class),
-			new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_RT_URI,
-							  SwitchOnHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_RT_URI,
-							SwitchOffHairDryer.class),
-			new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_RT_URI,
-							  SwitchOffHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_RT_URI,
-							SetLowHairDryer.class),
-				new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_RT_URI,
-							  SetLowHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerUserModel.MIL_RT_URI,
-							SetHighHairDryer.class),
-			new EventSink[] {
-				new EventSink(HairDryerStateModel.MIL_RT_URI,
-							  SetHighHairDryer.class)
-			});
+				new HashMap<EventSource,EventSink[]>();
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_RT_URI,
+								SwitchOnHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_RT_URI,
+										SwitchOnHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_RT_URI,
+								SwitchOffHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_RT_URI,
+										SwitchOffHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_RT_URI,
+								SetLowHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_RT_URI,
+										SetLowHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerUserModel.MIL_RT_URI,
+								SetHighHairDryer.class),
+						new EventSink[] {
+								new EventSink(HairDryerStateModel.MIL_RT_URI,
+										SetHighHairDryer.class)
+						});
 
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_RT_URI,
-							SwitchOnHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-							  SwitchOnHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_RT_URI,
-							SwitchOffHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-							  SwitchOffHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_RT_URI,
-							SetLowHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-							  SetLowHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.MIL_RT_URI,
-							SetHighHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-							  SetHighHairDryer.class)
-			});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_RT_URI,
+								SwitchOnHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOnHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_RT_URI,
+								SwitchOffHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOffHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_RT_URI,
+								SetLowHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SetLowHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.MIL_RT_URI,
+								SetHighHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SetHighHairDryer.class)
+						});
 
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
 								SetPowerHeater.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_RT_URI,
-								  SetPowerHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_RT_URI,
+										SetPowerHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
 								SwitchOnHeater.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_RT_URI,
-								  SwitchOnHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_RT_URI,
+										SwitchOnHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
 								SwitchOffHeater.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_RT_URI,
-								  SwitchOffHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_RT_URI,
+										SwitchOffHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
 								Heat.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_RT_URI,
-								  Heat.class)
-				});
-		connections.put(
-				new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_RT_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
 								DoNotHeat.class),
-				new EventSink[] {
-					new EventSink(HeaterCoupledModel.MIL_RT_URI,
-								  DoNotHeat.class)
-				});
+						new EventSink[] {
+								new EventSink(HeaterCoupledModel.MIL_RT_URI,
+										DoNotHeat.class)
+						});
 
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_RT_URI,
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_RT_URI,
 								SetPowerHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-								  SetPowerHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SetPowerHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_RT_URI,
 								SwitchOnHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-								  SwitchOnHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOnHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_RT_URI,
 								SwitchOffHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-								  SwitchOffHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOffHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_RT_URI,
 								Heat.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-								  Heat.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.MIL_RT_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.MIL_RT_URI,
 								DoNotHeat.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-								  DoNotHeat.class)
-				});
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										DoNotHeat.class)
+						});
 
-		// coupled model descriptor
-		coupledModelDescriptors.put(
-				GlobalCoupledModel.MIL_RT_URI,
-				RTComponentCoupledModelDescriptor.create(
-						GlobalCoupledModel.class,
+				//machine cafe
+				connections.put(
+						new EventSource(MachineCafeUserModel.MIL_RT_URI,
+								SwitchOnMachineCafe.class),
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_RT_URI,
+										SwitchOnMachineCafe.class)
+						});
+				connections.put(
+						new EventSource(MachineCafeUserModel.MIL_RT_URI,
+								SwitchOffMachineCafe.class),
+						new EventSink[] {
+								new EventSink(MachineCafeStateModel.MIL_RT_URI,
+										SwitchOffMachineCafe.class)
+						});
+
+				connections.put(
+						new EventSource(MachineCafeStateModel.MIL_RT_URI,
+								SwitchOnMachineCafe.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOnMachineCafe.class)
+						});
+				connections.put(
+						new EventSource(MachineCafeStateModel.MIL_RT_URI,
+								SwitchOffMachineCafe.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOffMachineCafe.class)
+						});
+
+				// coupled model descriptor
+				coupledModelDescriptors.put(
 						GlobalCoupledModel.MIL_RT_URI,
-						submodels,
-						null,
-						null,
-						connections,
-						null,
-						CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
-						CoordinatorPlugin.class,
-						null,
-						accelerationFactor));
+						RTComponentCoupledModelDescriptor.create(
+								GlobalCoupledModel.class,
+								GlobalCoupledModel.MIL_RT_URI,
+								submodels,
+								null,
+								null,
+								connections,
+								null,
+								CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
+								CoordinatorPlugin.class,
+								null,
+								accelerationFactor));
 
-		ComponentModelArchitecture architecture =
-				new ComponentModelArchitecture(
-						GlobalSupervisor.MIL_RT_SIM_ARCHITECTURE_URI,
-						GlobalCoupledModel.MIL_RT_URI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						TimeUnit.HOURS);
+				ComponentModelArchitecture architecture =
+						new ComponentModelArchitecture(
+								GlobalSupervisor.MIL_RT_SIM_ARCHITECTURE_URI,
+								GlobalCoupledModel.MIL_RT_URI,
+								atomicModelDescriptors,
+								coupledModelDescriptors,
+								TimeUnit.HOURS);
 
-		return architecture;
+				return architecture;
 	}
 
 	/**
@@ -678,16 +807,16 @@ public abstract class	ComponentSimulationArchitectures
 	 */
 	@SuppressWarnings("unchecked")
 	public static ComponentModelArchitecture
-									createSILComponentSimulationArchitectures(
-		String architectureURI, 
-		TimeUnit simulatedTimeUnit,
-		double accelerationFactor
-		) throws Exception
+	createSILComponentSimulationArchitectures(
+			String architectureURI, 
+			TimeUnit simulatedTimeUnit,
+			double accelerationFactor
+			) throws Exception
 	{
 		// map that will contain the atomic model descriptors to construct
 		// the simulation architecture
 		Map<String,AbstractAtomicModelDescriptor> atomicModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// Currently, the HEM application has only two appliances: a hair dryer
 		// and a heater.
@@ -701,10 +830,10 @@ public abstract class	ComponentSimulationArchitectures
 							SetLowHairDryer.class,		// the atomic model
 							SetHighHairDryer.class},	// appear here
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SwitchOnHairDryer.class,	// notice that the
-							SwitchOffHairDryer.class,	// exported events of
-							SetLowHairDryer.class,		// the atomic model
-							SetHighHairDryer.class},	// appear here
+								SwitchOnHairDryer.class,	// notice that the
+								SwitchOffHairDryer.class,	// exported events of
+								SetLowHairDryer.class,		// the atomic model
+								SetHighHairDryer.class},	// appear here
 						simulatedTimeUnit,
 						HairDryer.REFLECTION_INBOUND_PORT_URI
 						));
@@ -720,11 +849,11 @@ public abstract class	ComponentSimulationArchitectures
 							Heat.class,					// appear here
 							DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{
-							SetPowerHeater.class,		// notice that the
-							SwitchOnHeater.class,		// reexported events of
-							SwitchOffHeater.class,		// the coupled model
-							Heat.class,					// appear here
-							DoNotHeat.class},
+								SetPowerHeater.class,		// notice that the
+								SwitchOnHeater.class,		// reexported events of
+								SwitchOffHeater.class,		// the coupled model
+								Heat.class,					// appear here
+								DoNotHeat.class},
 						simulatedTimeUnit,
 						Heater.REFLECTION_INBOUND_PORT_URI));
 
@@ -747,114 +876,149 @@ public abstract class	ComponentSimulationArchitectures
 						simulatedTimeUnit,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
 
+		//machine cafe
+		atomicModelDescriptors.put(
+				MachineCafeStateModel.SIL_URI,
+				RTComponentAtomicModelDescriptor.create(
+						MachineCafeStateModel.SIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnMachineCafe.class,	// notice that the
+							SwitchOffMachineCafe.class	// imported events of
+						},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnMachineCafe.class,	// notice that the
+							SwitchOffMachineCafe.class	// exported events of
+						},	// appear here
+						simulatedTimeUnit,
+						MachineCafe.REFLECTION_INBOUND_PORT_URI
+						));
+
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
-															new HashMap<>();
+				new HashMap<>();
 
 		// the set of submodels of the coupled model, given by their URIs
 		Set<String> submodels = new HashSet<String>();
 		submodels.add(HairDryerStateModel.SIL_URI);
 		submodels.add(HeaterCoupledModel.SIL_URI);
 		submodels.add(ElectricMeterCoupledModel.SIL_URI);
+		//machine cafe
+		submodels.add(MachineCafeStateModel.SIL_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
 		Map<EventSource,EventSink[]> connections =
-									new HashMap<EventSource,EventSink[]>();
+				new HashMap<EventSource,EventSink[]>();
 
-		// first, the events going from the hair dryer to the electric meter
-		connections.put(
-			new EventSource(HairDryerStateModel.SIL_URI,
-							SwitchOnHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.SIL_URI,
-							  SwitchOnHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.SIL_URI,
-							SwitchOffHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.SIL_URI,
-							  SwitchOffHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.SIL_URI,
-							SetLowHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.SIL_URI,
-							  SetLowHairDryer.class)
-			});
-		connections.put(
-			new EventSource(HairDryerStateModel.SIL_URI,
-							SetHighHairDryer.class),
-			new EventSink[] {
-				new EventSink(ElectricMeterCoupledModel.SIL_URI,
-							  SetHighHairDryer.class)
-			});
+				// first, the events going from the hair dryer to the electric meter
+				connections.put(
+						new EventSource(HairDryerStateModel.SIL_URI,
+								SwitchOnHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOnHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.SIL_URI,
+								SwitchOffHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOffHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.SIL_URI,
+								SetLowHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SetLowHairDryer.class)
+						});
+				connections.put(
+						new EventSource(HairDryerStateModel.SIL_URI,
+								SetHighHairDryer.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SetHighHairDryer.class)
+						});
 
-		// second, the events going from the heater to the electric meter
-		connections.put(
-				new EventSource(HeaterCoupledModel.SIL_URI,
+				// second, the events going from the heater to the electric meter
+				connections.put(
+						new EventSource(HeaterCoupledModel.SIL_URI,
 								SetPowerHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-								  SetPowerHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.SIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SetPowerHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.SIL_URI,
 								SwitchOnHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-								  SwitchOnHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.SIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOnHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.SIL_URI,
 								SwitchOffHeater.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-								  SwitchOffHeater.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.SIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOffHeater.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.SIL_URI,
 								Heat.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-								  Heat.class)
-				});
-		connections.put(
-				new EventSource(HeaterCoupledModel.SIL_URI,
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(HeaterCoupledModel.SIL_URI,
 								DoNotHeat.class),
-				new EventSink[] {
-					new EventSink(ElectricMeterCoupledModel.SIL_URI,
-								  DoNotHeat.class)
-				});
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										DoNotHeat.class)
+						});
 
-		// coupled model descriptor
-		coupledModelDescriptors.put(
-				GlobalCoupledModel.SIL_URI,
-				RTComponentCoupledModelDescriptor.create(
-						GlobalCoupledModel.class,
+				//machine cafe.
+				connections.put(
+						new EventSource(MachineCafeStateModel.SIL_URI,
+								SwitchOnMachineCafe.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOnMachineCafe.class)
+						});
+				connections.put(
+						new EventSource(MachineCafeStateModel.SIL_URI,
+								SwitchOffMachineCafe.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOffMachineCafe.class)
+						});
+
+				// coupled model descriptor
+				coupledModelDescriptors.put(
 						GlobalCoupledModel.SIL_URI,
-						submodels,
-						null,
-						null,
-						connections,
-						null,
-						CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
-						CoordinatorPlugin.class,
-						null,
-						accelerationFactor));
+						RTComponentCoupledModelDescriptor.create(
+								GlobalCoupledModel.class,
+								GlobalCoupledModel.SIL_URI,
+								submodels,
+								null,
+								null,
+								connections,
+								null,
+								CoordinatorComponent.REFLECTION_INBOUND_PORT_URI,
+								CoordinatorPlugin.class,
+								null,
+								accelerationFactor));
 
-		ComponentModelArchitecture architecture =
-				new ComponentModelArchitecture(
-						GlobalSupervisor.SIL_SIM_ARCHITECTURE_URI,
-						GlobalCoupledModel.SIL_URI,
-						atomicModelDescriptors,
-						coupledModelDescriptors,
-						simulatedTimeUnit);
+				ComponentModelArchitecture architecture =
+						new ComponentModelArchitecture(
+								GlobalSupervisor.SIL_SIM_ARCHITECTURE_URI,
+								GlobalCoupledModel.SIL_URI,
+								atomicModelDescriptors,
+								coupledModelDescriptors,
+								simulatedTimeUnit);
 
-		return architecture;
+				return architecture;
 	}
 }
 // -----------------------------------------------------------------------------
