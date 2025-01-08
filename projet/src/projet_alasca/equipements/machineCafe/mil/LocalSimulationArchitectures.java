@@ -166,7 +166,7 @@ public abstract class	LocalSimulationArchitectures
 	 * @return					the local MIL simulation architecture for the {@code HairDryer} component.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public static Architecture	createHairDryerMILLocalArchitecture4UnitTest(
+	public static Architecture	createMachineCafeMILLocalArchitecture4UnitTest(
 			String architectureURI, 
 			TimeUnit simulatedTimeUnit
 			) throws Exception
@@ -296,7 +296,7 @@ public abstract class	LocalSimulationArchitectures
 	 * @return						the local MIL real time simulation architecture for the unit tests of the {@code HairDryer} component.
 	 * @throws Exception			<i>to do</i>.
 	 */
-	public static Architecture	createHairDryerMIL_RT_Architecture4UnitTest(
+	public static Architecture	createMachineCafeMIL_RT_Architecture4UnitTest(
 			String architectureURI, 
 			TimeUnit simulatedTimeUnit,
 			double accelerationFactor
@@ -441,7 +441,7 @@ public abstract class	LocalSimulationArchitectures
 	 * @return					the local MIL simulation architecture for the {@code HairDryer} component.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public static Architecture	createHairDryerMILArchitecture4IntegrationTest(
+	public static Architecture	createMachineCafeMILArchitecture4IntegrationTest(
 			String architectureURI, 
 			TimeUnit simulatedTimeUnit
 			) throws Exception
@@ -517,7 +517,7 @@ public abstract class	LocalSimulationArchitectures
 	 * @return						the local MIL real time simulation architecture for the {@code HairDryer} component.
 	 * @throws Exception			<i>to do</i>.
 	 */
-	public static Architecture	createHairDryerMIL_RT_Architecture4IntegrationTest(
+	public static Architecture	createMachineCafeMIL_RT_Architecture4IntegrationTest(
 			String architectureURI, 
 			TimeUnit simulatedTimeUnit,
 			double accelerationFactor
@@ -587,7 +587,7 @@ public abstract class	LocalSimulationArchitectures
 	 * @return					the local MIL simulation architecture for the {@code HairDryerUser} component.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public static Architecture	createHairDryerUserMIL_Architecture(
+	public static Architecture	createMachineCafeUserMIL_Architecture(
 			String architectureURI, 
 			TimeUnit simulatedTimeUnit
 			) throws Exception
@@ -656,7 +656,7 @@ public abstract class	LocalSimulationArchitectures
 	 * @return						the local MIL real time simulation architecture for the {@code HairDryerUser} component.
 	 * @throws Exception			<i>to do</i>.
 	 */
-	public static Architecture	createHairDryerUserMIL_RT_Architecture(
+	public static Architecture	createMachineCafeUserMIL_RT_Architecture(
 			String architectureURI, 
 			TimeUnit simulatedTimeUnit,
 			double accelerationFactor

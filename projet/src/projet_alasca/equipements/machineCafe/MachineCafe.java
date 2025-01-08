@@ -294,14 +294,14 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 			if (this.currentExecutionType.isUnitTest()) {
 				architecture =
 						LocalSimulationArchitectures.
-						createHairDryerMILLocalArchitecture4UnitTest(
+						createMachineCafeMILLocalArchitecture4UnitTest(
 								this.localArchitectureURI,
 								this.simulationTimeUnit);
 			} else {
 				assert	this.currentExecutionType.isIntegrationTest();
 				architecture =
 						LocalSimulationArchitectures.
-						createHairDryerMILArchitecture4IntegrationTest(
+						createMachineCafeMILArchitecture4IntegrationTest(
 								this.localArchitectureURI,
 								this.simulationTimeUnit);
 			}
@@ -323,7 +323,7 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 			if (this.currentExecutionType.isUnitTest()) {
 				architecture =
 						LocalSimulationArchitectures.
-						createHairDryerMIL_RT_Architecture4UnitTest(
+						createMachineCafeMIL_RT_Architecture4UnitTest(
 								this.localArchitectureURI,
 								this.simulationTimeUnit,
 								this.accFactor);
@@ -331,7 +331,7 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 				assert	this.currentExecutionType.isIntegrationTest();
 				architecture =
 						LocalSimulationArchitectures.
-						createHairDryerMIL_RT_Architecture4IntegrationTest(
+						createMachineCafeMIL_RT_Architecture4IntegrationTest(
 								this.localArchitectureURI,
 								this.simulationTimeUnit,
 								this.accFactor);
@@ -351,7 +351,7 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 		}
 
 		if (VERBOSE) {
-			this.tracer.get().setTitle("Hair dryer component");
+			this.tracer.get().setTitle("Machine cafe component");
 			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 					Y_RELATIVE_POSITION);
 			this.toggleTracing();
@@ -435,7 +435,7 @@ public class MachineCafe extends AbstractCyPhyComponent implements MachineCafeIm
 					clocksServerOutboundPort.getPortURI(),
 					ClocksServer.STANDARD_INBOUNDPORT_URI,
 					ClocksServerWithSimulationConnector.class.getCanonicalName());
-			this.logMessage("HairDryer gets the clock.");
+			this.logMessage("MachineCafe gets the clock.");
 			AcceleratedAndSimulationClock acceleratedClock =
 					clocksServerOutboundPort.getClockWithSimulation(this.clockURI);
 			this.doPortDisconnection(clocksServerOutboundPort.getPortURI());

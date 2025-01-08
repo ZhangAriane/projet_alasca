@@ -485,7 +485,7 @@ implements	MachineCafeOperationI
 		case MIL_SIMULATION:
 			Architecture architecture =
 			LocalSimulationArchitectures.
-			createHairDryerUserMIL_Architecture(
+			createMachineCafeUserMIL_Architecture(
 					this.localArchitectureURI,
 					this.simulationTimeUnit);
 			assert	architecture.getRootModelURI().
@@ -501,7 +501,7 @@ implements	MachineCafeOperationI
 		case MIL_RT_SIMULATION:
 			architecture =
 			LocalSimulationArchitectures.
-			createHairDryerUserMIL_RT_Architecture(
+			createMachineCafeUserMIL_RT_Architecture(
 					this.localArchitectureURI,
 					this.simulationTimeUnit,
 					this.accFactor);
@@ -557,7 +557,7 @@ implements	MachineCafeOperationI
 	public void			turnOff()
 	{
 		if (VERBOSE) {
-			this.logMessage("HairDryerUser#turnOff().");
+			this.logMessage("MachineCafeUser#turnOff().");
 		}
 		try {
 			this.mcop.turnOff();

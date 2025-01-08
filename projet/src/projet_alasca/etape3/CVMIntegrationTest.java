@@ -206,8 +206,8 @@ extends		AbstractCVM
 	public static SimulationType	CURRENT_SIMULATION_TYPE =
 //											SimulationType.NO_SIMULATION;
 //											SimulationType.MIL_SIMULATION;
-											SimulationType.MIL_RT_SIMULATION;
-//											SimulationType.SIL_SIMULATION;
+//											SimulationType.MIL_RT_SIMULATION;
+											SimulationType.SIL_SIMULATION;
 
 	/** for unit tests and SIL simulation tests, a {@code Clock} is
 	 *  used to get a time-triggered synchronisation of the actions of

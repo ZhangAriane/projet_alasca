@@ -220,7 +220,7 @@ extends		AbstractCyPhyComponent
 				CVM_MachineCafeUnitTest.DELAY_TO_STOP,
 				MachineCafeUnitTestsSupervisor.class, instance,
 				"DELAY_TO_GET_REPORT > 0 && DELAY_TO_GET_REPORT < "
-						+ "CVM_HairDryerUnitTest.DELAY_TO_STOP");
+						+ "CVM_MacihneCafeUnitTest.DELAY_TO_STOP");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MIL_ARCHITECTURE_URI != null && 
 				!MIL_ARCHITECTURE_URI.isEmpty(),
@@ -291,7 +291,7 @@ extends		AbstractCyPhyComponent
 		this.currentSimulationType = currentSimulationType;
 		this.simArchitectureURI = simArchitectureURI;
 
-		this.tracer.get().setTitle("HairDryer unit test supervisor");
+		this.tracer.get().setTitle("MachineCafe unit test supervisor");
 		this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 				Y_RELATIVE_POSITION);
 		this.toggleTracing();
@@ -324,7 +324,7 @@ extends		AbstractCyPhyComponent
 				clocksServerOutboundPort.getPortURI(),
 				ClocksServer.STANDARD_INBOUNDPORT_URI,
 				ClocksServerWithSimulationConnector.class.getCanonicalName());
-		this.logMessage("HairDryerUnitTestsSupervisor gets the clock.");
+		this.logMessage("MachineCafeUnitTestsSupervisor gets the clock.");
 		AcceleratedAndSimulationClock acceleratedClock =
 				clocksServerOutboundPort.getClockWithSimulation(
 						CVMIntegrationTest.CLOCK_URI);
@@ -340,9 +340,9 @@ extends		AbstractCyPhyComponent
 				TimeUnit.NANOSECONDS.toMillis(
 						acceleratedClock.getSimulationStartEpochNanos());
 
-		this.logMessage("HairDryerUnitTestsSupervisor waits until start time.");
+		this.logMessage("MachineCafeUnitTestsSupervisor waits until start time.");
 		acceleratedClock.waitUntilStart();
-		this.logMessage("HairDryerUnitTestsSupervisor starts.");
+		this.logMessage("MachineCafeUnitTestsSupervisor starts.");
 
 		switch (this.currentSimulationType) {
 		case MIL_SIMULATION:
