@@ -204,10 +204,10 @@ extends		AbstractCVM
 	/** the type of execution, to select among the values of the
 	 *  enumeration {@code ExecutionType}.									*/
 	public static SimulationType	CURRENT_SIMULATION_TYPE =
-											//SimulationType.NO_SIMULATION;
-											//SimulationType.MIL_SIMULATION;
-											//SimulationType.MIL_RT_SIMULATION;
-											SimulationType.SIL_SIMULATION;
+//											SimulationType.NO_SIMULATION;
+//											SimulationType.MIL_SIMULATION;
+											SimulationType.MIL_RT_SIMULATION;
+//											SimulationType.SIL_SIMULATION;
 
 	/** for unit tests and SIL simulation tests, a {@code Clock} is
 	 *  used to get a time-triggered synchronisation of the actions of

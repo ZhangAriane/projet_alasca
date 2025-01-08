@@ -95,6 +95,8 @@ import projet_alasca.etape3.equipments.meter.ElectricMeter;
 					   type = Double.class)
 @ModelImportedVariable(name = "currentHairDryerIntensity",
 					   type = Double.class)
+@ModelImportedVariable(name = "currentMachineCafeIntensity",
+type = Double.class)
 //-----------------------------------------------------------------------------
 public class			ElectricMeterElectricityModel
 extends		AtomicHIOA
@@ -139,6 +141,9 @@ extends		AtomicHIOA
 	/** current intensity of the heater in amperes.							*/
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>			currentHairDryerIntensity;
+	
+	@ImportedVariable(type = Double.class)
+	protected Value<Double>			currentMachineCafeIntensity;
 
 	/** current total power consumption of the house in amperes.			*/
 	@InternalVariable(type = Double.class)
@@ -219,7 +224,8 @@ extends		AtomicHIOA
 	{
 		// simple sum of all incoming intensities
 		double i = this.currentHairDryerIntensity.getValue()
-				   + this.currentHeaterIntensity.getValue();
+				   + this.currentHeaterIntensity.getValue()
+				   + this.currentMachineCafeIntensity.getValue();
 
 		return i;
 	}
@@ -248,7 +254,8 @@ extends		AtomicHIOA
 
 		if (!this.currentPowerConsumption.isInitialised()
 						&& this.currentHairDryerIntensity.isInitialised()
-						&& this.currentHeaterIntensity.isInitialised()) {
+						&& this.currentHeaterIntensity.isInitialised()
+						&& this.currentMachineCafeIntensity.isInitialised()) {
 			double i = this.computePowerConsumption();
 			this.currentPowerConsumption.initialise(i);
 			this.currentCumulativeConsumption.initialise(0.0);

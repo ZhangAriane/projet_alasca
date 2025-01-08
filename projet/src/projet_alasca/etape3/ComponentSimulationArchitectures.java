@@ -51,6 +51,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import projet_alasca.equipements.machineCafe.MachineCafe;
 import projet_alasca.equipements.machineCafe.MachineCafeUser;
+import projet_alasca.equipements.machineCafe.mil.MachineCafeCoupledModel;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeStateModel;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
 import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
@@ -235,6 +236,7 @@ public abstract class	ComponentSimulationArchitectures
 						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
 
 
+
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
 		Map<String,CoupledModelDescriptor> coupledModelDescriptors =
@@ -415,6 +417,8 @@ public abstract class	ComponentSimulationArchitectures
 								new EventSink(ElectricMeterCoupledModel.MIL_URI,
 										SwitchOffMachineCafe.class)
 						});
+				
+
 
 				// coupled model descriptor
 				coupledModelDescriptors.put(
@@ -579,6 +583,8 @@ public abstract class	ComponentSimulationArchitectures
 						},	// appear here
 						simulatedTimeUnit,
 						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+		
+
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
@@ -592,9 +598,9 @@ public abstract class	ComponentSimulationArchitectures
 		submodels.add(HeaterCoupledModel.MIL_RT_URI);
 		submodels.add(HeaterUnitTesterModel.MIL_RT_URI);
 		submodels.add(ElectricMeterCoupledModel.MIL_RT_URI);
-		//machine cafe
-		//		submodels.add(MachineCafeStateModel.MIL_RT_URI);
-		//		submodels.add(MachineCafeUserModel.MIL_RT_URI);
+//		machine cafe
+		submodels.add(MachineCafeStateModel.MIL_RT_URI);
+		submodels.add(MachineCafeUserModel.MIL_RT_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
@@ -892,6 +898,8 @@ public abstract class	ComponentSimulationArchitectures
 						simulatedTimeUnit,
 						MachineCafe.REFLECTION_INBOUND_PORT_URI
 						));
+		
+
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
@@ -993,6 +1001,7 @@ public abstract class	ComponentSimulationArchitectures
 								new EventSink(ElectricMeterCoupledModel.SIL_URI,
 										SwitchOffMachineCafe.class)
 						});
+
 
 				// coupled model descriptor
 				coupledModelDescriptors.put(
