@@ -37,6 +37,8 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import projet_alasca.equipements.ventilateur.mil.VentilateurElectricityModel;
+import projet_alasca.equipements.ventilateur.mil.VentilateurOperationI;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerOperationI;
 
 // -----------------------------------------------------------------------------
 /**
@@ -118,21 +120,25 @@ extends		AbstractVentilateurEvent
 	@Override
 	public void				executeOn(AtomicModelI model)
 	{
-		assert	model instanceof VentilateurElectricityModel :
-				new AssertionError(
-						"Precondition violation: model instanceof "
-						+ "VentilateurElectricityModel");
+//		assert	model instanceof VentilateurElectricityModel :
+//				new AssertionError(
+//						"Precondition violation: model instanceof "
+//						+ "VentilateurElectricityModel");
+//
+//		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
+//		// a SetLow event can only be executed when the state of the ventilateur
+//		//  model is in the state HIGH
+//		if (m.getState() == VentilateurElectricityModel.State.HIGH) {
+//			// then put it in the state LOW
+//			m.setState(VentilateurElectricityModel.State.LOW);
+//			// trigger an internal transition by toggling the electricity
+//			// consumption changed boolean to true
+//			m.toggleConsumptionHasChanged();
+//		}
+		
+		assert	model instanceof HairDryerOperationI;
 
-		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
-		// a SetLow event can only be executed when the state of the ventilateur
-		//  model is in the state HIGH
-		if (m.getState() == VentilateurElectricityModel.State.HIGH) {
-			// then put it in the state LOW
-			m.setState(VentilateurElectricityModel.State.LOW);
-			// trigger an internal transition by toggling the electricity
-			// consumption changed boolean to true
-			m.toggleConsumptionHasChanged();
-		}
+		((VentilateurOperationI)model).setLow();
 	}
 }
 // -----------------------------------------------------------------------------

@@ -1,4 +1,4 @@
-package projet_alasca.etape3.equipments.hairdryer.mil;
+package projet_alasca.equipements.ventilateur.mil;
 
 
 // Copyright Jacques Malenfant, Sorbonne Universite.
@@ -47,12 +47,9 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
-import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerElectricityModel.State;
-import projet_alasca.etape3.equipments.hairdryer.mil.events.AbstractHairDryerEvent;
-import projet_alasca.etape3.equipments.hairdryer.mil.events.SetHighHairDryer;
-import projet_alasca.etape3.equipments.hairdryer.mil.events.SetLowHairDryer;
-import projet_alasca.etape3.equipments.hairdryer.mil.events.SwitchOffHairDryer;
-import projet_alasca.etape3.equipments.hairdryer.mil.events.SwitchOnHairDryer;
+import projet_alasca.equipements.ventilateur.mil.VentilateurElectricityModel.State;
+import projet_alasca.equipements.ventilateur.mil.events.AbstractVentilateurEvent;
+import projet_alasca.equipements.ventilateur.mil.events.*;
 
 // -----------------------------------------------------------------------------
 /**
@@ -112,15 +109,15 @@ import projet_alasca.etape3.equipments.hairdryer.mil.events.SwitchOnHairDryer;
  */
 // -----------------------------------------------------------------------------
 @ModelExternalEvents(
-	imported = {SwitchOnHairDryer.class,SwitchOffHairDryer.class,
-				SetLowHairDryer.class,SetHighHairDryer.class},
-	exported = {SwitchOnHairDryer.class,SwitchOffHairDryer.class,
-				SetLowHairDryer.class,SetHighHairDryer.class}
+	imported = {SwitchOnVentilateur.class,SwitchOffVentilateur.class,
+				SetLowVentilateur.class,SetHighVentilateur.class,SetMediumVentilateur.class},
+	exported = {SwitchOnVentilateur.class,SwitchOffVentilateur.class,
+				SetLowVentilateur.class,SetHighVentilateur.class,SetMediumVentilateur.class}
 	)
 // -----------------------------------------------------------------------------
-public class			HairDryerStateModel
+public class			VentilateurStateModel
 extends		AtomicModel
-implements	HairDryerOperationI
+implements	VentilateurOperationI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -129,22 +126,22 @@ implements	HairDryerOperationI
 	private static final long serialVersionUID = 1L;
 	/** URI for an instance model in MIL simulations; works as long as
 	 *  only one instance is created.										*/
-	public static final String	MIL_URI = HairDryerStateModel.class.
+	public static final String	MIL_URI = VentilateurStateModel.class.
 												getSimpleName() + "-MIL";
 	/** URI for an instance model in MIL real time simulations; works as
 	 *  long as only one instance is created.								*/
-	public static final String	MIL_RT_URI = HairDryerStateModel.class.
+	public static final String	MIL_RT_URI = VentilateurStateModel.class.
 												getSimpleName() + "-MIL/SIL_RT";
 	/** URI for an instance model in SIL simulations; works as long as
 	 *  only one instance is created. It is the same value as for MIL
 	 *  real time simulations as the same models are used in both cases.	*/
-	public static final String	SIL_URI = HairDryerStateModel.class.
+	public static final String	SIL_URI = VentilateurStateModel.class.
 												getSimpleName() + "-MIL/SIL_RT";
 
 	/** current state of the hair dryer.									*/
 	protected State						currentState;
 	/** last received event or null if none.								*/
-	protected AbstractHairDryerEvent	lastReceived;
+	protected AbstractVentilateurEvent	lastReceived;
 
 	// -------------------------------------------------------------------------
 	// Invariants
@@ -163,7 +160,7 @@ implements	HairDryerOperationI
 	 * @param instance	instance to be tested.
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
-	protected static boolean	glassBoxInvariants(HairDryerStateModel instance)
+	protected static boolean	glassBoxInvariants(VentilateurStateModel instance)
 	{
 		assert	instance != null :
 				new NeoSim4JavaException("Precondition violation: "
@@ -186,7 +183,7 @@ implements	HairDryerOperationI
 	 * @param instance	instance to be tested.
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
-	protected static boolean	blackBoxInvariants(HairDryerStateModel instance)
+	protected static boolean	blackBoxInvariants(VentilateurStateModel instance)
 	{
 		assert	instance != null :
 				new NeoSim4JavaException("Precondition violation: "
@@ -195,17 +192,17 @@ implements	HairDryerOperationI
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MIL_URI != null && !MIL_URI.isEmpty(),
-				HairDryerStateModel.class,
+				VentilateurStateModel.class,
 				instance,
 				"MIL_URI != null && !MIL_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
-				HairDryerStateModel.class,
+				VentilateurStateModel.class,
 				instance,
 				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				SIL_URI != null && !SIL_URI.isEmpty(),
-				HairDryerStateModel.class,
+				VentilateurStateModel.class,
 				instance,
 				"SIL_URI != null && !SIL_URI.isEmpty()");
 		return ret;
@@ -237,7 +234,7 @@ implements	HairDryerOperationI
 	 * @param simulationEngine	simulation engine to which the model is attached.
 	 * @throws Exception		<i>to do</i>.
 	 */
-	public				HairDryerStateModel(
+	public				VentilateurStateModel(
 		String uri,
 		TimeUnit simulatedTimeUnit,
 		AtomicSimulatorI simulationEngine
@@ -249,10 +246,10 @@ implements	HairDryerOperationI
 
 		assert	glassBoxInvariants(this) :
 				new NeoSim4JavaException(
-						"HairDryerStateModel.glassBoxInvariants(this)");
+						"VentilateurStateModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
 				new NeoSim4JavaException(
-						"HairDryerStateModel.blackBoxInvariants(this)");
+						"VentilateurStateModel.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -265,9 +262,9 @@ implements	HairDryerOperationI
 	@Override
 	public void			turnOn()
 	{
-		if (this.currentState == HairDryerElectricityModel.State.OFF) {
+		if (this.currentState == VentilateurElectricityModel.State.OFF) {
 			// then put it in the state LOW
-			this.currentState = HairDryerElectricityModel.State.LOW;
+			this.currentState = VentilateurElectricityModel.State.LOW;
 		}
 	}
 
@@ -279,9 +276,9 @@ implements	HairDryerOperationI
 	{
 		// a SwitchOff event can be executed when the state of the hair
 		// dryer model is *not* in the state OFF
-		if (this.currentState != HairDryerElectricityModel.State.OFF) {
+		if (this.currentState != VentilateurElectricityModel.State.OFF) {
 			// then put it in the state OFF
-			this.currentState = HairDryerElectricityModel.State.OFF;
+			this.currentState = VentilateurElectricityModel.State.OFF;
 		}
 	}
 
@@ -293,9 +290,9 @@ implements	HairDryerOperationI
 	{
 		// a SetHigh event can only be executed when the state of the hair
 		// dryer model is in the state LOW
-		if (this.currentState == HairDryerElectricityModel.State.LOW) {
+		if (this.currentState == VentilateurElectricityModel.State.LOW || this.currentState == VentilateurElectricityModel.State.MEDIUM) {
 			// then put it in the state HIGH
-			this.currentState = HairDryerElectricityModel.State.HIGH;
+			this.currentState = VentilateurElectricityModel.State.HIGH;
 		}
 	}
 
@@ -307,9 +304,20 @@ implements	HairDryerOperationI
 	{
 		// a SetLow event can only be executed when the state of the hair
 		// dryer model is in the state HIGH
-		if (this.currentState == HairDryerElectricityModel.State.HIGH) {
+		if (this.currentState == VentilateurElectricityModel.State.HIGH || this.currentState == VentilateurElectricityModel.State.MEDIUM) {
 			// then put it in the state LOW
-			this.currentState = HairDryerElectricityModel.State.LOW;
+			this.currentState = VentilateurElectricityModel.State.LOW;
+		}
+	}
+	
+	@Override
+	public void			setMedium()
+	{
+		// a SetLow event can only be executed when the state of the hair
+		// dryer model is in the state HIGH
+		if (this.currentState == VentilateurElectricityModel.State.HIGH || this.currentState == VentilateurElectricityModel.State.LOW) {
+			// then put it in the state LOW
+			this.currentState = VentilateurElectricityModel.State.MEDIUM;
 		}
 	}
 
@@ -377,7 +385,7 @@ implements	HairDryerOperationI
 		// on the model state except to put lastReceived to null again, but
 		// this will also trigger output and the sending of the event to
 		// the electricity model to also change its state
-		this.lastReceived = (AbstractHairDryerEvent) currentEvents.get(0);
+		this.lastReceived = (AbstractVentilateurEvent) currentEvents.get(0);
 
 		// tracing
 		StringBuffer message = new StringBuffer(this.uri);

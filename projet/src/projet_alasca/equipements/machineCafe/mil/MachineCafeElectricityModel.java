@@ -273,7 +273,7 @@ implements MachineCafeOperationI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOn()
+	 * @see fr.sorbonne_u.components.VentilateurOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOn()
 	 */
 	@Override
 	public void			turnOn()
@@ -288,7 +288,7 @@ implements MachineCafeOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.MachineCafeOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOff()
+	 * @see fr.sorbonne_u.components.VentilateurOperationI.equipments.hairdryer.mil.HairDryerOperationI#turnOff()
 	 */
 	@Override
 	public void			turnOff()

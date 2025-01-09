@@ -242,18 +242,18 @@ public class			RunHEM_RT_Simulation
 
 			// ventilateur models
 			atomicModelDescriptors.put(
-					VentilateurElectricityModel.URI,
+					VentilateurElectricityModel.MIL_RT_URI,
 					RTAtomicHIOA_Descriptor.create(
 							VentilateurElectricityModel.class,
-							VentilateurElectricityModel.URI,
+							VentilateurElectricityModel.MIL_RT_URI,
 							TimeUnit.HOURS,
 							null,
 							ACCELERATION_FACTOR));
 			atomicModelDescriptors.put(
-					VentilateurUserModel.URI,
+					VentilateurUserModel.MIL_RT_URI,
 					RTAtomicModelDescriptor.create(
 							VentilateurUserModel.class,
-							VentilateurUserModel.URI,
+							VentilateurUserModel.MIL_RT_URI,
 							TimeUnit.HOURS,
 							null,
 							ACCELERATION_FACTOR));
@@ -368,8 +368,8 @@ public class			RunHEM_RT_Simulation
 			submodels.add(ElectricMeterElectricityModel.URI);
 
 			//ventilateur
-			submodels.add(VentilateurElectricityModel.URI);
-			submodels.add(VentilateurUserModel.URI);
+			submodels.add(VentilateurElectricityModel.MIL_RT_URI);
+			submodels.add(VentilateurUserModel.MIL_RT_URI);
 			//machine cafe
 			submodels.add(MachineCafeElectricityModel.MIL_RT_URI);
 			submodels.add(MachineCafeUserModel.MIL_RT_URI);
@@ -458,33 +458,33 @@ public class			RunHEM_RT_Simulation
 							});
 					//ventilateur
 					connections.put(
-							new EventSource(VentilateurUserModel.URI, SwitchOnVentilateur.class),
+							new EventSource(VentilateurUserModel.MIL_RT_URI, SwitchOnVentilateur.class),
 							new EventSink[] {
-									new EventSink(VentilateurElectricityModel.URI,
+									new EventSink(VentilateurElectricityModel.MIL_RT_URI,
 											SwitchOnVentilateur.class)
 							});
 					connections.put(
-							new EventSource(VentilateurUserModel.URI, SwitchOffVentilateur.class),
+							new EventSource(VentilateurUserModel.MIL_RT_URI, SwitchOffVentilateur.class),
 							new EventSink[] {
-									new EventSink(VentilateurElectricityModel.URI,
+									new EventSink(VentilateurElectricityModel.MIL_RT_URI,
 											SwitchOffVentilateur.class)
 							});
 					connections.put(
-							new EventSource(VentilateurUserModel.URI, SetHighVentilateur.class),
+							new EventSource(VentilateurUserModel.MIL_RT_URI, SetHighVentilateur.class),
 							new EventSink[] {
-									new EventSink(VentilateurElectricityModel.URI,
+									new EventSink(VentilateurElectricityModel.MIL_RT_URI,
 											SetHighVentilateur.class)
 							});
 					connections.put(
-							new EventSource(VentilateurUserModel.URI, SetMediumVentilateur.class),
+							new EventSource(VentilateurUserModel.MIL_RT_URI, SetMediumVentilateur.class),
 							new EventSink[] {
-									new EventSink(VentilateurElectricityModel.URI,
+									new EventSink(VentilateurElectricityModel.MIL_RT_URI,
 											SetMediumVentilateur.class)
 							});
 					connections.put(
-							new EventSource(VentilateurUserModel.URI, SetLowVentilateur.class),
+							new EventSource(VentilateurUserModel.MIL_RT_URI, SetLowVentilateur.class),
 							new EventSink[] {
-									new EventSink(VentilateurElectricityModel.URI,
+									new EventSink(VentilateurElectricityModel.MIL_RT_URI,
 											SetLowVentilateur.class)
 							});
 					//machine cafe
@@ -709,7 +709,7 @@ public class			RunHEM_RT_Simulation
 							bindings.put(
 									new VariableSource("currentIntensity",
 											Double.class,
-											VentilateurElectricityModel.URI),
+											VentilateurElectricityModel.MIL_RT_URI),
 									new VariableSink[] {
 											new VariableSink("currentIntensity",
 													Double.class,
@@ -818,25 +818,25 @@ public class			RunHEM_RT_Simulation
 							//ventilateur
 							simParams.put(
 									ModelI.createRunParameterName(
-											VentilateurElectricityModel.URI,
+											VentilateurElectricityModel.MIL_RT_URI,
 											VentilateurElectricityModel.LOW_MODE_CONSUMPTION_RPNAME),
 									1320.0);
 							simParams.put(
 									ModelI.createRunParameterName(
-											VentilateurElectricityModel.URI,
+											VentilateurElectricityModel.MIL_RT_URI,
 											VentilateurElectricityModel.MEDIUM_MODE_CONSUMPTION_RPNAME),
 									1320.0);
 							simParams.put(
 									ModelI.createRunParameterName(
-											VentilateurElectricityModel.URI,
+											VentilateurElectricityModel.MIL_RT_URI,
 											VentilateurElectricityModel.HIGH_MODE_CONSUMPTION_RPNAME),
 									2200.0);
 							simParams.put(ModelI.createRunParameterName(
-									VentilateurUserModel.URI,
+									VentilateurUserModel.MIL_RT_URI,
 									VentilateurUserModel.MEAN_STEP_RPNAME),
 									0.05);
 							simParams.put(ModelI.createRunParameterName(
-									VentilateurUserModel.URI,
+									VentilateurUserModel.MIL_RT_URI,
 									VentilateurUserModel.MEAN_DELAY_RPNAME),
 									2.0);
 
@@ -847,7 +847,7 @@ public class			RunHEM_RT_Simulation
 											MachineCafeElectricityModel.CONSUMPTION_RPNAME),
 									1320.0);
 							simParams.put(ModelI.createRunParameterName(
-									VentilateurUserModel.URI,
+									VentilateurUserModel.MIL_RT_URI,
 									VentilateurUserModel.MEAN_STEP_RPNAME),
 									0.05);
 							simParams.put(ModelI.createRunParameterName(

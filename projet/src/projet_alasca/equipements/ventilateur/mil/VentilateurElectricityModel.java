@@ -35,9 +35,12 @@ package projet_alasca.equipements.ventilateur.mil;
 import java.util.ArrayList;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.components.hem2024e2.HEM_ReportI;
 import fr.sorbonne_u.components.hem2024e2.utils.Electricity;
 import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
@@ -54,6 +57,7 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
 import projet_alasca.equipements.ventilateur.mil.events.AbstractVentilateurEvent;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOnVentilateur;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerElectricityModel;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOffVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetLowVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetMediumVentilateur;
@@ -120,14 +124,15 @@ import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 @ModelExternalEvents(imported = {SwitchOnVentilateur.class,
-								 SwitchOffVentilateur.class,
-								 SetLowVentilateur.class,
-								 SetMediumVentilateur.class,
-								 SetHighVentilateur.class})
+		SwitchOffVentilateur.class,
+		SetLowVentilateur.class,
+		SetMediumVentilateur.class,
+		SetHighVentilateur.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
 // -----------------------------------------------------------------------------
 public class			VentilateurElectricityModel
 extends		AtomicHIOA
+implements VentilateurOperationI
 {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
@@ -151,7 +156,7 @@ extends		AtomicHIOA
 		OFF,
 		/** low mode is less cold and less consuming.						*/
 		LOW,			
-		
+
 		/** medium mode is medium  cold and medium consuming       */
 		MEDIUM,
 		/** high mode is colder and more consuming.							*/
@@ -164,18 +169,27 @@ extends		AtomicHIOA
 
 	private static final long		serialVersionUID = 1L;
 
-	/** URI for an instance model; works as long as only one instance is
-	 *  created.															*/
-	public static final String		URI = VentilateurElectricityModel.class.
-																getSimpleName();
+	/** URI for an instance model in MIL simulations; works as long as
+	 *   only one instance is created.										*/
+	public static final String	MIL_URI = VentilateurElectricityModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for an instance model in MIL real time simulations; works as
+	 *  long as  only one instance is created.								*/
+	public static final String	MIL_RT_URI = VentilateurElectricityModel.class.
+			getSimpleName() + "-MIL_RT";
+	/** URI for an instance model in SIL simulations; works as long as
+	 *   only one instance is created. It is the same value as for MIL
+	 *  real time simulations as the same models are used in both cases.	*/
+	public static final String	SIL_URI = VentilateurElectricityModel.class.
+			getSimpleName() + "-MIL_RT";
 
 	/** energy consumption (in Watts) of the ventilateur in LOW mode.		*/
 	protected static double			LOW_MODE_CONSUMPTION = 30.0; // Watts
-	
+
 	/** energy consumption (in Watts) of the ventilateur in MEDIUM mode.		*/
 	protected static double			MEDIUM_MODE_CONSUMPTION = 60.0; // Watts
-	
-	
+
+
 	/** energy consumption (in Watts) of the ventilateur in HIGH mode.		*/
 	protected static double			HIGH_MODE_CONSUMPTION = 100.0; // Watts
 	/** nominal tension (in Volts) of the ventilateur.						*/
@@ -219,11 +233,12 @@ extends		AtomicHIOA
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	glassBoxInvariants(
-		VentilateurElectricityModel instance
-		)
+			VentilateurElectricityModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
@@ -237,10 +252,10 @@ extends		AtomicHIOA
 				instance,
 				"LOW_MODE_CONSUMPTION <= MEDIUM_MODE_CONSUMPTION");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
-	            MEDIUM_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION,
-	            VentilateurElectricityModel.class,
-	            instance,
-	            "MEDIUM_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION");
+				MEDIUM_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION,
+				VentilateurElectricityModel.class,
+				instance,
+				"MEDIUM_MODE_CONSUMPTION <= HIGH_MODE_CONSUMPTION");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				TENSION > 0.0,
 				VentilateurElectricityModel.class,
@@ -258,11 +273,11 @@ extends		AtomicHIOA
 				"currentState != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				!instance.currentIntensity.isInitialised() ||
-									instance.currentIntensity.getValue() >= 0.0,
+				instance.currentIntensity.getValue() >= 0.0,
 				VentilateurElectricityModel.class,
 				instance,
 				"!currentIntensity.isInitialised() || "
-				+ "currentIntensity.getValue() >= 0.0");
+						+ "currentIntensity.getValue() >= 0.0");
 		return ret;
 	}
 
@@ -280,37 +295,48 @@ extends		AtomicHIOA
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	blackBoxInvariants(
-		VentilateurElectricityModel instance
-		)
+			VentilateurElectricityModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				URI != null && !URI.isEmpty(),
+				MIL_URI != null && !MIL_URI.isEmpty(),
 				VentilateurElectricityModel.class,
 				instance,
-				"URI != null && !URI.isEmpty()");
+				"MIL_URI != null && !MIL_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
+				VentilateurElectricityModel.class,
+				instance,
+				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				SIL_URI != null && !SIL_URI.isEmpty(),
+				VentilateurElectricityModel.class,
+				instance,
+				"SIL_URI != null && !SIL_URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				LOW_MODE_CONSUMPTION_RPNAME != null &&
-										!LOW_MODE_CONSUMPTION_RPNAME.isEmpty(),
+				!LOW_MODE_CONSUMPTION_RPNAME.isEmpty(),
 				VentilateurElectricityModel.class,
 				instance,
 				"LOW_MODE_CONSUMPTION_RPNAME != null && "
-								+ "!LOW_MODE_CONSUMPTION_RPNAME.isEmpty()");
-		 ret &= InvariantChecking.checkBlackBoxInvariant(
-		            MEDIUM_MODE_CONSUMPTION_RPNAME != null && !MEDIUM_MODE_CONSUMPTION_RPNAME.isEmpty(),
-		            VentilateurElectricityModel.class,
-		            instance,
-		            "MEDIUM_MODE_CONSUMPTION_RPNAME != null && !MEDIUM_MODE_CONSUMPTION_RPNAME.isEmpty()");
+						+ "!LOW_MODE_CONSUMPTION_RPNAME.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MEDIUM_MODE_CONSUMPTION_RPNAME != null && !MEDIUM_MODE_CONSUMPTION_RPNAME.isEmpty(),
+				VentilateurElectricityModel.class,
+				instance,
+				"MEDIUM_MODE_CONSUMPTION_RPNAME != null && !MEDIUM_MODE_CONSUMPTION_RPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				HIGH_MODE_CONSUMPTION_RPNAME != null &&
-									!HIGH_MODE_CONSUMPTION_RPNAME.isEmpty(),
+				!HIGH_MODE_CONSUMPTION_RPNAME.isEmpty(),
 				VentilateurElectricityModel.class,
 				instance,
 				"HIGH_MODE_CONSUMPTION_RPNAME != null && "
-							+ "!HIGH_MODE_CONSUMPTION_RPNAME.isEmpty()");
+						+ "!HIGH_MODE_CONSUMPTION_RPNAME.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				TENSION_RPNAME != null && !TENSION_RPNAME.isEmpty(),
 				VentilateurElectricityModel.class,
@@ -346,24 +372,94 @@ extends		AtomicHIOA
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				VentilateurElectricityModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		AtomicSimulatorI simulationEngine
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			AtomicSimulatorI simulationEngine
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.getSimulationEngine().setLogger(new StandardLogger());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
-	}
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.blackBoxInvariants(this)");
+}
 
 	// -------------------------------------------------------------------------
 	// Methods
 	// -------------------------------------------------------------------------
 
+	@Override
+	public void			turnOn()
+	{
+		if (this.currentState == VentilateurElectricityModel.State.OFF) {
+			// then put it in the state LOW
+			this.currentState = VentilateurElectricityModel.State.LOW;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
+	}
+	
+	@Override
+	public void			turnOff()
+	{
+		// a SwitchOff event can be executed when the state of the hair
+		// dryer model is *not* in the state OFF
+		if (this.currentState != VentilateurElectricityModel.State.OFF) {
+			// then put it in the state OFF
+			this.currentState = VentilateurElectricityModel.State.OFF;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
+	}
+	
+	@Override
+	public void			setHigh()
+	{
+		// a SetHigh event can only be executed when the state of the hair
+		// dryer model is in the state LOW
+		if (this.currentState == VentilateurElectricityModel.State.LOW ||this.currentState == VentilateurElectricityModel.State.MEDIUM  ) {
+			// then put it in the state HIGH
+			this.currentState = VentilateurElectricityModel.State.HIGH;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
+	}
+	
+	@Override
+	public void			setLow()
+	{
+		// a SetLow event can only be executed when the state of the hair
+		// dryer model is in the state HIGH
+		if (this.currentState == VentilateurElectricityModel.State.HIGH || this.currentState == VentilateurElectricityModel.State.MEDIUM) {
+			// then put it in the state LOW
+			this.currentState = VentilateurElectricityModel.State.LOW;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
+	}
+	
+	@Override
+	public void			setMedium()
+	{
+		// a SetLow event can only be executed when the state of the hair
+		// dryer model is in the state HIGH
+		if (this.currentState == VentilateurElectricityModel.State.HIGH || this.currentState == VentilateurElectricityModel.State.LOW) {
+			// then put it in the state LOW
+			this.currentState = VentilateurElectricityModel.State.MEDIUM;
+			// trigger an internal transition by toggling the electricity
+			// consumption changed boolean to true
+			this.toggleConsumptionHasChanged();
+		}
+	}
+	
 	/**
 	 * set the state of the ventilateur.
 	 * 
@@ -443,9 +539,11 @@ extends		AtomicHIOA
 		this.logMessage("simulation begins.\n");
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -460,9 +558,11 @@ extends		AtomicHIOA
 		this.currentIntensity.initialise(0.0);
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -496,9 +596,12 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.blackBoxInvariants(this)");
+
 
 		return ret;
 	}
@@ -515,17 +618,17 @@ extends		AtomicHIOA
 		Time t = this.getCurrentStateTime();
 		switch (this.currentState)
 		{
-			case OFF : this.currentIntensity.setNewValue(0.0, t); break;
-			case LOW :
-				this.currentIntensity.
-							setNewValue(LOW_MODE_CONSUMPTION/TENSION, t);
-				break;
-			case MEDIUM:
-				this.currentIntensity.setNewValue(MEDIUM_MODE_CONSUMPTION / TENSION, t);
-				break;
-			case HIGH :
-				this.currentIntensity.
-							setNewValue(HIGH_MODE_CONSUMPTION/TENSION, t);
+		case OFF : this.currentIntensity.setNewValue(0.0, t); break;
+		case LOW :
+			this.currentIntensity.
+			setNewValue(LOW_MODE_CONSUMPTION/TENSION, t);
+			break;
+		case MEDIUM:
+			this.currentIntensity.setNewValue(MEDIUM_MODE_CONSUMPTION / TENSION, t);
+			break;
+		case HIGH :
+			this.currentIntensity.
+			setNewValue(HIGH_MODE_CONSUMPTION/TENSION, t);
 		}
 
 		// Tracing
@@ -539,9 +642,11 @@ extends		AtomicHIOA
 		this.logMessage(message.toString());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -565,8 +670,8 @@ extends		AtomicHIOA
 		// report.
 		this.totalConsumption +=
 				Electricity.computeConsumption(
-									elapsedTime,
-									TENSION*this.currentIntensity.getValue());
+						elapsedTime,
+						TENSION*this.currentIntensity.getValue());
 
 		// Tracing
 		StringBuffer message =
@@ -576,17 +681,19 @@ extends		AtomicHIOA
 		this.logMessage(message.toString());
 
 		assert	ce instanceof AbstractVentilateurEvent :
-				new RuntimeException(
-						ce + " is not an event that an VentilateurElectricityModel"
-						+ " can receive and process.");
+			new RuntimeException(
+					ce + " is not an event that an VentilateurElectricityModel"
+							+ " can receive and process.");
 		// events have a method execute on to perform their effect on this
 		// model
 		ce.executeOn(this);
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -598,8 +705,8 @@ extends		AtomicHIOA
 		Duration d = endTime.subtract(this.getCurrentStateTime());
 		this.totalConsumption +=
 				Electricity.computeConsumption(
-									d,
-									TENSION*this.currentIntensity.getValue());
+						d,
+						TENSION*this.currentIntensity.getValue());
 
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
@@ -610,42 +717,51 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/** run parameter name for {@code LOW_MODE_CONSUMPTION}.				*/
-	public static final String		LOW_MODE_CONSUMPTION_RPNAME =
-												URI + ":LOW_MODE_CONSUMPTION";
+	public static final String		LOW_MODE_CONSUMPTION_RPNAME = "LOW_MODE_CONSUMPTION";
 	/** run parameter name for {@code MEDIUM_MODE_CONSUMPTION}.				*/
-	public static final String		MEDIUM_MODE_CONSUMPTION_RPNAME =
-												URI + ":MEDIUM_MODE_CONSUMPTION";
+	public static final String		MEDIUM_MODE_CONSUMPTION_RPNAME = "MEDIUM_MODE_CONSUMPTION";
 	/** run parameter name for {@code HIGH_MODE_CONSUMPTION}.				*/
-	public static final String		HIGH_MODE_CONSUMPTION_RPNAME =
-												URI + ":HIGH_MODE_CONSUMPTION";
+	public static final String		HIGH_MODE_CONSUMPTION_RPNAME = "HIGH_MODE_CONSUMPTION";
 	/** run parameter name for {@code TENSION}.								*/
-	public static final String		TENSION_RPNAME = URI + ":TENSION";
+	public static final String		TENSION_RPNAME = "TENSION";
 
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#setSimulationRunParameters(Map)
 	 */
 	@Override
 	public void			setSimulationRunParameters(
-		Map<String, Object> simParams
-		) throws MissingRunParameterException
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
 	{
 		super.setSimulationRunParameters(simParams);
+		
+		// this gets the reference on the owner component which is required
+				// to have simulation models able to make the component perform some
+				// operations or tasks or to get the value of variables held by the
+				// component when necessary.
+				if (simParams.containsKey(
+								AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+					// by the following, all of the logging will appear in the owner
+					// component logger
+					this.getSimulationEngine().setLogger(
+								AtomicSimulatorPlugin.createComponentLogger(simParams));
+				}
 
 		String lowName =
-			ModelI.createRunParameterName(getURI(),
-										  LOW_MODE_CONSUMPTION_RPNAME);
+				ModelI.createRunParameterName(getURI(),
+						LOW_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(lowName)) {
 			LOW_MODE_CONSUMPTION = (double) simParams.get(lowName);
 		}
 		String mediumName =
 				ModelI.createRunParameterName(getURI(),
-											  MEDIUM_MODE_CONSUMPTION_RPNAME);
-			if (simParams.containsKey(mediumName)) {
-				MEDIUM_MODE_CONSUMPTION = (double) simParams.get(mediumName);
-			}
+						MEDIUM_MODE_CONSUMPTION_RPNAME);
+		if (simParams.containsKey(mediumName)) {
+			MEDIUM_MODE_CONSUMPTION = (double) simParams.get(mediumName);
+		}
 		String highName =
-			ModelI.createRunParameterName(getURI(),
-										  HIGH_MODE_CONSUMPTION_RPNAME);
+				ModelI.createRunParameterName(getURI(),
+						HIGH_MODE_CONSUMPTION_RPNAME);
 		if (simParams.containsKey(highName)) {
 			HIGH_MODE_CONSUMPTION = (double) simParams.get(highName);
 		}
@@ -656,10 +772,12 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariant violation!");
-	}
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"VentilateurElectricityModel.blackBoxInvariants(this)");
+}
 
 	// -------------------------------------------------------------------------
 	// Optional DEVS simulation protocol: simulation report
@@ -695,9 +813,9 @@ extends		AtomicHIOA
 		protected double	totalConsumption; // in kwh
 
 		public				ventilateurElectricityReport(
-			String modelURI,
-			double totalConsumption
-			)
+				String modelURI,
+				double totalConsumption
+				)
 		{
 			super();
 			this.modelURI = modelURI;
@@ -736,7 +854,7 @@ extends		AtomicHIOA
 		public String	toString()
 		{
 			return this.printout("");
-			
+
 		}
 	}
 
@@ -747,7 +865,7 @@ extends		AtomicHIOA
 	public SimulationReportI	getFinalReport()
 	{
 		return new ventilateurElectricityReport(this.getURI(),
-											  this.totalConsumption);
+				this.totalConsumption);
 	}
 }
 // -----------------------------------------------------------------------------

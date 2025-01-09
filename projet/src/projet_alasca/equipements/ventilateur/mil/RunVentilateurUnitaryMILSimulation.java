@@ -121,18 +121,18 @@ public class			RunVentilateurUnitaryMILSimulation
 			// the ventilateur model simulating its electricity consumption, an
 			// atomic HIOA model hence we use an AtomicHIOA_Descriptor
 			atomicModelDescriptors.put(
-					VentilateurElectricityModel.URI,
+					VentilateurElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							VentilateurElectricityModel.class,
-							VentilateurElectricityModel.URI,
+							VentilateurElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			// for atomic model, we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
-					VentilateurUserModel.URI,
+					VentilateurUserModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							VentilateurUserModel.class,
-							VentilateurUserModel.URI,
+							VentilateurUserModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -143,8 +143,8 @@ public class			RunVentilateurUnitaryMILSimulation
 
 			// the set of submodels of the coupled model, given by their URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(VentilateurElectricityModel.URI);
-			submodels.add(VentilateurUserModel.URI);
+			submodels.add(VentilateurElectricityModel.MIL_URI);
+			submodels.add(VentilateurUserModel.MIL_URI);
 
 			// event exchanging connections between exporting and importing
 			// models
@@ -152,42 +152,42 @@ public class			RunVentilateurUnitaryMILSimulation
 										new HashMap<EventSource,EventSink[]>();
 
 			connections.put(
-					new EventSource(VentilateurUserModel.URI, SwitchOnVentilateur.class),
+					new EventSource(VentilateurUserModel.MIL_URI, SwitchOnVentilateur.class),
 					new EventSink[] {
-							new EventSink(VentilateurElectricityModel.URI,
+							new EventSink(VentilateurElectricityModel.MIL_URI,
 										  SwitchOnVentilateur.class)
 					});
 			connections.put(
-					new EventSource(VentilateurUserModel.URI, SwitchOffVentilateur.class),
+					new EventSource(VentilateurUserModel.MIL_URI, SwitchOffVentilateur.class),
 					new EventSink[] {
-							new EventSink(VentilateurElectricityModel.URI,
+							new EventSink(VentilateurElectricityModel.MIL_URI,
 										  SwitchOffVentilateur.class)
 					});
 			connections.put(
-					new EventSource(VentilateurUserModel.URI, SetHighVentilateur.class),
+					new EventSource(VentilateurUserModel.MIL_URI, SetHighVentilateur.class),
 					new EventSink[] {
-							new EventSink(VentilateurElectricityModel.URI,
+							new EventSink(VentilateurElectricityModel.MIL_URI,
 										  SetHighVentilateur.class)
 					});
 			connections.put(
-					new EventSource(VentilateurUserModel.URI, SetMediumVentilateur.class),
+					new EventSource(VentilateurUserModel.MIL_URI, SetMediumVentilateur.class),
 					new EventSink[] {
-							new EventSink(VentilateurElectricityModel.URI,
+							new EventSink(VentilateurElectricityModel.MIL_URI,
 										  SetMediumVentilateur.class)
 					});
 			connections.put(
-					new EventSource(VentilateurUserModel.URI, SetLowVentilateur.class),
+					new EventSource(VentilateurUserModel.MIL_URI, SetLowVentilateur.class),
 					new EventSink[] {
-							new EventSink(VentilateurElectricityModel.URI,
+							new EventSink(VentilateurElectricityModel.MIL_URI,
 										  SetLowVentilateur.class)
 					});
 
 			// coupled model descriptor
 			coupledModelDescriptors.put(
-					VentilateurCoupledModel.URI,
+					VentilateurCoupledModel.MIL_URI,
 					new CoupledModelDescriptor(
 							VentilateurCoupledModel.class,
-							VentilateurCoupledModel.URI,
+							VentilateurCoupledModel.MIL_URI,
 							submodels,
 							null,
 							null,
@@ -197,7 +197,7 @@ public class			RunVentilateurUnitaryMILSimulation
 			// simulation architecture
 			ArchitectureI architecture =
 					new Architecture(
-							VentilateurCoupledModel.URI,
+							VentilateurCoupledModel.MIL_URI,
 							atomicModelDescriptors,
 							coupledModelDescriptors,
 							TimeUnit.HOURS);

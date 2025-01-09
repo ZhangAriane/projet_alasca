@@ -37,6 +37,8 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import projet_alasca.equipements.ventilateur.mil.VentilateurElectricityModel;
+import projet_alasca.equipements.ventilateur.mil.VentilateurOperationI;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerOperationI;
 
 // -----------------------------------------------------------------------------
 /**
@@ -118,22 +120,26 @@ extends		AbstractVentilateurEvent
 	@Override
 	public void				executeOn(AtomicModelI model)
 	{
-		assert	model instanceof VentilateurElectricityModel :
-				new AssertionError(
-						"Precondition violation: model instanceof "
-						+ "VentilateurElectricityModel");
+//		assert	model instanceof VentilateurElectricityModel :
+//				new AssertionError(
+//						"Precondition violation: model instanceof "
+//						+ "VentilateurElectricityModel");
+//
+//		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
+//
+//		// a SetHigh event can only be executed when the state of the ventilateur
+//		//  model is in the state Low or Medium
+//		if (m.getState() == VentilateurElectricityModel.State.LOW || m.getState() == VentilateurElectricityModel.State.MEDIUM) {
+//			// then put it in the state HIGH
+//			m.setState(VentilateurElectricityModel.State.HIGH);
+//			// trigger an internal transition by toggling the electricity
+//			// consumption changed boolean to true
+//			m.toggleConsumptionHasChanged();
+//		}
+		
+		assert	model instanceof HairDryerOperationI;
 
-		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
-
-		// a SetHigh event can only be executed when the state of the ventilateur
-		//  model is in the state Low or Medium
-		if (m.getState() == VentilateurElectricityModel.State.LOW || m.getState() == VentilateurElectricityModel.State.MEDIUM) {
-			// then put it in the state HIGH
-			m.setState(VentilateurElectricityModel.State.HIGH);
-			// trigger an internal transition by toggling the electricity
-			// consumption changed boolean to true
-			m.toggleConsumptionHasChanged();
-		}
+		((VentilateurOperationI)model).setHigh();
 	}
 }
 // -----------------------------------------------------------------------------

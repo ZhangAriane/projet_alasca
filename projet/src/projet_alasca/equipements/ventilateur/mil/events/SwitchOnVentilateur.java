@@ -36,6 +36,8 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import projet_alasca.equipements.ventilateur.mil.VentilateurElectricityModel;
+import projet_alasca.equipements.ventilateur.mil.VentilateurOperationI;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerOperationI;
 
 // -----------------------------------------------------------------------------
 /**
@@ -112,21 +114,24 @@ extends		AbstractVentilateurEvent
 	@Override
 	public void				executeOn(AtomicModelI model)
 	{
-		assert	model instanceof VentilateurElectricityModel :
-				new AssertionError(
-						"Precondition violation: model instanceof "
-						+ "HairDryerElectricityModel");
+//		assert	model instanceof VentilateurElectricityModel :
+//				new AssertionError(
+//						"Precondition violation: model instanceof "
+//						+ "HairDryerElectricityModel");
+//
+//		// a SwitchOnHairDryer event can be executed when the state of the hair
+//		// dryer model is in the state OFF
+//		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
+//		if (m.getState() == VentilateurElectricityModel.State.OFF) {
+//			// then put it in the state LOW
+//			m.setState(VentilateurElectricityModel.State.LOW);
+//			// trigger an internal transition by toggling the electricity
+//			// consumption changed boolean to true
+//			m.toggleConsumptionHasChanged();
+//		}
+		assert	model instanceof HairDryerOperationI;
 
-		// a SwitchOnHairDryer event can be executed when the state of the hair
-		// dryer model is in the state OFF
-		VentilateurElectricityModel m = (VentilateurElectricityModel)model;
-		if (m.getState() == VentilateurElectricityModel.State.OFF) {
-			// then put it in the state LOW
-			m.setState(VentilateurElectricityModel.State.LOW);
-			// trigger an internal transition by toggling the electricity
-			// consumption changed boolean to true
-			m.toggleConsumptionHasChanged();
-		}
+		((VentilateurOperationI)model).turnOn();
 	}
 }
 // -----------------------------------------------------------------------------

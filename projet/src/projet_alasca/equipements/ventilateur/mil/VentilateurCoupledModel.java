@@ -41,6 +41,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.models.interfaces.ModelI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.CoordinatorI;
+import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerCoupledModel;
 
 // -----------------------------------------------------------------------------
 /**
@@ -80,9 +81,17 @@ extends		CoupledModel
 	private static final long serialVersionUID = 1L;
 	/** URI for an instance model; works as long as only one instance is
 	 *  created.															*/
-	public static final String	URI = VentilateurCoupledModel.class.
-																getSimpleName();
-
+	public static final String	MIL_URI = VentilateurCoupledModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created.										*/
+	public static final String	MIL_RT_URI = VentilateurCoupledModel.class.
+			getSimpleName() + "-MIL_RT";
+	/** URI for an instance model in MIL simulations; works as long as
+	 *  only one instance is created. It is the same value as for MIL
+	 *  real time simulations as the same models are used in both cases.	*/
+	public static final String	SIL_URI = VentilateurCoupledModel.class.
+			getSimpleName() + "-MIL_RT";
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -115,17 +124,17 @@ extends		CoupledModel
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				VentilateurCoupledModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		CoordinatorI simulationEngine,
-		ModelI[] submodels,
-		Map<Class<? extends EventI>,EventSink[]> imported,
-		Map<Class<? extends EventI>,ReexportedEvent> reexported,
-		Map<EventSource, EventSink[]> connections
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			CoordinatorI simulationEngine,
+			ModelI[] submodels,
+			Map<Class<? extends EventI>,EventSink[]> imported,
+			Map<Class<? extends EventI>,ReexportedEvent> reexported,
+			Map<EventSource, EventSink[]> connections
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine, submodels,
-			  imported, reexported, connections);
+				imported, reexported, connections);
 	}
 }
 // -----------------------------------------------------------------------------
