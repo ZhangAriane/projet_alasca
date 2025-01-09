@@ -62,8 +62,8 @@ import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>HeaterElectricityModel</code> defines a simulation model
- * for the electricity consumption of the heater.
+ * The class <code>ChauffeEauElectricityModel</code> defines a simulation model
+ * for the electricity consumption of the ChauffeEau.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -72,10 +72,10 @@ import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
  * current power level i.e., {@code State.OFF => consumption == 0.0},
  * {@code State.ON => consumption == NOT_HEATING_POWER} and
  * {@code State.HEATING => consumption >= NOT_HEATING_POWER && consumption <= MAX_HEATING_POWER}).
- * The state of the heater is modified by the reception of external events
- * ({@code SwitchOnHeater}, {@code SwitchOffHeater}, {@code Heat} and
+ * The state of the ChauffeEau is modified by the reception of external events
+ * ({@code SwitchOnChauffeEau}, {@code SwitchOffChauffeEau}, {@code Heat} and
  * {@code DoNotHeat}). The power level is set through the external event
- * {@code SetPowerHeater} that has a parameter defining the required power
+ * {@code SetPowerChauffeEau} that has a parameter defining the required power
  * level. The electric power consumption is stored in the exported variable
  * {@code currentIntensity}.
  * </p>
@@ -86,9 +86,9 @@ import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
  * 
  * <ul>
  * <li>Imported events:
- *   {@code SwitchOnHeater},
- *   {@code SwitchOffHeater},
- *   {@code SetPowerHeater},
+ *   {@code SwitchOnChauffeEau},
+ *   {@code SwitchOffChauffeEau},
+ *   {@code SetPowerChauffeEau},
  *   {@code Heat},
  *   {@code DoNotHeat}</li>
  * <li>Exported events: none</li>
@@ -139,18 +139,18 @@ extends		AtomicHIOA
 
 	/**
 	 * The enumeration <code>State</code> defines the state in which the
-	 * heater can be from the electric power consumption perspective.
+	 * ChauffeEau can be from the electric power consumption perspective.
 	 *
 	 * <p>Created on : 2021-09-24</p>
 	 * 
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
 	public static enum	State {
-		/** heater is on but not heating.									*/
+		/** ChauffeEau is on but not heating.									*/
 		ON,
-		/** heater is on and heating.										*/
+		/** ChauffeEau is on and heating.										*/
 		HEATING,
-		/** heater is off.													*/
+		/** ChauffeEau is off.													*/
 		OFF
 	}
 
@@ -163,23 +163,23 @@ extends		AtomicHIOA
 	public static final String	URI = ChauffeEauElectricityModel.class.
 															getSimpleName();
 
-	/** power of the heater in watts.										*/
+	/** power of the ChauffeEau in watts.										*/
 	protected static double		NOT_HEATING_POWER = 22.0;
-	/** max power of the heater in watts.										*/
+	/** max power of the ChauffeEau in watts.										*/
 	public static double		MAX_HEATING_POWER = 2000.0;
-	/** nominal tension (in Volts) of the heater.							*/
+	/** nominal tension (in Volts) of the ChauffeEau.							*/
 	protected static double		TENSION = 220.0;
 
-	/** current state of the heater.										*/
+	/** current state of the ChauffeEau.										*/
 	protected State				currentState = State.OFF;
-	/** true when the electricity consumption of the heater has changed
+	/** true when the electricity consumption of the ChauffeEau has changed
 	 *  after executing an external event; the external event changes the
 	 *  value of <code>currentState</code> and then an internal transition
 	 *  will be triggered by putting through in this variable which will
 	 *  update the variable <code>currentIntensity</code>.					*/
 	protected boolean			consumptionHasChanged = false;
 
-	/** total consumption of the heater during the simulation in kwh.		*/
+	/** total consumption of the ChauffeEau during the simulation in kwh.		*/
 	protected double			totalConsumption;
 
 	// -------------------------------------------------------------------------
@@ -187,7 +187,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/** the current heating power between 0 and
-	 *  {@code HeaterElectricityModel.MAX_HEATING_POWER}.					*/
+	 *  {@code ChauffeEauElectricityModel.MAX_HEATING_POWER}.					*/
 	@ExportedVariable(type = Double.class)
 	protected final Value<Double>	currentHeatingPower =
 														new Value<Double>(this);
@@ -315,7 +315,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a heater MIL model instance.
+	 * create a ChauffeEau MIL model instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -356,7 +356,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * set the state of the heater.
+	 * set the state of the ChauffeEau.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -383,7 +383,7 @@ extends		AtomicHIOA
 	}
 
 	/**
-	 * return the state of the heater.
+	 * return the state of the ChauffeEau.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -400,7 +400,7 @@ extends		AtomicHIOA
 	}
 
 	/**
-	 * set the current heating power of the heater to {@code newPower}.
+	 * set the current heating power of the ChauffeEau to {@code newPower}.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -409,7 +409,7 @@ extends		AtomicHIOA
 	 * post	{@code getCurrentHeatingPower() == newPower}
 	 * </pre>
 	 *
-	 * @param newPower	the new power in watts to be set on the heater.
+	 * @param newPower	the new power in watts to be set on the ChauffeEau.
 	 * @param t			time at which the new power is set.
 	 */
 	public void			setCurrentHeatingPower(double newPower, Time t)
@@ -418,7 +418,7 @@ extends		AtomicHIOA
 				newPower <= ChauffeEauElectricityModel.MAX_HEATING_POWER :
 			new AssertionError(
 					"Precondition violation: newPower >= 0.0 && "
-					+ "newPower <= HeaterElectricityModel.MAX_HEATING_POWER,"
+					+ "newPower <= ChauffeEauElectricityModel.MAX_HEATING_POWER,"
 					+ " but newPower = " + newPower);
 
 		double oldPower = this.currentHeatingPower.getValue();
@@ -477,7 +477,7 @@ extends		AtomicHIOA
 
 		if (!this.currentIntensity.isInitialised() ||
 								!this.currentHeatingPower.isInitialised()) {
-			// initially, the heater is off, so its consumption is zero.
+			// initially, the ChauffeEau is off, so its consumption is zero.
 			this.currentIntensity.initialise(0.0);
 			this.currentHeatingPower.initialise(MAX_HEATING_POWER);
 
@@ -585,7 +585,7 @@ extends		AtomicHIOA
 		// get the vector of current external events
 		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		// when this method is called, there is at least one external event,
-		// and for the heater model, there will be exactly one by
+		// and for the ChauffeEau model, there will be exactly one by
 		// construction.
 		assert	currentEvents != null && currentEvents.size() == 1;
 
@@ -603,10 +603,10 @@ extends		AtomicHIOA
 		sb.append(".\n");
 		this.logMessage(sb.toString());
 
-		// the next call will update the current state of the heater and if
+		// the next call will update the current state of the ChauffeEau and if
 		// this state has changed, it put the boolean consumptionHasChanged
 		// at true, which in turn will trigger an immediate internal transition
-		// to update the current intensity of the heater electricity
+		// to update the current intensity of the ChauffeEau electricity
 		// consumption.
 		ce.executeOn(this);
 
@@ -636,11 +636,11 @@ extends		AtomicHIOA
 	// Optional DEVS simulation protocol: simulation run parameters
 	// -------------------------------------------------------------------------
 
-	/** power of the heater in watts.										*/
+	/** power of the ChauffeEau in watts.										*/
 	public static final String	NOT_HEATING_POWER_RUNPNAME = "NOT_HEATING_POWER";
-	/** power of the heater in watts.										*/
+	/** power of the ChauffeEau in watts.										*/
 	public static final String	MAX_HEATING_POWER_RUNPNAME = "MAX_HEATING_POWER";
-	/** nominal tension (in Volts) of the heater.							*/
+	/** nominal tension (in Volts) of the ChauffeEau.							*/
 	public static final String	TENSION_RUNPNAME = "TENSION";
 
 	/**
@@ -680,8 +680,8 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The class <code>HeaterElectricityReport</code> implements the
-	 * simulation report for the <code>HeaterElectricityModel</code>.
+	 * The class <code>ChauffeEauElectricityReport</code> implements the
+	 * simulation report for the <code>ChauffeEauElectricityModel</code>.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
@@ -701,7 +701,7 @@ extends		AtomicHIOA
 	 * 
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
-	public static class		HeaterElectricityReport
+	public static class		ChauffeEauElectricityReport
 	implements	SimulationReportI, HEM_ReportI
 	{
 		private static final long serialVersionUID = 1L;
@@ -709,7 +709,7 @@ extends		AtomicHIOA
 		protected double	totalConsumption; // in kwh
 
 
-		public			HeaterElectricityReport(
+		public			ChauffeEauElectricityReport(
 			String modelURI,
 			double totalConsumption
 			)
@@ -751,7 +751,7 @@ extends		AtomicHIOA
 	@Override
 	public SimulationReportI	getFinalReport()
 	{
-		return new HeaterElectricityReport(this.getURI(), this.totalConsumption);
+		return new ChauffeEauElectricityReport(this.getURI(), this.totalConsumption);
 	}
 }
 // -----------------------------------------------------------------------------

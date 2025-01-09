@@ -47,9 +47,9 @@ import fr.sorbonne_u.devs_simulation.simulators.interfaces.CoordinatorI;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>HeaterCoupledModel</code> defines a simple coupled
- * model used to assemble the models defined for the heater in order to
- * execute unit tests on the heater simulator.
+ * The class <code>ChauffeEauCoupledModel</code> defines a simple coupled
+ * model used to assemble the models defined for the ChauffeEau in order to
+ * execute unit tests on the ChauffeEau simulator.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -116,8 +116,7 @@ extends		CoupledModel
 		TimeUnit simulatedTimeUnit,
 		CoordinatorI simulationEngine,
 		ModelI[] submodels,
-		Map<Class<? extends EventI>,
-		EventSink[]> imported,
+		Map<Class<? extends EventI>,EventSink[]> imported,
 		Map<Class<? extends EventI>, ReexportedEvent> reexported,
 		Map<EventSource, EventSink[]> connections
 		) throws Exception

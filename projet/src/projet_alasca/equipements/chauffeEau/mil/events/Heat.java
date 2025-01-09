@@ -42,7 +42,7 @@ import projet_alasca.equipements.chauffeEau.mil.ChauffeEauTemperatureModel;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>Heat</code> defines the simulation event of the heater
+ * The class <code>Heat</code> defines the simulation event of the ChauffeEau
  * starting to heat.
  *
  * <p><strong>Description</strong></p>
@@ -107,9 +107,9 @@ implements	ChauffeEauEventI
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		// if many heater events occur at the same time, the Heat one will be
-		// executed after SwitchOnHeater and DoNotHeat ones but before
-		// SwitchOffHeater.
+		// if many ChauffeEau events occur at the same time, the Heat one will be
+		// executed after SwitchOnChauffeEau and DoNotHeat ones but before
+		// SwitchOffChauffeEau.
 		if (e instanceof SwitchOnChauffeEau || e instanceof DoNotHeat) {
 			return false;
 		} else {

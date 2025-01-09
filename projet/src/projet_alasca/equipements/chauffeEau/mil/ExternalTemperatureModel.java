@@ -95,7 +95,8 @@ import fr.sorbonne_u.exceptions.InvariantChecking;
  * 
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
-@ModelExportedVariable(name = "externalTemperature", type = Double.class)
+
+@ModelExportedVariable(name = "externalTemperature", type = Double.class) //temperature d'eau 
 //-----------------------------------------------------------------------------
 public class			ExternalTemperatureModel
 extends		AtomicHIOA
@@ -110,20 +111,25 @@ extends		AtomicHIOA
 															getSimpleName();
 
 	// TODO: define as simulation run parameters
-	/** minimal external temperature.										*/
-	protected static double			MIN_EXTERNAL_TEMPERATURE = -5.0;
-	/** maximal external temperature.										*/
-	protected static double			MAX_EXTERNAL_TEMPERATURE = 15.0;
+	/** minimal water temperature.										*/
+	protected static double			MIN_EXTERNAL_TEMPERATURE = 5.0;
+	/** maximal water temperature.										*/
+	protected static double			MAX_EXTERNAL_TEMPERATURE = 20.0;
+	
+	protected static double HEATING_POWER = 4.0; // Heating power in kW
+	protected static double WATER_CAPACITY = 150.0; // Capacity in liters
+	protected static double THERMAL_LOSS_RATE = 0.05; // Loss rate per hour
+	
 	/** period of the temperature variation cycle (day); the cycle begins
 	 *  at the minimal temperature and ends at the same temperature.		*/
 	protected static double			PERIOD = 24.0;
 	/** evaluation step for the equation (assumed in hours).				*/
-	protected static double			STEP = 60.0/3600.0;	// 60 seconds
+	protected static double			STEP = 30.0/3600.0;	// 60 seconds
 
 	/** evaluation step as a duration, including the time unit.				*/
 	protected final Duration		evaluationStep;
 	/** current time in the external temperature variation cycle.			*/
-	protected double				cycleTime;
+	//protected double				cycleTime;
 
 	// -------------------------------------------------------------------------
 	// HIOA model variables
@@ -159,11 +165,11 @@ extends		AtomicHIOA
 				new AssertionError("Precondition violation: instance != null");
 
 		boolean ret = true;
-		ret &= InvariantChecking.checkGlassBoxInvariant(
+		/*ret &= InvariantChecking.checkGlassBoxInvariant(
 					instance.cycleTime >= 0.0 && instance.cycleTime <= PERIOD,
 					ExternalTemperatureModel.class,
 					instance,
-					"cycleTime >= 0.0 && instance.cycleTime <= PERIOD");
+					"cycleTime >= 0.0 && instance.cycleTime <= PERIOD");*/
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 					STEP > 0.0,
 					ExternalTemperatureModel.class,
@@ -271,7 +277,9 @@ extends		AtomicHIOA
 	{
 		super.initialiseState(initialTime);
 
-		this.cycleTime = 0.0;
+		//this.cycleTime = 0.0;
+		
+		this.externalTemperature.initialise(MIN_EXTERNAL_TEMPERATURE);
 
 		assert	glassBoxInvariants(this) :
 			new AssertionError("White-box invariants violation!");
@@ -365,7 +373,7 @@ extends		AtomicHIOA
 		super.userDefinedInternalTransition(elapsedTime);
 
 		// compute the current time in the cycle
-		this.cycleTime += elapsedTime.getSimulatedDuration();
+		/*this.cycleTime += elapsedTime.getSimulatedDuration();
 		if (this.cycleTime > PERIOD) {
 			this.cycleTime -= PERIOD;
 		}
@@ -376,7 +384,20 @@ extends		AtomicHIOA
 					(MAX_EXTERNAL_TEMPERATURE - MIN_EXTERNAL_TEMPERATURE)*
 																((1.0 + c)/2.0);
 		this.externalTemperature.setNewValue(newTemp,
-											 this.getCurrentStateTime());
+											 this.getCurrentStateTime());*/
+		
+		// Simulate heating
+        double currentTemp = this.externalTemperature.getValue();
+        double heatingIncrement = (HEATING_POWER * 200 * STEP) / (WATER_CAPACITY * 4.18); // Delta T = Q / (m * c)
+        double loss = currentTemp * THERMAL_LOSS_RATE * STEP;
+
+       double newTemp = Math.min(MAX_EXTERNAL_TEMPERATURE, currentTemp + heatingIncrement - loss);
+        //double newTemp = (currentTemp + heatingIncrement - loss);
+        this.externalTemperature.setNewValue(newTemp, this.getCurrentStateTime());
+
+        // Logging
+        this.logMessage(String.format("Water temperature: %.2f°C at %s%n", newTemp, this.getCurrentStateTime()));
+   
 
 		// Tracing
 		StringBuffer message =

@@ -6,4 +6,6 @@ extends ChauffeEauTemperatureI
 	public double		getMaxPowerLevel() throws Exception;
 	public void			setCurrentPowerLevel(double powerLevel) throws Exception;
 	public double		getCurrentPowerLevel() throws Exception;
+	 
+    
 }

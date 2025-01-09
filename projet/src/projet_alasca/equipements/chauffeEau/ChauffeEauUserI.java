@@ -9,7 +9,9 @@ extends ChauffeEauExternalControlI
 
 	public void	switchOff() throws Exception;
 
-	public void	setTargetTemperature(double target)
-	throws Exception;
+	// température de l'eau
+	public void	setTargetTemperature(double target)throws Exception;
+	
+	
 	
 }

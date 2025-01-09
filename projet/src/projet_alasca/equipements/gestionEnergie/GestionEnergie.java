@@ -24,7 +24,6 @@ import fr.sorbonne_u.utils.aclocks.ClocksServerConnector;
 import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 import projet_alasca.equipements.batterie.Batterie;
 import projet_alasca.equipements.batterie.BatterieConnector;
-import projet_alasca.equipements.batterie.BatterieI.BatterieState;
 import projet_alasca.equipements.batterie.BatterieOutboundPort;
 import projet_alasca.equipements.chauffeEau.ChauffeEau;
 import projet_alasca.equipements.chauffeEau.ChauffeEauTester;
@@ -265,7 +264,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 
 
 			this.testMeter();
-			this.testBatterie();
+			//this.testBatterie();
 			this.testGeneratriceGaz();
 			this.testPanneauSolaire();
 			if (this.isPreFirstStep) {
@@ -490,7 +489,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 	}
 
 
-	private void testBatterie() {
+	/*private void testBatterie() {
 		BatterieState state;
 		try {
 			state = this.batterieOutboundPort.getState();
@@ -500,7 +499,7 @@ public class GestionEnergie extends AbstractComponent implements RegistrationCI 
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-	}
+	}*/
 	
 	private void testGeneratriceGaz() {
 		GeneratriceGazState state;

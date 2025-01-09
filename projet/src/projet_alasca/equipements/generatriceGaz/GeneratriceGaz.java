@@ -5,7 +5,6 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import projet_alasca.equipements.batterie.Batterie;
 import projet_alasca.equipements.batterie.BatterieInboundPort;
-import projet_alasca.equipements.batterie.BatterieI.BatterieState;
 
 public class GeneratriceGaz extends AbstractComponent implements GeneratriceGazCI {
 

@@ -50,6 +50,7 @@ import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.simulators.SimulationEngine;
+import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulationReportI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.SimulatorI;
 import projet_alasca.equipements.chauffeEau.mil.events.SwitchOnChauffeEau;
 import projet_alasca.equipements.chauffeEau.mil.events.SwitchOffChauffeEau;
@@ -259,6 +260,7 @@ public class			RunChauffeEauUnitaryMILSimulation
 			// run a simulation with the simulation beginning at 0.0 and
 			// ending at 24.0
 			se.doStandAloneSimulation(0.0, 24.0);
+			
 			System.exit(0);
 		} catch (Exception e) {
 			throw new RuntimeException(e) ;

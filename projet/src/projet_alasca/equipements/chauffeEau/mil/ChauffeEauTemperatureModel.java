@@ -58,8 +58,8 @@ import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>HeaterTemperatureModel</code> defines a simulation model
- * for the temperature inside a room equipped with a heater.
+ * The class <code>ChauffeEauTemperatureModel</code> defines a simulation model
+ * for the temperature inside a room equipped with a ChauffeEau.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -76,12 +76,12 @@ import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
  *   applied to the difference between the outside temperature and the
  *   current temperature models the thermal insulation of the walls
  *   ({@code INSULATION_TRANSFER_CONSTANT});</li>
- * <li>the temperature of the heater when it heats where the coefficient
- *   applied to the difference between the heater temperature
+ * <li>the temperature of the ChauffeEau when it heats where the coefficient
+ *   applied to the difference between the ChauffeEau temperature
  *   ({@code STANDARD_HEATING_TEMP}) and the current temperature models the
  *   heat diffusion over the house (room)
  *   ({@code HEATING_TRANSFER_CONSTANT}); the heat diffusion is not constant
- *   but rather proportional to the current power level of the heater.</li>
+ *   but rather proportional to the current power level of the ChauffeEau.</li>
  * </ol>
  * <p>
  * The resulting differential equation is integrated using the Euler method
@@ -100,7 +100,7 @@ import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
  * 
  * <ul>
  * <li>Imported events:
- *   {@code SwitchOffHeater},
+ *   {@code SwitchOffChauffeEau},
  *   {@code Heat},
  *   {@code DoNotHeat}</li>
  * <li>Exported events: none</li>
@@ -149,16 +149,16 @@ extends		AtomicHIOA
 
 	/**
 	 * The enumeration <code>State</code> defines the state in which the
-	 * heater can be from the temperature perspective.
+	 * ChauffeEau can be from the temperature perspective.
 	 *
 	 * <p>Created on : 2021-09-24</p>
 	 * 
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
 	public static enum	State {
-		/** heater is not heating.											*/
+		/** ChauffeEau is not heating.											*/
 		NOT_HEATING,
-		/** heater is on and heating.										*/
+		/** ChauffeEau is on and heating.										*/
 		HEATING
 	}
 
@@ -166,6 +166,9 @@ extends		AtomicHIOA
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
+	
+	
+    
 	private static final long		serialVersionUID = 1L;
 
 	// The following variables should be considered constant but can be changed
@@ -177,25 +180,39 @@ extends		AtomicHIOA
 															getSimpleName();
 
 	// TODO: deine as simulation run parameters
-	/** temperature of the room (house) when the simulation begins.			*/
-	public static double		INITIAL_TEMPERATURE = 19.005;
+	
+	/** Débit de l'eau (en litres par minute) */
+    public static double DEBIT_EAU = 10.0; // Exemple : 10 L/min
+    
+    
+    protected static double VOLUME_EAU = 100.0; // en litres, volume d'eau dans le chauffe-eau
+    protected static double INITIAL_TEMPERATURE_EAU = 15.0; // Température initiale de l'eau en °C
+    protected static double STANDARD_HEATING_TEMP = 60.0; // Température cible du chauffe-eau en °C
+    protected static double POWER_HEATING = 2000.0; // Puissance de chauffage (en watts)
+
+
+	protected static double TEMPERATURE_EAU_FROIDE = 10.0; // Température de l'eau froide en °C
+	//protected static double EFFICIENCE_CHAUFFAGE = 0.9; // Efficacité énergétique du chauffe-eau
+    
+	/** temperature of the room (house) when the simulation begins.	*/		
+	//public static double		INITIAL_TEMPERATURE = 19.005;
 	/** wall insulation heat transfer constant in the differential equation.*/
 	protected static double 	INSULATION_TRANSFER_CONSTANT = 12.5;
 	/** heating transfer constant in the differential equation when the
 	 *  heating power is maximal.											*/
-	protected static double		MIN_HEATING_TRANSFER_CONSTANT = 40.0;
-	/** temperature of the heating plate in the heater.						*/
-	protected static double		STANDARD_HEATING_TEMP = 300.0;
+	//protected static double		MIN_HEATING_TRANSFER_CONSTANT = 40.0;
+	/** temperature of the heating plate in the ChauffeEau.			*/			
+	//protected static double		STANDARD_HEATING_TEMP = 300.0;
 	/** update tolerance for the temperature <i>i.e.</i>, shortest elapsed
 	 *  time since the last update under which the temperature is not
 	 *  changed by the update to avoid too large computation errors.		*/
 	protected static double		TEMPERATURE_UPDATE_TOLERANCE = 0.0001;
 	/** the minimal power under which the temperature derivative must be 0.	*/
-	protected static double		POWER_HEAT_TRANSFER_TOLERANCE = 0.0001;
+	//protected static double		POWER_HEAT_TRANSFER_TOLERANCE = 0.0001;
 	/** integration step for the differential equation(assumed in hours).	*/
 	protected static double		STEP = 60.0/3600.0;	// 60 seconds
 
-	/** current state of the heater.										*/
+	/** current state of the ChauffeEau.										*/
 	protected State				currentState = State.NOT_HEATING;
 
 	// Simulation run variables
@@ -219,7 +236,7 @@ extends		AtomicHIOA
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>					externalTemperature;
 	/** the current heating power between 0 and
-	 *  {@code HeaterElectricityModel.MAX_HEATING_POWER}.					*/
+	 *  {@code ChauffeEauElectricityModel.MAX_HEATING_POWER}.					*/
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>					currentHeatingPower;
 	/** current temperature in the room.									*/
@@ -257,21 +274,21 @@ extends		AtomicHIOA
 				ChauffeEauTemperatureModel.class,
 				instance,
 				"TEMPERATURE_UPDATE_TOLERANCE >= 0.0");
-		ret &= InvariantChecking.checkGlassBoxInvariant(
+		/*ret &= InvariantChecking.checkGlassBoxInvariant(
 				POWER_HEAT_TRANSFER_TOLERANCE >= 0.0,
 				ChauffeEauTemperatureModel.class,
 				instance,
-				"POWER_HEAT_TRANSFER_TOLERANCE >= 0.0");
+				"POWER_HEAT_TRANSFER_TOLERANCE >= 0.0");*/
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				INSULATION_TRANSFER_CONSTANT > 0.0,
 				ChauffeEauTemperatureModel.class,
 				instance,
 				"INSULATION_TRANSFER_CONSTANT > 0.0");
-		ret &= InvariantChecking.checkGlassBoxInvariant(
+		/*ret &= InvariantChecking.checkGlassBoxInvariant(
 				MIN_HEATING_TRANSFER_CONSTANT > 0.0,
 				ChauffeEauTemperatureModel.class,
 				instance,
-				"MIN_HEATING_TRANSFER_CONSTANT > 0.0");
+				"MIN_HEATING_TRANSFER_CONSTANT > 0.0");*/
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				STEP > 0.0,
 				ChauffeEauTemperatureModel.class,
@@ -343,7 +360,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>HeaterTemperatureModel</code> instance.
+	 * create a <code>ChauffeEauTemperatureModel</code> instance.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -385,7 +402,7 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * set the state of the heater.
+	 * set the state of the ChauffeEau.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -407,7 +424,7 @@ extends		AtomicHIOA
 	}
 
 	/**
-	 * return the state of the heater.
+	 * return the state of the ChauffeEau.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -425,7 +442,7 @@ extends		AtomicHIOA
 
 	/**
 	 * compute the current heat transfer constant given the current heating
-	 * power of the heater.
+	 * power of the ChauffeEau.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -436,7 +453,7 @@ extends		AtomicHIOA
 	 *
 	 * @return	the current heat transfer constant.
 	 */
-	protected double	currentHeatTransfertConstant()
+	/*protected double	currentHeatTransfertConstant()
 	{
 		// the following formula is just a mathematical trick to get a heat
 		// transfer constant that grows as the power gets lower, hence the
@@ -445,6 +462,15 @@ extends		AtomicHIOA
 		double c = 1.0/(MIN_HEATING_TRANSFER_CONSTANT*
 									ChauffeEauElectricityModel.MAX_HEATING_POWER);
 		return 1.0/(c*this.currentHeatingPower.getValue());
+	}*/
+	
+	// Méthode pour calculer la température moyenne dans le chauffe-eau après mélange
+	protected double computeMixedTemperature(double currentTemp, double debitSortie, double deltaT) {
+	    double volumeSortie = debitSortie * deltaT / 60.0; // Volume d'eau sorti en litres
+	    double volumeRestant = VOLUME_EAU - volumeSortie;
+
+	    // Calcul de la nouvelle température après mélange
+	    return (currentTemp * volumeRestant + TEMPERATURE_EAU_FROIDE * volumeSortie) / VOLUME_EAU;
 	}
 
 	/**
@@ -460,7 +486,7 @@ extends		AtomicHIOA
 	 * @param current	current temperature of the room.
 	 * @return			the current derivative.
 	 */
-	protected double	computeDerivatives(Double current)
+	/*protected double	computeDerivatives(Double current)
 	{
 		double currentTempDerivative = 0.0;
 		if (this.currentState == State.HEATING) {
@@ -484,6 +510,22 @@ extends		AtomicHIOA
 				(this.externalTemperature.evaluateAt(t) - current)/
 												INSULATION_TRANSFER_CONSTANT;
 		return currentTempDerivative;
+	}*/
+	
+	protected double computeDerivatives(Double current) {
+	    double currentTempDerivative = 0.0;
+
+	    if (this.currentState == State.HEATING ) {
+	        // Contribution du chauffage
+	        currentTempDerivative = (POWER_HEATING * STEP) /
+	                                (VOLUME_EAU * 4186);
+	    }
+
+	    // Contribution du mélange avec l'eau froide
+	    double deltaTempMix = (TEMPERATURE_EAU_FROIDE - current) / VOLUME_EAU;
+	    currentTempDerivative += deltaTempMix;
+
+	    return currentTempDerivative;
 	}
 
 	/**
@@ -500,7 +542,7 @@ extends		AtomicHIOA
 	 * @param deltaT	the duration of the step since the last update.
 	 * @return			the new temperature in celsius.
 	 */
-	protected double	computeNewTemperature(double deltaT)
+	/*protected double	computeNewTemperature(double deltaT)
 	{
 		Time t = this.currentTemperature.getTime();
 		double oldTemp = this.currentTemperature.evaluateAt(t);
@@ -518,6 +560,26 @@ extends		AtomicHIOA
 		// accumulate the temperature*time to compute the mean temperature
 		this.temperatureAcc += ((oldTemp + newTemp)/2.0) * deltaT;
 		return newTemp;
+	}*/
+	protected double computeNewTemperature(double deltaT) {
+	    Time t = this.currentTemperature.getTime();
+	    double oldTemp = this.currentTemperature.evaluateAt(t);
+
+	    // Calcul de la température mélangée
+	    double mixedTemp = computeMixedTemperature(oldTemp, DEBIT_EAU, deltaT);
+
+	    double newTemp;
+	    if (deltaT > TEMPERATURE_UPDATE_TOLERANCE) {
+	        // Intégration Euler avec les dérivées
+	        double derivative = computeDerivatives(mixedTemp);
+	        newTemp = mixedTemp + derivative * deltaT;
+	    } else {
+	        newTemp = mixedTemp;
+	    }
+
+	    // Accumulation de température pour la moyenne
+	    this.temperatureAcc += ((oldTemp + newTemp) / 2.0) * deltaT;
+	    return newTemp;
 	}
 
 	// -------------------------------------------------------------------------
@@ -570,8 +632,8 @@ extends		AtomicHIOA
 			// If the current temperature is not initialised yet but the
 			// external temperature is, then initialise the current temperature
 			// and say one more variable is initialised at this execution.
-			double derivative = this.computeDerivatives(INITIAL_TEMPERATURE);
-			this.currentTemperature.initialise(INITIAL_TEMPERATURE, derivative);
+			double derivative = this.computeDerivatives(INITIAL_TEMPERATURE_EAU);
+			this.currentTemperature.initialise(INITIAL_TEMPERATURE_EAU, derivative);
 			justInitialised++;
 		} else if (!this.currentTemperature.isInitialised()) {
 			// If the external temperature is not initialised and the current
@@ -653,7 +715,7 @@ extends		AtomicHIOA
 		// get the vector of current external events
 		ArrayList<EventI> currentEvents = this.getStoredEventAndReset();
 		// when this method is called, there is at least one external event,
-		// and for the heater model, there will be exactly one by
+		// and for the ChauffeEau model, there will be exactly one by
 		// construction.
 		assert	currentEvents != null && currentEvents.size() == 1;
 
@@ -669,7 +731,7 @@ extends		AtomicHIOA
 		// variable) until the current time.
 		double newTemp =
 				this.computeNewTemperature(elapsedTime.getSimulatedDuration());
-		// Then, update the current state of the heater.
+		// Then, update the current state of the ChauffeEau.
 		ce.executeOn(this);
 		// Next, compute the new derivative
 		double newDerivative = this.computeDerivatives(newTemp);
@@ -708,8 +770,8 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	/**
-	 * The class <code>HeaterTemperatureReport</code> implements the
-	 * simulation report for the <code>HeaterTemperatureModel</code>.
+	 * The class <code>ChauffeEauTemperatureReport</code> implements the
+	 * simulation report for the <code>ChauffeEauTemperatureModel</code>.
 	 *
 	 * <p><strong>Description</strong></p>
 	 * 
@@ -729,14 +791,14 @@ extends		AtomicHIOA
 	 * 
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
-	public static class		HeaterTemperatureReport
+	public static class		ChauffeEauTemperatureReport
 	implements	SimulationReportI, HEM_ReportI
 	{
 		private static final long serialVersionUID = 1L;
 		protected String	modelURI;
 		protected double	meanTemperature;
 
-		public			HeaterTemperatureReport(
+		public			ChauffeEauTemperatureReport(
 			String modelURI,
 			double meanTemperature
 			)
@@ -778,7 +840,7 @@ extends		AtomicHIOA
 	@Override
 	public SimulationReportI	getFinalReport()
 	{
-		return new HeaterTemperatureReport(this.getURI(), this.meanTemperature);
+		return new ChauffeEauTemperatureReport(this.getURI(), this.meanTemperature);
 	}
 }
 // -----------------------------------------------------------------------------

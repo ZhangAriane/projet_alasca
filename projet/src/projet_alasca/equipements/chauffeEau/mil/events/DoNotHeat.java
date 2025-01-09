@@ -42,7 +42,7 @@ import projet_alasca.equipements.chauffeEau.mil.ChauffeEauTemperatureModel;
 // -----------------------------------------------------------------------------
 /**
  * The class <code>DoNotHeat</code> defines the simulation event of the
- * heater stopping to heat.
+ * ChauffeEau stopping to heat.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -106,8 +106,8 @@ implements	ChauffeEauEventI
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		// if many heater events occur at the same time, the DoNotHeat one
-		// will be executed first except for SwitchOnHeater ones.
+		// if many ChauffeEau events occur at the same time, the DoNotHeat one
+		// will be executed first except for SwitchOnChauffeEau ones.
 		if (e instanceof SwitchOnChauffeEau){
 			return false;
 		} else {
@@ -129,22 +129,22 @@ implements	ChauffeEauEventI
 						+ "model instanceof ChauffeEauTemperatureModel");
 
 		if (model instanceof ChauffeEauElectricityModel) {
-			ChauffeEauElectricityModel chauffeEau = (ChauffeEauElectricityModel)model;
-			assert	chauffeEau.getState() == ChauffeEauElectricityModel.State.HEATING:
+			ChauffeEauElectricityModel ChauffeEau = (ChauffeEauElectricityModel)model;
+			assert	ChauffeEau.getState() == ChauffeEauElectricityModel.State.HEATING:
 				new AssertionError(
 						"model not in the right state, should be "
 								+ "ChauffeEauElectricityModel.State.HEATING but is "
-								+ chauffeEau.getState());
-			chauffeEau.setState(ChauffeEauElectricityModel.State.ON,
+								+ ChauffeEau.getState());
+			ChauffeEau.setState(ChauffeEauElectricityModel.State.ON,
 							this.getTimeOfOccurrence());
 		} else {
-			ChauffeEauTemperatureModel chauffeEau = (ChauffeEauTemperatureModel)model;
-			assert	chauffeEau.getState() == ChauffeEauTemperatureModel.State.HEATING:
+			ChauffeEauTemperatureModel ChauffeEau = (ChauffeEauTemperatureModel)model;
+			assert	ChauffeEau.getState() == ChauffeEauTemperatureModel.State.HEATING:
 				new AssertionError(
 						"model not in the right state, should be "
 								+ "ChauffeEauTemperatureModel.State.HEATING but is "
-								+ chauffeEau.getState());
-			chauffeEau.setState(ChauffeEauTemperatureModel.State.NOT_HEATING);
+								+ ChauffeEau.getState());
+			ChauffeEau.setState(ChauffeEauTemperatureModel.State.NOT_HEATING);
 		}
 	}
 }

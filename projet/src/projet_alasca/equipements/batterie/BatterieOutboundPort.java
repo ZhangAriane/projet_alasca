@@ -6,7 +6,7 @@ import projet_alasca.equipements.machineCafe.MachineCafeUserCI;
 
 public class BatterieOutboundPort extends		AbstractOutboundPort implements BatterieCI{
 
-	private static final long serialVersionUID = 1L;
+	/*private static final long serialVersionUID = 1L;
 
 	public BatterieOutboundPort(ComponentI owner)
 			throws Exception {
@@ -20,20 +20,44 @@ public class BatterieOutboundPort extends		AbstractOutboundPort implements Batte
 	}
 
 	@Override
-	public BatterieState getState() throws Exception {
+	public State getState() throws Exception {
 		return ((BatterieCI)this.getConnector()).getState();
+	}*/
+	
+	private static final long serialVersionUID = 1L;
+
+	public BatterieOutboundPort(ComponentI owner) throws Exception {
+		super(BatterieCI.class, owner);
+	}
+
+	public BatterieOutboundPort(String uri, ComponentI owner)
+			throws Exception {
+		super(uri, BatterieCI.class, owner);
 	}
 
 	@Override
-	public void swicthConsume() throws Exception {
-		((BatterieCI)this.getConnector()).swicthConsume();
-		
+	public boolean isFull() throws Exception {
+		return ((BatterieCI)this.getConnector()).isFull();
 	}
 
 	@Override
-	public void switchProduct() throws Exception {
-		((BatterieCI)this.getConnector()).switchProduct();
-		
+	public boolean isEmpty() throws Exception {
+		return ((BatterieCI)this.getConnector()).isEmpty();
+	}
+
+	@Override
+	public void ConsumeEnergy(double energy) throws Exception {
+		((BatterieCI)this.getConnector()).ConsumeEnergy(energy);
+	}
+
+	@Override
+	public void provideEnergy(double energy) throws Exception {
+		((BatterieCI)this.getConnector()).provideEnergy(energy);
+	}
+
+	@Override
+	public double getEnergyLevel() throws Exception {
+		return ((BatterieCI)this.getConnector()).getEnergyLevel();
 	}
 
 	

@@ -3,15 +3,22 @@ package projet_alasca.equipements.batterie;
 
 public interface BatterieI{
 
-	public enum BatterieState{
+	/*public enum State{
 		CONSUME,
 		PRODUCT
 	}
 
-	public BatterieState getState() throws Exception;
+	public State getState() throws Exception;*/
 	
-	public void swicthConsume()throws Exception;
+	public boolean isFull() throws Exception;
+	public boolean isEmpty() throws Exception;
 	
-	public void switchProduct()throws Exception;
+	// doit etre !isFull() pour qu'il puisse produire de l'energie
+	public void ConsumeEnergy(double energy) throws Exception;
+	
+	// doit etre !isEmty() pour qu'il puisse produire de l'energie
+	public void provideEnergy(double energy) throws Exception;
+	
+	public double getEnergyLevel() throws Exception;
 
 }

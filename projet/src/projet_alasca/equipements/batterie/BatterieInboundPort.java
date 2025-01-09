@@ -2,11 +2,10 @@ package projet_alasca.equipements.batterie;
 
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
-import projet_alasca.equipements.chauffeEau.ChauffeEauInternalControlI;
 
 public class BatterieInboundPort extends		AbstractInboundPort implements BatterieCI{
 
-	private static final long serialVersionUID = 1L;
+	/*private static final long serialVersionUID = 1L;
 
 	public BatterieInboundPort( ComponentI owner)
 			throws Exception {
@@ -24,31 +23,58 @@ public class BatterieInboundPort extends		AbstractInboundPort implements Batteri
 	}
 
 	@Override
-	public BatterieState getState() throws Exception{
+	public State getState() throws Exception{
 		return this.getOwner().handleRequest(
 				o -> ((BatterieI)o).getState());
+	}*/
+	
+	
+	private static final long serialVersionUID = 1L;
+
+	public BatterieInboundPort(ComponentI owner) throws Exception {
+		super(BatterieCI.class, owner);
+	}
+
+	public BatterieInboundPort(String uri, ComponentI owner)
+			throws Exception {
+		super(uri, BatterieCI.class, owner);
 	}
 
 	@Override
-	public void swicthConsume() throws Exception{
-		this.getOwner().handleRequest(
-				o -> {	((BatterieI)o).
-					swicthConsume();
-						return null;
-				});
-		
+	public boolean isFull() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((BatterieI)o).isFull());
 	}
 
 	@Override
-	public void switchProduct()throws Exception {
-		this.getOwner().handleRequest(
-				o -> {	((BatterieI)o).
-					switchProduct();
-						return null;
-				});
-		
+	public boolean isEmpty() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((BatterieI)o).isEmpty());
 	}
 
+	@Override
+	public void ConsumeEnergy(double energy) throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((BatterieI)o).ConsumeEnergy(energy);
+						return null;
+					 });
+	}
+
+	@Override
+	public void provideEnergy(double energy) throws Exception {
+		this.getOwner().handleRequest(
+				o -> {	((BatterieI)o).provideEnergy(energy);
+						return null;
+					 });
+	}
+
+	@Override
+	public double getEnergyLevel() throws Exception {
+		return this.getOwner().handleRequest(
+				o -> ((BatterieI)o).getEnergyLevel());
+	}
+
+	
 
 
 

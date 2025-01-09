@@ -42,8 +42,8 @@ import projet_alasca.equipements.chauffeEau.mil.ChauffeEauTemperatureModel;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>SwitchOffHeater</code> defines the simulation event of the
- * heater being switched off.
+ * The class <code>SwitchOffChauffeEau</code> defines the simulation event of the
+ * ChauffeEau being switched off.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -74,7 +74,7 @@ implements	ChauffeEauEventI
 	private static final long serialVersionUID = 1L;
 
 	/**
-	 * create a <code>SwitchOffHeater</code> event.
+	 * create a <code>SwitchOffChauffeEau</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -103,7 +103,7 @@ implements	ChauffeEauEventI
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		// if many heater events occur at the same time, the
+		// if many ChauffeEau events occur at the same time, the
 		// SwitchOffHairDryer one will be executed after all others.
 		return false;
 	}
@@ -122,17 +122,17 @@ implements	ChauffeEauEventI
 						+ "model instanceof ChauffeEauTemperatureModel");
 
 		if (model instanceof ChauffeEauElectricityModel) {
-			ChauffeEauElectricityModel chauffeEau = (ChauffeEauElectricityModel)model;
-			assert	chauffeEau.getState() != ChauffeEauElectricityModel.State.ON :
+			ChauffeEauElectricityModel ChauffeEau = (ChauffeEauElectricityModel)model;
+			assert	ChauffeEau.getState() != ChauffeEauElectricityModel.State.ON :
 				new AssertionError(
 						"model not in the right state, should not be "
 								+ "ChauffeEauElectricityModel.State.ON but is "
-								+ chauffeEau.getState());
-			chauffeEau.setState(ChauffeEauElectricityModel.State.OFF,
+								+ ChauffeEau.getState());
+			ChauffeEau.setState(ChauffeEauElectricityModel.State.OFF,
 							this.getTimeOfOccurrence());
 		} else {
-			ChauffeEauTemperatureModel heater = (ChauffeEauTemperatureModel)model;
-			heater.setState(ChauffeEauTemperatureModel.State.NOT_HEATING);
+			ChauffeEauTemperatureModel ChauffeEau = (ChauffeEauTemperatureModel)model;
+			ChauffeEau.setState(ChauffeEauTemperatureModel.State.NOT_HEATING);
 		}
 	}
 }

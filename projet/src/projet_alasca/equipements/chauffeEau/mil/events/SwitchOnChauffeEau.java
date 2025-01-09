@@ -41,8 +41,8 @@ import projet_alasca.equipements.chauffeEau.mil.ChauffeEauElectricityModel;
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>SwitchOnHeater</code> defines the simulation event of the
- * heater being switched on.
+ * The class <code>SwitchOnChauffeEau</code> defines the simulation event of the
+ * ChauffeEau being switched on.
  *
  * <p><strong>Description</strong></p>
  * 
@@ -77,7 +77,7 @@ implements	ChauffeEauEventI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a <code>SwitchOnHeater</code> event.
+	 * create a <code>SwitchOnChauffeEau</code> event.
 	 * 
 	 * <p><strong>Contract</strong></p>
 	 * 
@@ -106,8 +106,8 @@ implements	ChauffeEauEventI
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		// if many heater events occur at the same time, the
-		// SwitchOnHeater one will be executed first.
+		// if many ChauffeEau events occur at the same time, the
+		// SwitchOnChauffeEau one will be executed first.
 		return true;
 	}
 
@@ -122,13 +122,13 @@ implements	ChauffeEauEventI
 						"Precondition violation: model instanceof "
 						+ "ChauffeEauElectricityModel");
 
-		ChauffeEauElectricityModel chauffeEau = (ChauffeEauElectricityModel)model;
-		assert	chauffeEau.getState() == ChauffeEauElectricityModel.State.OFF :
+		ChauffeEauElectricityModel ChauffeEau = (ChauffeEauElectricityModel)model;
+		assert	ChauffeEau.getState() == ChauffeEauElectricityModel.State.OFF :
 				new AssertionError(
 						"model not in the right state, should be "
 						+ "ChauffeEauElectricityModel.State.OFF but is "
-						+ chauffeEau.getState());
-		chauffeEau.setState(ChauffeEauElectricityModel.State.ON,
+						+ ChauffeEau.getState());
+		ChauffeEau.setState(ChauffeEauElectricityModel.State.ON,
 						this.getTimeOfOccurrence());
 	}
 }

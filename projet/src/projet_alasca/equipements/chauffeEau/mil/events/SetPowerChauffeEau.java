@@ -43,8 +43,8 @@ import projet_alasca.equipements.chauffeEau.mil.ChauffeEauElectricityModel.State
 
 // -----------------------------------------------------------------------------
 /**
- * The class <code>SetPowerHeater</code> defines the simulation event of the
- * heater power being set to some level (in watts).
+ * The class <code>SetPowerChauffeEau</code> defines the simulation event of the
+ * ChauffeEau power being set to some level (in watts).
  *
  * <p><strong>Description</strong></p>
  * 
@@ -74,7 +74,7 @@ implements	ChauffeEauEventI
 
 	/**
 	 * The class <code>PowerValue</code> represent a power value to be passed
-	 * as an {@code EventInformationI} when creating a {@code SetPowerHeater}
+	 * as an {@code EventInformationI} when creating a {@code SetPowerChauffeEau}
 	 * event.
 	 *
 	 * <p><strong>Description</strong></p>
@@ -82,7 +82,7 @@ implements	ChauffeEauEventI
 	 * <p><strong>White-box Invariant</strong></p>
 	 * 
 	 * <pre>
-	 * invariant	{@code power >= 0.0 && power <= HeaterElectricityModel.MAX_HEATING_POWER}
+	 * invariant	{@code power >= 0.0 && power <= ChauffeEauElectricityModel.MAX_HEATING_POWER}
 	 * </pre>
 	 * 
 	 * <p><strong>Black-box Invariant</strong></p>
@@ -108,7 +108,7 @@ implements	ChauffeEauEventI
 		 * <p><strong>Contract</strong></p>
 		 * 
 		 * <pre>
-		 * pre	{@code power >= 0.0 && power <= HeaterElectricityModel.MAX_HEATING_POWER}
+		 * pre	{@code power >= 0.0 && power <= ChauffeEauElectricityModel.MAX_HEATING_POWER}
 		 * post	{@code getPower() == power}
 		 * </pre>
 		 *
@@ -122,7 +122,7 @@ implements	ChauffeEauEventI
 							power <= ChauffeEauElectricityModel.MAX_HEATING_POWER :
 					new AssertionError(
 							"Precondition violation: power >= 0.0 && "
-							+ "power <= HeaterElectricityModel.MAX_HEATING_POWER,"
+							+ "power <= ChauffeEauElectricityModel.MAX_HEATING_POWER,"
 							+ " but power = " + power);
 
 			this.power = power;
@@ -135,7 +135,7 @@ implements	ChauffeEauEventI
 		 * 
 		 * <pre>
 		 * pre	{@code true}	// no precondition.
-		 * post	{@code return >= 0.0 && return <= HeaterElectricityModel.MAX_HEATING_POWER}
+		 * post	{@code return >= 0.0 && return <= ChauffeEauElectricityModel.MAX_HEATING_POWER}
 		 * </pre>
 		 *
 		 * @return	the power value in watts.
@@ -161,7 +161,7 @@ implements	ChauffeEauEventI
 	// -------------------------------------------------------------------------
 
 	private static final long	serialVersionUID = 1L;
-	/** the power value to be set on the heater when the event will be
+	/** the power value to be set on the ChauffeEau when the event will be
 	 *  executed.															*/
 	protected final PowerValue	powerValue;
 
@@ -170,7 +170,7 @@ implements	ChauffeEauEventI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * create a {@code SetPowerHeater} event which content is a
+	 * create a {@code SetPowerChauffeEau} event which content is a
 	 * {@code PowerValue}.
 	 * 
 	 * <p><strong>Contract</strong></p>
@@ -183,7 +183,7 @@ implements	ChauffeEauEventI
 	 * </pre>
 	 *
 	 * @param timeOfOccurrence	time at which the event must be executed in simulated time.
-	 * @param content			the power value to be set on the heater when the event will be executed.
+	 * @param content			the power value to be set on the ChauffeEau when the event will be executed.
 	 */
 	public				SetPowerChauffeEau(
 		Time timeOfOccurrence,
@@ -210,8 +210,8 @@ implements	ChauffeEauEventI
 	@Override
 	public boolean		hasPriorityOver(EventI e)
 	{
-		// if many heater events occur at the same time, the SetPowerHeater one
-		// will be executed first except for SwitchOnHeater ones.
+		// if many ChauffeEau events occur at the same time, the SetPowerChauffeEau one
+		// will be executed first except for SwitchOnChauffeEau ones.
 		if (e instanceof SwitchOffChauffeEau) {
 			return true;
 		} else {
@@ -230,12 +230,12 @@ implements	ChauffeEauEventI
 						"Precondition violation: model instanceof "
 						+ "ChauffeEauElectricityModel");
 
-		ChauffeEauElectricityModel chauffeEau = (ChauffeEauElectricityModel)model;
-		assert	chauffeEau.getState() == State.HEATING :
+		ChauffeEauElectricityModel ChauffeEau = (ChauffeEauElectricityModel)model;
+		assert	ChauffeEau.getState() == State.HEATING :
 				new AssertionError(
 						"model not in the right state, should be "
-						+ "State.HEATING but is " + chauffeEau.getState());
-		chauffeEau.setCurrentHeatingPower(this.powerValue.getPower(),
+						+ "State.HEATING but is " + ChauffeEau.getState());
+		ChauffeEau.setCurrentHeatingPower(this.powerValue.getPower(),
 									  this.getTimeOfOccurrence());
 	}
 }

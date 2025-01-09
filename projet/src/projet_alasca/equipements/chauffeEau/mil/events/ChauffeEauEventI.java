@@ -36,7 +36,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventI;
 
 // -----------------------------------------------------------------------------
 /**
- * The interface <code>HeaterEventI</code> enforces a common type for all heater
+ * The interface <code>ChauffeEauEventI</code> enforces a common type for all ChauffeEau
  * simulation events.
  *
  * <p><strong>Description</strong></p>

@@ -3,8 +3,7 @@ package projet_alasca.equipements.batterie;
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.cvm.AbstractCVM;
 
-
-public class CVMUnitTest 
+public class CVMUnitTest
 extends AbstractCVM 
 {
 
@@ -23,11 +22,11 @@ extends AbstractCVM
 	public void			deploy() throws Exception
 	{
 		AbstractComponent.createComponent(
-				Batterie.class.getCanonicalName(),
+					Batterie.class.getCanonicalName(),
 					new Object[]{});
 
 		AbstractComponent.createComponent(
-				BatterieTester.class.getCanonicalName(),
+					BatterieTester.class.getCanonicalName(),
 					new Object[]{true});
 
 		super.deploy();
@@ -44,7 +43,5 @@ extends AbstractCVM
 			e.printStackTrace();
 		}
 	}
-
-	
 
 }

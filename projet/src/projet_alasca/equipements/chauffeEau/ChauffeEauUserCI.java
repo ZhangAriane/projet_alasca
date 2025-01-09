@@ -14,6 +14,8 @@ extends OfferedCI,
 	
 	@Override
 	public double		getTargetTemperature() throws Exception ;
+	
+	// température de l'eau 
 
 	@Override
 	public double		getCurrentTemperature() throws Exception;

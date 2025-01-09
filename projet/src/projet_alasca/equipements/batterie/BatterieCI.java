@@ -7,16 +7,22 @@ import fr.sorbonne_u.components.interfaces.RequiredCI;
 
 public interface BatterieCI 
 extends OfferedCI,
-RequiredCI,
-BatterieI
+		RequiredCI,
+		BatterieI
 {
 	@Override
-	public BatterieState getState() throws Exception;
+	public boolean isFull() throws Exception;
 
 	@Override
-	public void swicthConsume()throws Exception;
+	public boolean isEmpty() throws Exception;
 
 	@Override
-	public void switchProduct()throws Exception;
+	public void ConsumeEnergy(double energy) throws Exception;
 
+	@Override
+	public void provideEnergy(double energy) throws Exception;
+	
+	@Override
+	public double getEnergyLevel() throws Exception;
+	
 }
