@@ -41,7 +41,6 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.models.interfaces.ModelI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.CoordinatorI;
-import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerCoupledModel;
 
 // -----------------------------------------------------------------------------
 /**

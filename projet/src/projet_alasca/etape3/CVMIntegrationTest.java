@@ -46,6 +46,10 @@ import projet_alasca.equipements.machineCafe.MachineCafe;
 import projet_alasca.equipements.machineCafe.MachineCafeUser;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeStateModel;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
+import projet_alasca.equipements.ventilateur.Ventilateur;
+import projet_alasca.equipements.ventilateur.VentilateurUser;
+import projet_alasca.equipements.ventilateur.mil.VentilateurStateModel;
+import projet_alasca.equipements.ventilateur.mil.VentilateurUserModel;
 import projet_alasca.etape3.equipments.hairdryer.HairDryer;
 import projet_alasca.etape3.equipments.hairdryer.HairDryerUser;
 import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerStateModel;
@@ -281,6 +285,14 @@ extends		AbstractCVM
 		MachineCafeUser.VERBOSE = true;
 		MachineCafeUser.X_RELATIVE_POSITION = 2;
 		MachineCafeUser.Y_RELATIVE_POSITION = 2;
+		
+		//ventilateur
+		Ventilateur.VERBOSE = true;
+		Ventilateur.X_RELATIVE_POSITION = 3;
+		Ventilateur.Y_RELATIVE_POSITION = 1;
+		VentilateurUser.VERBOSE = true;
+		VentilateurUser.X_RELATIVE_POSITION = 2;
+		VentilateurUser.Y_RELATIVE_POSITION = 1;
 	}
 
 	// -------------------------------------------------------------------------
@@ -320,6 +332,10 @@ extends		AbstractCVM
 		//machine cafe
 		String machineCafeLocalArchitectureURI = "";
 		String machineCafeUserLocalArchitectureURI = "";
+		
+		//ventilateur
+		String ventilateurLocalArchitectureURI = "";
+		String ventilateurUserLocalArchitectureURI = "";
 
 		long current = System.currentTimeMillis();
 		// start time of the components in Unix epoch time in milliseconds.
@@ -343,6 +359,9 @@ extends		AbstractCVM
 			//machine cafe
 			machineCafeLocalArchitectureURI = MachineCafeStateModel.MIL_URI;
 			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_URI;
+			//ventilateur
+			ventilateurLocalArchitectureURI = VentilateurStateModel.MIL_URI;
+			ventilateurUserLocalArchitectureURI = VentilateurUserModel.MIL_URI;
 			break;
 		case MIL_RT_SIMULATION:
 			globalArchitectureURI = GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI;
@@ -354,6 +373,9 @@ extends		AbstractCVM
 			//machine cafe
 			machineCafeLocalArchitectureURI = MachineCafeStateModel.MIL_RT_URI;
 			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.MIL_RT_URI;
+			//ventilateur
+			ventilateurLocalArchitectureURI = VentilateurStateModel.MIL_RT_URI;
+			ventilateurUserLocalArchitectureURI = VentilateurUserModel.MIL_RT_URI;
 			break;
 		case SIL_SIMULATION:
 			globalArchitectureURI = GlobalSupervisor.SIL_SIM_ARCHITECTURE_URI;
@@ -365,6 +387,9 @@ extends		AbstractCVM
 			//machine cafe
 			machineCafeLocalArchitectureURI = MachineCafeStateModel.SIL_URI;
 			machineCafeUserLocalArchitectureURI = MachineCafeUserModel.SIL_URI;
+			//ventilateur
+			ventilateurLocalArchitectureURI = VentilateurStateModel.SIL_URI;
+			ventilateurUserLocalArchitectureURI = VentilateurUserModel.SIL_URI;
 			break;
 		case NO_SIMULATION:
 		default:
@@ -466,6 +491,31 @@ extends		AbstractCVM
 							 SIMULATION_TIME_UNIT,
 							 ACCELERATION_FACTOR,
 							 CLOCK_URI});
+		
+		//ventilateur
+		AbstractComponent.createComponent(
+				Ventilateur.class.getCanonicalName(),
+				new Object[]{Ventilateur.REFLECTION_INBOUND_PORT_URI,
+						Ventilateur.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 globalArchitectureURI,
+							 ventilateurLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
+		AbstractComponent.createComponent(
+				VentilateurUser.class.getCanonicalName(),
+				new Object[]{VentilateurUser.REFLECTION_INBOUND_PORT_URI,
+						Ventilateur.INBOUND_PORT_URI,
+							 CURRENT_EXECUTION_TYPE,
+							 CURRENT_SIMULATION_TYPE,
+							 globalArchitectureURI,
+							 ventilateurUserLocalArchitectureURI,
+							 SIMULATION_TIME_UNIT,
+							 ACCELERATION_FACTOR,
+							 CLOCK_URI});
+
 
 		AbstractComponent.createComponent(
 				HEM.class.getCanonicalName(),

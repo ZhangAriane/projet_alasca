@@ -223,7 +223,7 @@ extends		AbstractCyPhyComponent
 				CVM_VentilateurUnitTest.DELAY_TO_STOP,
 				VentilateurUnitTestsSupervisor.class, instance,
 				"DELAY_TO_GET_REPORT > 0 && DELAY_TO_GET_REPORT < "
-						+ "CVM_HairDryerUnitTest.DELAY_TO_STOP");
+						+ "CVM_VentilateurUnitTest.DELAY_TO_STOP");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 				MIL_ARCHITECTURE_URI != null && 
 				!MIL_ARCHITECTURE_URI.isEmpty(),
@@ -294,7 +294,7 @@ extends		AbstractCyPhyComponent
 		this.currentSimulationType = currentSimulationType;
 		this.simArchitectureURI = simArchitectureURI;
 
-		this.tracer.get().setTitle("HairDryer unit test supervisor");
+		this.tracer.get().setTitle("Ventilateur unit test supervisor");
 		this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 				Y_RELATIVE_POSITION);
 		this.toggleTracing();

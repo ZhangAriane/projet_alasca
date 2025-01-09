@@ -523,7 +523,7 @@ implements	VentilateurOperationI
 		}		
 
 		if (VERBOSE) {
-			this.tracer.get().setTitle("Hair dryer user component");
+			this.tracer.get().setTitle("Ventilateur user component");
 			this.tracer.get().setRelativePosition(X_RELATIVE_POSITION,
 												  Y_RELATIVE_POSITION);
 			this.toggleTracing();

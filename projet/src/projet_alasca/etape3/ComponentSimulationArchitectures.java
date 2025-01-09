@@ -56,6 +56,15 @@ import projet_alasca.equipements.machineCafe.mil.MachineCafeStateModel;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeUserModel;
 import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
 import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
+import projet_alasca.equipements.ventilateur.Ventilateur;
+import projet_alasca.equipements.ventilateur.VentilateurUser;
+import projet_alasca.equipements.ventilateur.mil.VentilateurStateModel;
+import projet_alasca.equipements.ventilateur.mil.VentilateurUserModel;
+import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SetLowVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SetMediumVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SwitchOffVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SwitchOnVentilateur;
 import projet_alasca.etape3.equipments.hairdryer.HairDryer;
 import projet_alasca.etape3.equipments.hairdryer.HairDryerUser;
 import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerStateModel;
@@ -235,6 +244,40 @@ public abstract class	ComponentSimulationArchitectures
 						simulatedTimeUnit,
 						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
 
+		//ventilateur
+		atomicModelDescriptors.put(
+				VentilateurStateModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						VentilateurStateModel.MIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnVentilateur.class,
+							SwitchOffVentilateur.class,
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							SetMediumVentilateur.class},
+						(Class<? extends EventI>[]) new Class<?>[]{
+								SwitchOnVentilateur.class,
+								SwitchOffVentilateur.class,
+								SetLowVentilateur.class,
+								SetHighVentilateur.class,
+								SetMediumVentilateur.class},
+						simulatedTimeUnit,
+						Ventilateur.REFLECTION_INBOUND_PORT_URI
+						));
+		atomicModelDescriptors.put(
+				VentilateurUserModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						VentilateurUserModel.MIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnVentilateur.class,
+							SwitchOffVentilateur.class,
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							SetMediumVentilateur.class},
+						simulatedTimeUnit,
+						VentilateurUser.REFLECTION_INBOUND_PORT_URI));
+
 
 
 		// map that will contain the coupled model descriptors to construct
@@ -252,6 +295,9 @@ public abstract class	ComponentSimulationArchitectures
 		//machine cafe
 		submodels.add(MachineCafeStateModel.MIL_URI);
 		submodels.add(MachineCafeUserModel.MIL_URI);
+		//ventilateur
+		submodels.add(VentilateurStateModel.MIL_URI);
+		submodels.add(VentilateurUserModel.MIL_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
@@ -418,6 +464,81 @@ public abstract class	ComponentSimulationArchitectures
 										SwitchOffMachineCafe.class)
 						});
 				
+				//ventilateur
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_URI,
+								SwitchOnVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_URI,
+										SwitchOnVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_URI,
+								SwitchOffVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_URI,
+										SwitchOffVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_URI,
+								SetLowVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_URI,
+										SetLowVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_URI,
+								SetHighVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_URI,
+										SetHighVentilateur.class)
+						});
+				
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_URI,
+								SetMediumVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_URI,
+										SetMediumVentilateur.class)
+						});
+
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_URI,
+								SwitchOnVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOnVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_URI,
+								SwitchOffVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOffVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_URI,
+								SetLowVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SetLowVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_URI,
+								SetHighVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SetHighVentilateur.class)
+						});
+				
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_URI,
+								SetMediumVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SetMediumVentilateur.class)
+						});
+
 
 
 				// coupled model descriptor
@@ -583,7 +704,44 @@ public abstract class	ComponentSimulationArchitectures
 						},	// appear here
 						simulatedTimeUnit,
 						MachineCafeUser.REFLECTION_INBOUND_PORT_URI));
+
 		
+		//ventilateur
+		atomicModelDescriptors.put(
+				VentilateurStateModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						VentilateurStateModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnVentilateur.class,	// notice that the
+							SwitchOffVentilateur.class,	// imported events of
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							SetMediumVentilateur.class
+						},	// appear here
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnVentilateur.class,	// notice that the
+							SwitchOffVentilateur.class,	// imported events of
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							SetMediumVentilateur.class
+						},	// appear here
+						simulatedTimeUnit,
+						Ventilateur.REFLECTION_INBOUND_PORT_URI
+						));
+		atomicModelDescriptors.put(
+				VentilateurUserModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						VentilateurUserModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnVentilateur.class,	// notice that the
+							SwitchOffVentilateur.class,	// imported events of
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							SetMediumVentilateur.class
+						},	// appear here
+						simulatedTimeUnit,
+						VentilateurUser.REFLECTION_INBOUND_PORT_URI));
 
 
 		// map that will contain the coupled model descriptors to construct
@@ -598,9 +756,12 @@ public abstract class	ComponentSimulationArchitectures
 		submodels.add(HeaterCoupledModel.MIL_RT_URI);
 		submodels.add(HeaterUnitTesterModel.MIL_RT_URI);
 		submodels.add(ElectricMeterCoupledModel.MIL_RT_URI);
-//		machine cafe
+		//		machine cafe
 		submodels.add(MachineCafeStateModel.MIL_RT_URI);
 		submodels.add(MachineCafeUserModel.MIL_RT_URI);
+		//ventilateur
+		submodels.add(VentilateurStateModel.MIL_RT_URI);
+		submodels.add(VentilateurUserModel.MIL_RT_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
@@ -766,6 +927,82 @@ public abstract class	ComponentSimulationArchitectures
 								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
 										SwitchOffMachineCafe.class)
 						});
+				
+				//ventilateur
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_RT_URI,
+								SwitchOnVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_RT_URI,
+										SwitchOnVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_RT_URI,
+								SwitchOffVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_RT_URI,
+										SwitchOffVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_RT_URI,
+								SetLowVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_RT_URI,
+										SetLowVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_RT_URI,
+								SetHighVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_RT_URI,
+										SetHighVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurUserModel.MIL_RT_URI,
+								SetMediumVentilateur.class),
+						new EventSink[] {
+								new EventSink(VentilateurStateModel.MIL_RT_URI,
+										SetMediumVentilateur.class)
+						});
+
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_RT_URI,
+								SwitchOnVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOnVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_RT_URI,
+								SwitchOffVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOffVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_RT_URI,
+								SetLowVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SetLowVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_RT_URI,
+								SetHighVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SetHighVentilateur.class)
+						});
+				
+				connections.put(
+						new EventSource(VentilateurStateModel.MIL_RT_URI,
+								SetMediumVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SetMediumVentilateur.class)
+						});
+
+
 
 				// coupled model descriptor
 				coupledModelDescriptors.put(
@@ -899,6 +1136,29 @@ public abstract class	ComponentSimulationArchitectures
 						MachineCafe.REFLECTION_INBOUND_PORT_URI
 						));
 		
+		//ventilateur
+				atomicModelDescriptors.put(
+						VentilateurStateModel.SIL_URI,
+						RTComponentAtomicModelDescriptor.create(
+								VentilateurStateModel.SIL_URI,
+								(Class<? extends EventI>[]) new Class<?>[]{
+									SwitchOnMachineCafe.class,	// notice that the
+									SwitchOffMachineCafe.class,	// imported events of
+									SetLowVentilateur.class,
+									SetHighVentilateur.class,
+									SetMediumVentilateur.class
+								},
+								(Class<? extends EventI>[]) new Class<?>[]{
+									SwitchOnMachineCafe.class,	// notice that the
+									SwitchOffMachineCafe.class,	// imported events of
+									SetLowVentilateur.class,
+									SetHighVentilateur.class,
+									SetMediumVentilateur.class
+								},	// appear here
+								simulatedTimeUnit,
+								Ventilateur.REFLECTION_INBOUND_PORT_URI
+								));
+
 
 
 		// map that will contain the coupled model descriptors to construct
@@ -913,6 +1173,8 @@ public abstract class	ComponentSimulationArchitectures
 		submodels.add(ElectricMeterCoupledModel.SIL_URI);
 		//machine cafe
 		submodels.add(MachineCafeStateModel.SIL_URI);
+		//ventilateur
+		submodels.add(VentilateurStateModel.SIL_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
@@ -1000,6 +1262,43 @@ public abstract class	ComponentSimulationArchitectures
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.SIL_URI,
 										SwitchOffMachineCafe.class)
+						});
+				
+				//ventilateur
+				connections.put(
+						new EventSource(VentilateurStateModel.SIL_URI,
+								SwitchOnVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOnVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.SIL_URI,
+								SwitchOffVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOffVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.SIL_URI,
+								SetLowVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SetLowVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.SIL_URI,
+								SetHighVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SetHighVentilateur.class)
+						});
+				connections.put(
+						new EventSource(VentilateurStateModel.SIL_URI,
+								SetMediumVentilateur.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SetMediumVentilateur.class)
 						});
 
 

@@ -57,7 +57,6 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
 import projet_alasca.equipements.ventilateur.mil.events.AbstractVentilateurEvent;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOnVentilateur;
-import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerElectricityModel;
 import projet_alasca.equipements.ventilateur.mil.events.SwitchOffVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetLowVentilateur;
 import projet_alasca.equipements.ventilateur.mil.events.SetMediumVentilateur;

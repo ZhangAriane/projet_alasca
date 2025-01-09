@@ -56,6 +56,12 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeElectricityModel;
 import projet_alasca.equipements.machineCafe.mil.events.SwitchOffMachineCafe;
 import projet_alasca.equipements.machineCafe.mil.events.SwitchOnMachineCafe;
+import projet_alasca.equipements.ventilateur.mil.VentilateurElectricityModel;
+import projet_alasca.equipements.ventilateur.mil.events.SetHighVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SetLowVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SetMediumVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SwitchOffVentilateur;
+import projet_alasca.equipements.ventilateur.mil.events.SwitchOnVentilateur;
 import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerElectricityModel;
 import projet_alasca.etape3.equipments.hairdryer.mil.events.SetHighHairDryer;
 import projet_alasca.etape3.equipments.hairdryer.mil.events.SetLowHairDryer;
@@ -156,6 +162,14 @@ public abstract class	LocalSimulationArchitectures
 						MachineCafeElectricityModel.MIL_URI,
 						simulatedTimeUnit,
 						null));
+		//ventilateur
+		atomicModelDescriptors.put(
+				VentilateurElectricityModel.MIL_URI,
+				AtomicHIOA_Descriptor.create(
+						VentilateurElectricityModel.class,
+						VentilateurElectricityModel.MIL_URI,
+						simulatedTimeUnit,
+						null));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
@@ -169,6 +183,8 @@ public abstract class	LocalSimulationArchitectures
 		submodels.add(HeaterElectricityModel.MIL_URI);
 		//machine cafe
 		submodels.add(MachineCafeElectricityModel.MIL_URI);
+		//ventilateur
+		submodels.add(VentilateurElectricityModel.MIL_URI);
 
 		// events imported from the HairDryer component model architecture
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
@@ -241,6 +257,39 @@ public abstract class	LocalSimulationArchitectures
 						new EventSink(MachineCafeElectricityModel.MIL_URI,
 								SwitchOffMachineCafe.class)
 				});
+		
+		//ventilateur
+		imported.put(
+				SwitchOnVentilateur.class,
+				new EventSink[] {
+						new EventSink(VentilateurElectricityModel.MIL_URI,
+								SwitchOnVentilateur.class)
+				});
+		imported.put(
+				SwitchOffVentilateur.class,
+				new EventSink[] {
+						new EventSink(VentilateurElectricityModel.MIL_URI,
+								SwitchOffVentilateur.class)
+				});
+		imported.put(
+				SetLowVentilateur.class,
+				new EventSink[] {
+						new EventSink(VentilateurElectricityModel.MIL_URI,
+								SetLowVentilateur.class)
+				});
+		imported.put(
+				SetHighVentilateur.class,
+				new EventSink[] {
+						new EventSink(VentilateurElectricityModel.MIL_URI,
+								SetHighVentilateur.class)
+				});
+		imported.put(
+				SetMediumVentilateur.class,
+				new EventSink[] {
+						new EventSink(VentilateurElectricityModel.MIL_URI,
+								SetMediumVentilateur.class)
+				});
+
 
 		// variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
@@ -271,6 +320,17 @@ public abstract class	LocalSimulationArchitectures
 								MachineCafeElectricityModel.MIL_URI),
 						new VariableSink[] {
 								new VariableSink("currentMachineCafeIntensity",
+										Double.class,
+										ElectricMeterElectricityModel.MIL_URI)
+						});
+				
+				//ventilateur
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								VentilateurElectricityModel.MIL_URI),
+						new VariableSink[] {
+								new VariableSink("currentVentilateurIntensity",
 										Double.class,
 										ElectricMeterElectricityModel.MIL_URI)
 						});
@@ -333,6 +393,8 @@ public abstract class	LocalSimulationArchitectures
 		String electricMeterCoupledModelURI = null;
 		//machine cafe
 		String machineCafeElectricityModelURI = null;
+		//vantilateur
+		String ventilateurElectricityModelURI = null;
 		switch (currentSimulationType) {
 		case MIL_RT_SIMULATION:
 			electricMeterElectricityModelURI = ElectricMeterElectricityModel.MIL_RT_URI;
@@ -342,6 +404,8 @@ public abstract class	LocalSimulationArchitectures
 			electricMeterCoupledModelURI = ElectricMeterCoupledModel.MIL_RT_URI;
 			//machine cafe
 			machineCafeElectricityModelURI = MachineCafeElectricityModel.MIL_RT_URI;
+			//ventilateur
+			ventilateurElectricityModelURI = VentilateurElectricityModel.MIL_RT_URI;
 			break;
 		case SIL_SIMULATION:
 			electricMeterElectricityModelURI = ElectricMeterElectricitySILModel.SIL_URI;
@@ -351,6 +415,8 @@ public abstract class	LocalSimulationArchitectures
 			electricMeterCoupledModelURI = ElectricMeterCoupledModel.SIL_URI;
 			//machine cafe
 			machineCafeElectricityModelURI = MachineCafeElectricityModel.SIL_URI;
+			//ventilateur
+			ventilateurElectricityModelURI = VentilateurElectricityModel.SIL_URI;
 			break;
 		default:
 		}
@@ -400,6 +466,16 @@ public abstract class	LocalSimulationArchitectures
 						simulatedTimeUnit,
 						null,
 						accelerationFactor));
+		
+		//ventilateur
+		atomicModelDescriptors.put(
+				ventilateurElectricityModelURI,
+				RTAtomicHIOA_Descriptor.create(
+						VentilateurElectricityModel.class,
+						ventilateurElectricityModelURI,
+						simulatedTimeUnit,
+						null,
+						accelerationFactor));
 
 		// map that will contain the coupled model descriptors to construct
 		// the simulation architecture
@@ -413,6 +489,8 @@ public abstract class	LocalSimulationArchitectures
 		submodels.add(heaterElectricityModelURI);
 		//machine cafe
 		submodels.add(machineCafeElectricityModelURI);
+		//ventilateur
+		submodels.add(ventilateurElectricityModelURI);
 
 		Map<Class<? extends EventI>,EventSink[]> imported = new HashMap<>();
 		imported.put(
@@ -484,6 +562,40 @@ public abstract class	LocalSimulationArchitectures
 						new EventSink(machineCafeElectricityModelURI,
 								SwitchOffMachineCafe.class)
 				});
+		
+		//Ventilateur
+		imported.put(
+				SwitchOnVentilateur.class,
+				new EventSink[] {
+						new EventSink(ventilateurElectricityModelURI,
+								SwitchOnVentilateur.class)
+				});
+		imported.put(
+				SwitchOffVentilateur.class,
+				new EventSink[] {
+						new EventSink(ventilateurElectricityModelURI,
+								SwitchOffVentilateur.class)
+				});
+		imported.put(
+				SetLowVentilateur.class,
+				new EventSink[] {
+						new EventSink(ventilateurElectricityModelURI,
+								SetLowVentilateur.class)
+				});
+		imported.put(
+				SetHighVentilateur.class,
+				new EventSink[] {
+						new EventSink(ventilateurElectricityModelURI,
+								SetHighVentilateur.class)
+				});
+		
+		imported.put(
+				SetMediumVentilateur.class,
+				new EventSink[] {
+						new EventSink(ventilateurElectricityModelURI,
+								SetMediumVentilateur.class)
+				});
+
 
 		// variable bindings between exporting and importing models
 		Map<VariableSource,VariableSink[]> bindings =
@@ -514,6 +626,17 @@ public abstract class	LocalSimulationArchitectures
 								machineCafeElectricityModelURI),
 						new VariableSink[] {
 								new VariableSink("currentMachineCafeIntensity",
+										Double.class,
+										electricMeterElectricityModelURI)
+						});
+				
+				//ventilateur
+				bindings.put(
+						new VariableSource("currentIntensity",
+								Double.class,
+								ventilateurElectricityModelURI),
+						new VariableSink[] {
+								new VariableSink("currentVentilateurIntensity",
 										Double.class,
 										electricMeterElectricityModelURI)
 						});
