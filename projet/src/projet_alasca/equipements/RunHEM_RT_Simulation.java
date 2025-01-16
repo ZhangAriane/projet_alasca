@@ -320,34 +320,34 @@ public class			RunHEM_RT_Simulation
 
 			// the chauffe eau models
 			atomicModelDescriptors.put(
-					ChauffeEauElectricityModel.URI,
+					ChauffeEauElectricityModel.MIL_RT_URI,
 					RTAtomicHIOA_Descriptor.create(
 							ChauffeEauElectricityModel.class,
-							ChauffeEauElectricityModel.URI,
+							ChauffeEauElectricityModel.MIL_RT_URI,
 							TimeUnit.HOURS,
 							null,
 							ACCELERATION_FACTOR));
 			atomicModelDescriptors.put(
-					ChauffeEauTemperatureModel.URI,
+					ChauffeEauTemperatureModel.MIL_RT_URI,
 					RTAtomicHIOA_Descriptor.create(
 							ChauffeEauTemperatureModel.class,
-							ChauffeEauTemperatureModel.URI,
+							ChauffeEauTemperatureModel.MIL_RT_URI,
 							TimeUnit.HOURS,
 							null,
 							ACCELERATION_FACTOR));
 			atomicModelDescriptors.put(
-					projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.URI,
+					projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.MIL_RT_URI,
 					RTAtomicHIOA_Descriptor.create(
 							projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.class,
-							projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.URI,
+							projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.MIL_RT_URI,
 							TimeUnit.HOURS,
 							null,
 							ACCELERATION_FACTOR));
 			atomicModelDescriptors.put(
-					ChauffeEauUnitTesterModel.URI,
+					ChauffeEauUnitTesterModel.MIL_RT_URI,
 					RTAtomicModelDescriptor.create(
 							ChauffeEauUnitTesterModel.class,
-							ChauffeEauUnitTesterModel.URI,
+							ChauffeEauUnitTesterModel.MIL_RT_URI,
 							TimeUnit.HOURS,
 							null,
 							ACCELERATION_FACTOR));
@@ -382,10 +382,10 @@ public class			RunHEM_RT_Simulation
 //			submodels.add(CongelateurTemperatureModel.URI);
 
 			//chauffe eau
-			submodels.add(ChauffeEauElectricityModel.URI);
-			submodels.add(ChauffeEauTemperatureModel.URI);
-			submodels.add(projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.URI);
-			submodels.add(ChauffeEauUnitTesterModel.URI);
+			submodels.add(ChauffeEauElectricityModel.MIL_RT_URI);
+			submodels.add(ChauffeEauTemperatureModel.MIL_RT_URI);
+			submodels.add(projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.MIL_RT_URI);
+			submodels.add(ChauffeEauUnitTesterModel.MIL_RT_URI);
 
 			// event exchanging connections between exporting and importing
 			// models
@@ -568,42 +568,42 @@ public class			RunHEM_RT_Simulation
 					
 					//chaffe eau
 					connections.put(
-							new EventSource(ChauffeEauUnitTesterModel.URI,
+							new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
 									SetPowerChauffeEau.class),
 							new EventSink[] {
-									new EventSink(ChauffeEauElectricityModel.URI,
+									new EventSink(ChauffeEauElectricityModel.MIL_RT_URI,
 											SetPowerChauffeEau.class)
 							});
 					connections.put(
-							new EventSource(ChauffeEauUnitTesterModel.URI,
+							new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
 									SwitchOnChauffeEau.class),
 							new EventSink[] {
-									new EventSink(ChauffeEauElectricityModel.URI,
+									new EventSink(ChauffeEauElectricityModel.MIL_RT_URI,
 											SwitchOnChauffeEau.class)
 							});
 					connections.put(
-							new EventSource(ChauffeEauUnitTesterModel.URI,
+							new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
 									SwitchOffChauffeEau.class),
 							new EventSink[] {
-									new EventSink(ChauffeEauElectricityModel.URI,
+									new EventSink(ChauffeEauElectricityModel.MIL_RT_URI,
 											SwitchOffChauffeEau.class),
-									new EventSink(ChauffeEauTemperatureModel.URI,
+									new EventSink(ChauffeEauTemperatureModel.MIL_RT_URI,
 											SwitchOffChauffeEau.class)
 							});
 					connections.put(
-							new EventSource(ChauffeEauUnitTesterModel.URI, projet_alasca.equipements.chauffeEau.mil.events.Heat.class),
+							new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI, projet_alasca.equipements.chauffeEau.mil.events.Heat.class),
 							new EventSink[] {
-									new EventSink(ChauffeEauElectricityModel.URI,
+									new EventSink(ChauffeEauElectricityModel.MIL_RT_URI,
 											projet_alasca.equipements.chauffeEau.mil.events.Heat.class),
-									new EventSink(ChauffeEauTemperatureModel.URI,
+									new EventSink(ChauffeEauTemperatureModel.MIL_RT_URI,
 											projet_alasca.equipements.chauffeEau.mil.events.Heat.class)
 							});
 					connections.put(
-							new EventSource(ChauffeEauUnitTesterModel.URI, projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat.class),
+							new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI, projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat.class),
 							new EventSink[] {
-									new EventSink(ChauffeEauElectricityModel.URI,
+									new EventSink(ChauffeEauElectricityModel.MIL_RT_URI,
 											projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat.class),
-									new EventSink(ChauffeEauTemperatureModel.URI,
+									new EventSink(ChauffeEauTemperatureModel.MIL_RT_URI,
 											projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat.class)
 							});
 
@@ -665,20 +665,20 @@ public class			RunHEM_RT_Simulation
 							bindings.put(
 									new VariableSource("externalTemperature",
 											Double.class,
-											projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.URI),
+											projet_alasca.equipements.chauffeEau.mil.ExternalTemperatureModel.MIL_RT_URI),
 									new VariableSink[] {
 											new VariableSink("externalTemperature",
 													Double.class,
-													ChauffeEauTemperatureModel.URI)
+													ChauffeEauTemperatureModel.MIL_RT_URI)
 									});
 							bindings.put(
 									new VariableSource("currentHeatingPower",
 											Double.class,
-											ChauffeEauElectricityModel.URI),
+											ChauffeEauElectricityModel.MIL_RT_URI),
 									new VariableSink[] {
 											new VariableSink("currentHeatingPower",
 													Double.class,
-													ChauffeEauTemperatureModel.URI)
+													ChauffeEauTemperatureModel.MIL_RT_URI)
 									});
 
 							// bindings between hair dryer and heater models to the electric
@@ -746,7 +746,7 @@ public class			RunHEM_RT_Simulation
 							bindings.put(
 									new VariableSource("currentIntensity",
 											Double.class,
-											ChauffeEauElectricityModel.URI),
+											ChauffeEauElectricityModel.MIL_RT_URI),
 									new VariableSink[] {
 											new VariableSink("currentIntensity",
 													Double.class,
@@ -881,12 +881,12 @@ public class			RunHEM_RT_Simulation
 							//chauffe eau
 							simParams.put(
 									ModelI.createRunParameterName(
-											ChauffeEauElectricityModel.URI,
+											ChauffeEauElectricityModel.MIL_RT_URI,
 											ChauffeEauElectricityModel.NOT_HEATING_POWER_RUNPNAME),
 									0.0);
 							simParams.put(
 									ModelI.createRunParameterName(
-											ChauffeEauElectricityModel.URI,
+											ChauffeEauElectricityModel.MIL_RT_URI,
 											ChauffeEauElectricityModel.MAX_HEATING_POWER_RUNPNAME),
 									4400.0);
 

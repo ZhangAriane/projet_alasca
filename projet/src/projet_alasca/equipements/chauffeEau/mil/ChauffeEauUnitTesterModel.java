@@ -33,8 +33,11 @@ package projet_alasca.equipements.chauffeEau.mil;
 // knowledge of the CeCILL-C license and that you accept its terms.
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
 
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
+import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
 import fr.sorbonne_u.devs_simulation.models.AtomicModel;
 import fr.sorbonne_u.devs_simulation.models.annotations.ModelExternalEvents;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
@@ -47,6 +50,7 @@ import projet_alasca.equipements.chauffeEau.mil.events.SwitchOnChauffeEau;
 import projet_alasca.equipements.chauffeEau.mil.events.SwitchOffChauffeEau;
 import projet_alasca.equipements.chauffeEau.mil.events.SetPowerChauffeEau;
 import projet_alasca.equipements.chauffeEau.mil.events.SetPowerChauffeEau.PowerValue;
+import projet_alasca.etape3.equipments.heater.mil.HeaterUnitTesterModel;
 import projet_alasca.equipements.chauffeEau.mil.events.Heat;
 import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
 
@@ -97,9 +101,16 @@ extends		AtomicModel
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	/** URI for a model; works when only one instance is created.			*/
-	public static final String	URI = ChauffeEauUnitTesterModel.class.
-															getSimpleName();
+	/** URI for a MIL model; works when only one instance is created.		*/
+	public static final String	MIL_URI = HeaterUnitTesterModel.class.
+													getSimpleName() + "-MIL";
+	/** URI for a MIL real time model; works when only one instance is
+	 *  created.															*/
+	public static final String	MIL_RT_URI = HeaterUnitTesterModel.class.
+													getSimpleName() + "-MIL-RT";
+	/** URI for a SIL model; works when only one instance is created.		*/
+	public static final String	SIL_URI = HeaterUnitTesterModel.class.
+													getSimpleName() + "-SIL";
 
 	/** current step in the test scenario.									*/
 	protected int	step;
@@ -243,6 +254,30 @@ extends		AtomicModel
 		super.endSimulation(endTime);
 	}
 
+	// -------------------------------------------------------------------------
+		// Optional DEVS simulation protocol: simulation run parameters
+		// -------------------------------------------------------------------------
+
+		/**
+		 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#setSimulationRunParameters(java.util.Map)
+		 */
+		@Override
+		public void			setSimulationRunParameters(
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
+		{
+			// this gets the reference on the owner component which is required
+			// to have simulation models able to make the component perform some
+			// operations or tasks or to get the value of variables held by the
+			// component when necessary.
+			if (simParams.containsKey(
+							AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+				// by the following, all of the logging will appear in the owner
+				// component logger
+				this.getSimulationEngine().setLogger(
+							AtomicSimulatorPlugin.createComponentLogger(simParams));
+			}
+		}
 	// -------------------------------------------------------------------------
 	// Optional DEVS simulation protocol: simulation report
 	// -------------------------------------------------------------------------

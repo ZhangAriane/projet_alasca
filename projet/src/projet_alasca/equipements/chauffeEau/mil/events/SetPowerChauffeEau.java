@@ -34,12 +34,14 @@ package projet_alasca.equipements.chauffeEau.mil.events;
 // knowledge of the CeCILL-C license and that you accept its terms.
 
 import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventInformationI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import projet_alasca.equipements.chauffeEau.mil.ChauffeEauElectricityModel;
-import projet_alasca.equipements.chauffeEau.mil.ChauffeEauElectricityModel.State;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauStateModel.State;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauOperationI;
 
 // -----------------------------------------------------------------------------
 /**
@@ -119,11 +121,11 @@ implements	ChauffeEauEventI
 			super();
 
 			assert	power >= 0.0 &&
-							power <= ChauffeEauElectricityModel.MAX_HEATING_POWER :
-					new AssertionError(
-							"Precondition violation: power >= 0.0 && "
-							+ "power <= ChauffeEauElectricityModel.MAX_HEATING_POWER,"
-							+ " but power = " + power);
+					power <= ChauffeEauElectricityModel.MAX_HEATING_POWER :
+						new AssertionError(
+								"Precondition violation: power >= 0.0 && "
+										+ "power <= ChauffeEauElectricityModel.MAX_HEATING_POWER,"
+										+ " but power = " + power);
 
 			this.power = power;
 		}
@@ -186,16 +188,16 @@ implements	ChauffeEauEventI
 	 * @param content			the power value to be set on the ChauffeEau when the event will be executed.
 	 */
 	public				SetPowerChauffeEau(
-		Time timeOfOccurrence,
-		EventInformationI content
-		)
+			Time timeOfOccurrence,
+			EventInformationI content
+			)
 	{
 		super(timeOfOccurrence, content);
 
 		assert	content != null && content instanceof PowerValue :
-				new AssertionError(
-						"Precondition violation: event content is null or"
-						+ " not a PowerValue " + content);
+			new AssertionError(
+					"Precondition violation: event content is null or"
+							+ " not a PowerValue " + content);
 
 		this.powerValue = (PowerValue) content;
 	}
@@ -224,19 +226,16 @@ implements	ChauffeEauEventI
 	 */
 	@Override
 	public void			executeOn(AtomicModelI model)
-	{
-		assert	model instanceof ChauffeEauElectricityModel :
-				new AssertionError(
-						"Precondition violation: model instanceof "
-						+ "ChauffeEauElectricityModel");
+	{assert	model instanceof ChauffeEauOperationI :
+		new NeoSim4JavaException("model instanceof ChauffeEauOperationI");
 
-		ChauffeEauElectricityModel ChauffeEau = (ChauffeEauElectricityModel)model;
-		assert	ChauffeEau.getState() == State.HEATING :
-				new AssertionError(
-						"model not in the right state, should be "
-						+ "State.HEATING but is " + ChauffeEau.getState());
-		ChauffeEau.setCurrentHeatingPower(this.powerValue.getPower(),
-									  this.getTimeOfOccurrence());
+	ChauffeEauOperationI ChauffeEau = (ChauffeEauOperationI)model;
+	assert	ChauffeEau.getState() != State.OFF :
+		new NeoSim4JavaException(
+				"model not in the right state, should not be in "
+						+ "State.OFF but actually is.");
+	ChauffeEau.setCurrentHeatingPower(this.powerValue.getPower(),
+			this.getTimeOfOccurrence());
 	}
 }
 // -----------------------------------------------------------------------------

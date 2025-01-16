@@ -141,7 +141,7 @@ implements	HeaterSensorDataCI.HeaterSensorRequiredPullCI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#heatingPullSensor()
+	 * @see fr.sorbonne_u.components.ChauffeEauSensorDataCI.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#heatingPullSensor()
 	 */
 	@Override
 	public HeaterSensorData<Measure<Boolean>>	heatingPullSensor()
@@ -152,7 +152,7 @@ implements	HeaterSensorDataCI.HeaterSensorRequiredPullCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#targetTemperaturePullSensor()
+	 * @see fr.sorbonne_u.components.ChauffeEauSensorDataCI.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#targetTemperaturePullSensor()
 	 */
 	@Override
 	public HeaterSensorData<Measure<Double>>	targetTemperaturePullSensor()
@@ -163,7 +163,7 @@ implements	HeaterSensorDataCI.HeaterSensorRequiredPullCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#currentTemperaturePullSensor()
+	 * @see fr.sorbonne_u.components.ChauffeEauSensorDataCI.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#currentTemperaturePullSensor()
 	 */
 	@Override
 	public HeaterSensorData<Measure<Double>>	currentTemperaturePullSensor()
@@ -174,7 +174,7 @@ implements	HeaterSensorDataCI.HeaterSensorRequiredPullCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#startTemperaturesPushSensor(long, java.util.concurrent.TimeUnit)
+	 * @see fr.sorbonne_u.components.ChauffeEauSensorDataCI.equipments.heater.HeaterSensorDataCI.HeaterSensorCI#startTemperaturesPushSensor(long, java.util.concurrent.TimeUnit)
 	 */
 	@Override
 	public void			startTemperaturesPushSensor(

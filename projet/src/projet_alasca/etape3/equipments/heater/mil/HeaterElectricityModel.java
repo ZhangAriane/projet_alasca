@@ -134,6 +134,8 @@ import projet_alasca.etape3.equipments.heater.mil.events.SwitchOnHeater;
 								 Heat.class,
 								 DoNotHeat.class})
 @ModelExportedVariable(name = "currentIntensity", type = Double.class)
+
+@ModelExportedVariable(name = "currentHeatingPower", type = Double.class)
 //-----------------------------------------------------------------------------
 public class			HeaterElectricityModel
 extends		AtomicHIOA

@@ -34,10 +34,13 @@ package projet_alasca.equipements.chauffeEau.mil.events;
 // knowledge of the CeCILL-C license and that you accept its terms.
 
 import fr.sorbonne_u.devs_simulation.es.events.ES_Event;
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import projet_alasca.equipements.chauffeEau.mil.ChauffeEauElectricityModel;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauStateModel.State;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauOperationI;
 
 // -----------------------------------------------------------------------------
 /**
@@ -117,19 +120,15 @@ implements	ChauffeEauEventI
 	@Override
 	public void			executeOn(AtomicModelI model)
 	{
-		assert	model instanceof ChauffeEauElectricityModel :
-				new AssertionError(
-						"Precondition violation: model instanceof "
-						+ "ChauffeEauElectricityModel");
+		assert	model instanceof ChauffeEauOperationI :
+			new NeoSim4JavaException("model instanceof ChauffeEauOperationI");
 
-		ChauffeEauElectricityModel ChauffeEau = (ChauffeEauElectricityModel)model;
-		assert	ChauffeEau.getState() == ChauffeEauElectricityModel.State.OFF :
-				new AssertionError(
-						"model not in the right state, should be "
-						+ "ChauffeEauElectricityModel.State.OFF but is "
-						+ ChauffeEau.getState());
-		ChauffeEau.setState(ChauffeEauElectricityModel.State.ON,
-						this.getTimeOfOccurrence());
+	ChauffeEauOperationI ChauffeEau = (ChauffeEauOperationI)model;
+	assert	ChauffeEau.getState() == State.OFF :
+			new NeoSim4JavaException(
+					"model not in the right state, should be "
+					+ "State.OFF but actually is "+ ChauffeEau.getState());
+	ChauffeEau.setState(State.ON);
 	}
 }
 // -----------------------------------------------------------------------------

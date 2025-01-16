@@ -204,7 +204,7 @@ implements	HeaterMeasureI
 	// -------------------------------------------------------------------------
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.measures.HeaterMeasureI#isTemperatureMeasures()
+	 * @see fr.sorbonne_u.components.ChauffeEauMeasureI.equipments.heater.measures.HeaterMeasureI#isTemperatureMeasures()
 	 */
 	@Override
 	public boolean		isTemperatureMeasures()

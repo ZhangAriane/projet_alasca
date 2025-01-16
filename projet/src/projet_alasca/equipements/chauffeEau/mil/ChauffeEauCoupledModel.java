@@ -34,6 +34,8 @@ package projet_alasca.equipements.chauffeEau.mil;
 
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.StaticVariableDescriptor;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSink;
 import fr.sorbonne_u.devs_simulation.hioa.models.vars.VariableSource;
@@ -44,6 +46,7 @@ import fr.sorbonne_u.devs_simulation.models.events.EventSource;
 import fr.sorbonne_u.devs_simulation.models.events.ReexportedEvent;
 import fr.sorbonne_u.devs_simulation.models.interfaces.ModelI;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.CoordinatorI;
+import fr.sorbonne_u.exceptions.InvariantChecking;
 
 // -----------------------------------------------------------------------------
 /**
@@ -77,9 +80,57 @@ extends		CoupledModel
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	/** URI for a model; works when only one instance is created.			*/
-	public static final String	URI = ChauffeEauCoupledModel.class.getSimpleName();
+	/** URI for a MIL model; works when only one instance is created.		*/
+	public static final String	MIL_URI = ChauffeEauCoupledModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for a MIL real time model; works when only one instance is
+	 *  created.															*/
+	public static final String	MIL_RT_URI = ChauffeEauCoupledModel.class.
+			getSimpleName() + "-MIL-RT";
+	/** URI for a SIL model; works when only one instance is created.		*/
+	public static final String	SIL_URI = ChauffeEauCoupledModel.class.
+			getSimpleName() + "-SIL";
 
+
+	protected static boolean	glassBoxInvariants(
+			ChauffeEauCoupledModel instance
+			)
+	{
+		assert	instance != null :
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
+
+		boolean ret = true;
+		return ret;
+	}
+
+	protected static boolean	blackBoxInvariants(
+			ChauffeEauCoupledModel instance
+			)
+	{
+		// TODO Auto-generated method stub
+		assert	instance != null :
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
+
+		boolean ret = true;
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_URI != null && !MIL_URI.isEmpty(),
+				ChauffeEauCoupledModel.class,
+				instance,
+				"MIL_URI != null && !MIL_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
+				ChauffeEauCoupledModel.class,
+				instance,
+				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				SIL_URI != null && !SIL_URI.isEmpty(),
+				ChauffeEauCoupledModel.class,
+				instance,
+				"URI != null && !URI.isEmpty()");
+		return ret;
+	}
 	// -------------------------------------------------------------------------
 	// Constructors
 	// -------------------------------------------------------------------------
@@ -112,17 +163,21 @@ extends		CoupledModel
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				ChauffeEauCoupledModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		CoordinatorI simulationEngine,
-		ModelI[] submodels,
-		Map<Class<? extends EventI>,EventSink[]> imported,
-		Map<Class<? extends EventI>, ReexportedEvent> reexported,
-		Map<EventSource, EventSink[]> connections
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			CoordinatorI simulationEngine,
+			ModelI[] submodels,
+			Map<Class<? extends EventI>,EventSink[]> imported,
+			Map<Class<? extends EventI>, ReexportedEvent> reexported,
+			Map<EventSource, EventSink[]> connections
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine, submodels,
-			  imported, reexported, connections);
+				imported, reexported, connections);
+		assert	glassBoxInvariants(this) :
+			new NeoSim4JavaException("White-box invariants violation!");
+		assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException("Black-box invariants violation!");
 	}
 
 	/**
@@ -158,21 +213,25 @@ extends		CoupledModel
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				ChauffeEauCoupledModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		CoordinatorI simulationEngine,
-		ModelI[] submodels,
-		Map<Class<? extends EventI>, EventSink[]> imported,
-		Map<Class<? extends EventI>, ReexportedEvent> reexported,
-		Map<EventSource, EventSink[]> connections,
-		Map<StaticVariableDescriptor, VariableSink[]> importedVars,
-		Map<VariableSource, StaticVariableDescriptor> reexportedVars,
-		Map<VariableSource, VariableSink[]> bindings
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			CoordinatorI simulationEngine,
+			ModelI[] submodels,
+			Map<Class<? extends EventI>, EventSink[]> imported,
+			Map<Class<? extends EventI>, ReexportedEvent> reexported,
+			Map<EventSource, EventSink[]> connections,
+			Map<StaticVariableDescriptor, VariableSink[]> importedVars,
+			Map<VariableSource, StaticVariableDescriptor> reexportedVars,
+			Map<VariableSource, VariableSink[]> bindings
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine, submodels,
-			  imported, reexported, connections,
-			  importedVars, reexportedVars, bindings);
+				imported, reexported, connections,
+				importedVars, reexportedVars, bindings);
+		assert	glassBoxInvariants(this) :
+			new NeoSim4JavaException("White-box invariants violation!");
+		assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException("Black-box invariants violation!");
 	}
 }
 // -----------------------------------------------------------------------------

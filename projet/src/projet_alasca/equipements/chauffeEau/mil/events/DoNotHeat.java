@@ -1,5 +1,7 @@
 package projet_alasca.equipements.chauffeEau.mil.events;
 
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
+
 // Copyright Jacques Malenfant, Sorbonne Universite.
 // Jacques.Malenfant@lip6.fr
 //
@@ -38,6 +40,8 @@ import fr.sorbonne_u.devs_simulation.models.interfaces.AtomicModelI;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
 import projet_alasca.equipements.chauffeEau.mil.ChauffeEauElectricityModel;
 import projet_alasca.equipements.chauffeEau.mil.ChauffeEauTemperatureModel;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauOperationI;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauStateModel.State;
 
 // -----------------------------------------------------------------------------
 /**
@@ -90,8 +94,8 @@ implements	ChauffeEauEventI
 	 * @param timeOfOccurrence	time of occurrence of the event.
 	 */
 	public				DoNotHeat(
-		Time timeOfOccurrence
-		)
+			Time timeOfOccurrence
+			)
 	{
 		super(timeOfOccurrence, null);
 	}
@@ -121,31 +125,16 @@ implements	ChauffeEauEventI
 	@Override
 	public void			executeOn(AtomicModelI model)
 	{
-		assert	model instanceof ChauffeEauElectricityModel ||
-									model instanceof ChauffeEauTemperatureModel :
-				new AssertionError(
-						"Precondition violation: model instanceof "
-						+ "ChauffeEauElectricityModel || "
-						+ "model instanceof ChauffeEauTemperatureModel");
+		assert	model instanceof ChauffeEauOperationI :
+			new NeoSim4JavaException("model instanceof ChauffeEauOperationI");
 
-		if (model instanceof ChauffeEauElectricityModel) {
-			ChauffeEauElectricityModel ChauffeEau = (ChauffeEauElectricityModel)model;
-			assert	ChauffeEau.getState() == ChauffeEauElectricityModel.State.HEATING:
-				new AssertionError(
-						"model not in the right state, should be "
-								+ "ChauffeEauElectricityModel.State.HEATING but is "
-								+ ChauffeEau.getState());
-			ChauffeEau.setState(ChauffeEauElectricityModel.State.ON,
-							this.getTimeOfOccurrence());
-		} else {
-			ChauffeEauTemperatureModel ChauffeEau = (ChauffeEauTemperatureModel)model;
-			assert	ChauffeEau.getState() == ChauffeEauTemperatureModel.State.HEATING:
-				new AssertionError(
-						"model not in the right state, should be "
-								+ "ChauffeEauTemperatureModel.State.HEATING but is "
-								+ ChauffeEau.getState());
-			ChauffeEau.setState(ChauffeEauTemperatureModel.State.NOT_HEATING);
-		}
+		ChauffeEauOperationI ChauffeEau = (ChauffeEauOperationI)model;
+		assert	ChauffeEau.getState() == State.HEATING:
+			new NeoSim4JavaException(
+					"model not in the right state, should be "
+							+ "ChauffeEauElectricityModel.State.HEATING but is "
+							+ ChauffeEau.getState());
+		ChauffeEau.setState(State.ON);
 	}
 }
 // -----------------------------------------------------------------------------

@@ -25,9 +25,9 @@ package projet_alasca.equipements.chauffeEau.mil;
 // therefore means  that it is reserved for developers  and  experienced
 // professionals having in-depth computer knowledge. Users are therefore
 // encouraged to load and test the software's suitability as regards their
-// requirements in conditions enabling the security of their systems and/or 
+// requirements in conditions enabling the secMIL_URIty of their systems and/or 
 // data to be ensured and,  more generally, to use and operate it in the 
-// same conditions as regards security. 
+// same conditions as regards secMIL_URIty. 
 //
 // The fact that you are presently reading this means that you have had
 // knowledge of the CeCILL-C license and that you accept its terms.
@@ -121,33 +121,33 @@ public class			RunChauffeEauUnitaryMILSimulation
 			// temperatures and the external temperature are atomic HIOA models
 			// hence we use an AtomicHIOA_Descriptor(s)
 			atomicModelDescriptors.put(
-					ChauffeEauElectricityModel.URI,
+					ChauffeEauElectricityModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							ChauffeEauElectricityModel.class,
-							ChauffeEauElectricityModel.URI,
+							ChauffeEauElectricityModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					ChauffeEauTemperatureModel.URI,
+					ChauffeEauTemperatureModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							ChauffeEauTemperatureModel.class,
-							ChauffeEauTemperatureModel.URI,
+							ChauffeEauTemperatureModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			atomicModelDescriptors.put(
-					ExternalTemperatureModel.URI,
+					ExternalTemperatureModel.MIL_URI,
 					AtomicHIOA_Descriptor.create(
 							ExternalTemperatureModel.class,
-							ExternalTemperatureModel.URI,
+							ExternalTemperatureModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 			// the heater unit tester model only exchanges event, an
 			// atomic model hence we use an AtomicModelDescriptor
 			atomicModelDescriptors.put(
-					ChauffeEauUnitTesterModel.URI,
+					ChauffeEauUnitTesterModel.MIL_URI,
 					AtomicModelDescriptor.create(
 							ChauffeEauUnitTesterModel.class,
-							ChauffeEauUnitTesterModel.URI,
+							ChauffeEauUnitTesterModel.MIL_URI,
 							TimeUnit.HOURS,
 							null));
 
@@ -156,12 +156,12 @@ public class			RunChauffeEauUnitaryMILSimulation
 			Map<String,CoupledModelDescriptor> coupledModelDescriptors =
 																new HashMap<>();
 
-			// the set of submodels of the coupled model, given by their URIs
+			// the set of submodels of the coupled model, given by their MIL_URIs
 			Set<String> submodels = new HashSet<String>();
-			submodels.add(ChauffeEauElectricityModel.URI);
-			submodels.add(ChauffeEauTemperatureModel.URI);
-			submodels.add(ExternalTemperatureModel.URI);
-			submodels.add(ChauffeEauUnitTesterModel.URI);
+			submodels.add(ChauffeEauElectricityModel.MIL_URI);
+			submodels.add(ChauffeEauTemperatureModel.MIL_URI);
+			submodels.add(ExternalTemperatureModel.MIL_URI);
+			submodels.add(ChauffeEauUnitTesterModel.MIL_URI);
 			
 			// event exchanging connections between exporting and importing
 			// models
@@ -169,42 +169,42 @@ public class			RunChauffeEauUnitaryMILSimulation
 										new HashMap<EventSource,EventSink[]>();
 
 			connections.put(
-					new EventSource(ChauffeEauUnitTesterModel.URI,
+					new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
 									SetPowerChauffeEau.class),
 					new EventSink[] {
-							new EventSink(ChauffeEauElectricityModel.URI,
+							new EventSink(ChauffeEauElectricityModel.MIL_URI,
 										  SetPowerChauffeEau.class)
 					});
 			connections.put(
-					new EventSource(ChauffeEauUnitTesterModel.URI,
+					new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
 									SwitchOnChauffeEau.class),
 					new EventSink[] {
-							new EventSink(ChauffeEauElectricityModel.URI,
+							new EventSink(ChauffeEauElectricityModel.MIL_URI,
 										  SwitchOnChauffeEau.class)
 					});
 			connections.put(
-					new EventSource(ChauffeEauUnitTesterModel.URI,
+					new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
 									SwitchOffChauffeEau.class),
 					new EventSink[] {
-							new EventSink(ChauffeEauElectricityModel.URI,
+							new EventSink(ChauffeEauElectricityModel.MIL_URI,
 										  SwitchOffChauffeEau.class),
-							new EventSink(ChauffeEauTemperatureModel.URI,
+							new EventSink(ChauffeEauTemperatureModel.MIL_URI,
 										  SwitchOffChauffeEau.class)
 					});
 			connections.put(
-					new EventSource(ChauffeEauUnitTesterModel.URI, Heat.class),
+					new EventSource(ChauffeEauUnitTesterModel.MIL_URI, Heat.class),
 					new EventSink[] {
-							new EventSink(ChauffeEauElectricityModel.URI,
+							new EventSink(ChauffeEauElectricityModel.MIL_URI,
 										  Heat.class),
-							new EventSink(ChauffeEauTemperatureModel.URI,
+							new EventSink(ChauffeEauTemperatureModel.MIL_URI,
 										  Heat.class)
 					});
 			connections.put(
-					new EventSource(ChauffeEauUnitTesterModel.URI, DoNotHeat.class),
+					new EventSource(ChauffeEauUnitTesterModel.MIL_URI, DoNotHeat.class),
 					new EventSink[] {
-							new EventSink(ChauffeEauElectricityModel.URI,
+							new EventSink(ChauffeEauElectricityModel.MIL_URI,
 										  DoNotHeat.class),
-							new EventSink(ChauffeEauTemperatureModel.URI,
+							new EventSink(ChauffeEauTemperatureModel.MIL_URI,
 										  DoNotHeat.class)
 					});
 
@@ -214,27 +214,27 @@ public class			RunChauffeEauUnitaryMILSimulation
 
 			bindings.put(new VariableSource("externalTemperature",
 											Double.class,
-											ExternalTemperatureModel.URI),
+											ExternalTemperatureModel.MIL_URI),
 						 new VariableSink[] {
 								 new VariableSink("externalTemperature",
 										 		  Double.class,
-										 		  ChauffeEauTemperatureModel.URI)
+										 		  ChauffeEauTemperatureModel.MIL_URI)
 						 });
 			bindings.put(new VariableSource("currentHeatingPower",
 											Double.class,
-											ChauffeEauElectricityModel.URI),
+											ChauffeEauElectricityModel.MIL_URI),
 						 new VariableSink[] {
 								 new VariableSink("currentHeatingPower",
 										 		  Double.class,
-										 		  ChauffeEauTemperatureModel.URI)
+										 		  ChauffeEauTemperatureModel.MIL_URI)
 						 });
 
 			// coupled model descriptor
 			coupledModelDescriptors.put(
-					ChauffeEauCoupledModel.URI,
+					ChauffeEauCoupledModel.MIL_URI,
 					new CoupledHIOA_Descriptor(
 							ChauffeEauCoupledModel.class,
-							ChauffeEauCoupledModel.URI,
+							ChauffeEauCoupledModel.MIL_URI,
 							submodels,
 							null,
 							null,
@@ -247,7 +247,7 @@ public class			RunChauffeEauUnitaryMILSimulation
 			// simulation architecture
 			ArchitectureI architecture =
 					new Architecture(
-							ChauffeEauCoupledModel.URI,
+							ChauffeEauCoupledModel.MIL_URI,
 							atomicModelDescriptors,
 							coupledModelDescriptors,
 							TimeUnit.HOURS);

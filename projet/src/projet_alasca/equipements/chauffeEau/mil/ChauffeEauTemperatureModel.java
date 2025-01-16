@@ -33,8 +33,13 @@ package projet_alasca.equipements.chauffeEau.mil;
 // knowledge of the CeCILL-C license and that you accept its terms.
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.components.hem2024e2.HEM_ReportI;
+import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ImportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.InternalVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelImportedVariable;
@@ -53,6 +58,8 @@ import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 import fr.sorbonne_u.exceptions.InvariantChecking;
 import projet_alasca.equipements.chauffeEau.mil.events.ChauffeEauEventI;
 import projet_alasca.equipements.chauffeEau.mil.events.SwitchOffChauffeEau;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauElectricityModel;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauStateModel.State;
 import projet_alasca.equipements.chauffeEau.mil.events.Heat;
 import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
 
@@ -135,13 +142,14 @@ import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
  * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
  */
 @ModelExternalEvents(imported = {SwitchOffChauffeEau.class,
-		 						 Heat.class,
-		 						 DoNotHeat.class})
+		Heat.class,
+		DoNotHeat.class})
 @ModelImportedVariable(name = "externalTemperature", type = Double.class)
 @ModelImportedVariable(name = "currentHeatingPower", type = Double.class)
 // -----------------------------------------------------------------------------
 public class			ChauffeEauTemperatureModel
 extends		AtomicHIOA
+implements ChauffeEauOperationI
 {
 	// -------------------------------------------------------------------------
 	// Inner classes and types
@@ -155,45 +163,52 @@ extends		AtomicHIOA
 	 * 
 	 * @author	<a href="mailto:Jacques.Malenfant@lip6.fr">Jacques Malenfant</a>
 	 */
-	public static enum	State {
-		/** ChauffeEau is not heating.											*/
+	/*public static enum	State {
+		// ChauffeEau is not heating.											
 		NOT_HEATING,
-		/** ChauffeEau is on and heating.										*/
+		// ChauffeEau is on and heating.										
 		HEATING
-	}
+	}*/
 
 	// -------------------------------------------------------------------------
 	// Constants and variables
 	// -------------------------------------------------------------------------
 
-	
-	
-    
+
+
+
 	private static final long		serialVersionUID = 1L;
 
 	// The following variables should be considered constant but can be changed
 	// before the first model instance is created to adapt the simulation
 	// scenario.
 
-	/** URI for a model; works when only one instance is created.			*/
-	public static String		URI = ChauffeEauTemperatureModel.class.
-															getSimpleName();
+	/** URI for a MIL model; works when only one instance is created.		*/
+	public static String		MIL_URI = ChauffeEauTemperatureModel.class.
+			getSimpleName() + "-MIL";
+	/** URI for a MIL real time model; works when only one instance is
+	 *  created.															*/
+	public static String		MIL_RT_URI = ChauffeEauTemperatureModel.class.
+			getSimpleName() + "-MIL-RT";
+	/** URI for a SIL model; works when only one instance is created.		*/
+	public static String		SIL_URI = ChauffeEauTemperatureModel.class.
+			getSimpleName() + "-SIL";
 
 	// TODO: deine as simulation run parameters
-	
+
 	/** Débit de l'eau (en litres par minute) */
-    public static double DEBIT_EAU = 10.0; // Exemple : 10 L/min
-    
-    
-    protected static double VOLUME_EAU = 100.0; // en litres, volume d'eau dans le chauffe-eau
-    protected static double INITIAL_TEMPERATURE_EAU = 15.0; // Température initiale de l'eau en °C
-    protected static double STANDARD_HEATING_TEMP = 60.0; // Température cible du chauffe-eau en °C
-    protected static double POWER_HEATING = 2000.0; // Puissance de chauffage (en watts)
+	public static double DEBIT_EAU = 10.0; // Exemple : 10 L/min
+
+
+	protected static double VOLUME_EAU = 100.0; // en litres, volume d'eau dans le chauffe-eau
+	protected static double INITIAL_TEMPERATURE_EAU = 15.0; // Température initiale de l'eau en °C
+	protected static double STANDARD_HEATING_TEMP = 60.0; // Température cible du chauffe-eau en °C
+	protected static double POWER_HEATING = 2000.0; // Puissance de chauffage (en watts)
 
 
 	protected static double TEMPERATURE_EAU_FROIDE = 10.0; // Température de l'eau froide en °C
 	//protected static double EFFICIENCE_CHAUFFAGE = 0.9; // Efficacité énergétique du chauffe-eau
-    
+
 	/** temperature of the room (house) when the simulation begins.	*/		
 	//public static double		INITIAL_TEMPERATURE = 19.005;
 	/** wall insulation heat transfer constant in the differential equation.*/
@@ -213,7 +228,7 @@ extends		AtomicHIOA
 	protected static double		STEP = 60.0/3600.0;	// 60 seconds
 
 	/** current state of the ChauffeEau.										*/
-	protected State				currentState = State.NOT_HEATING;
+	protected State				currentState = State.ON;
 
 	// Simulation run variables
 
@@ -238,11 +253,11 @@ extends		AtomicHIOA
 	/** the current heating power between 0 and
 	 *  {@code ChauffeEauElectricityModel.MAX_HEATING_POWER}.					*/
 	@ImportedVariable(type = Double.class)
-	protected Value<Double>					currentHeatingPower;
+	protected Value<Double>					currentHeatingPower= new Value<Double>(this);
 	/** current temperature in the room.									*/
 	@InternalVariable(type = Double.class)
 	protected final DerivableValue<Double>	currentTemperature =
-												new DerivableValue<Double>(this);
+	new DerivableValue<Double>(this);
 
 	// -------------------------------------------------------------------------
 	// Invariants
@@ -262,11 +277,13 @@ extends		AtomicHIOA
 	 * @return			true if the glass-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	glassBoxInvariants(
-		ChauffeEauTemperatureModel instance
-		)
+			ChauffeEauTemperatureModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
+
 
 		boolean ret = true;
 		ret &= InvariantChecking.checkGlassBoxInvariant(
@@ -311,13 +328,13 @@ extends		AtomicHIOA
 				"!isStateInitialised() || start != null");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				instance.currentHeatingPower == null ||
-					(!instance.currentHeatingPower.isInitialised() ||
-								instance.currentHeatingPower.getValue() >= 0.0),
+				(!instance.currentHeatingPower.isInitialised() ||
+						instance.currentHeatingPower.getValue() >= 0.0),
 				ChauffeEauTemperatureModel.class,
 				instance,
 				"currentHeatingPower == null || "
-				+ "(!currentHeatingPower.isInitialised() || "
-				+ "currentHeatingPower.getValue() >= 0.0)");
+						+ "(!currentHeatingPower.isInitialised() || "
+						+ "currentHeatingPower.getValue() >= 0.0)");
 		ret &= InvariantChecking.checkGlassBoxInvariant(
 				instance.currentTemperature != null,
 				ChauffeEauTemperatureModel.class,
@@ -340,18 +357,28 @@ extends		AtomicHIOA
 	 * @return			true if the black-box invariants are observed, false otherwise.
 	 */
 	protected static boolean	blackBoxInvariants(
-		ChauffeEauTemperatureModel instance
-		)
+			ChauffeEauTemperatureModel instance
+			)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
-
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 		boolean ret = true;
 		ret &= InvariantChecking.checkBlackBoxInvariant(
-				URI != null && !URI.isEmpty(),
+				MIL_URI != null && !MIL_URI.isEmpty(),
 				ChauffeEauTemperatureModel.class,
 				instance,
-				"URI != null && !URI.isEmpty()");
+				"MIL_URI != null && !MIL_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
+				ChauffeEauTemperatureModel.class,
+				instance,
+				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
+		ret &= InvariantChecking.checkBlackBoxInvariant(
+				SIL_URI != null && !SIL_URI.isEmpty(),
+				ChauffeEauTemperatureModel.class,
+				instance,
+				"SIL_URI != null && !SIL_URI.isEmpty()");
 		return ret;
 	}
 
@@ -382,19 +409,21 @@ extends		AtomicHIOA
 	 * @throws Exception		<i>to do</i>.
 	 */
 	public				ChauffeEauTemperatureModel(
-		String uri,
-		TimeUnit simulatedTimeUnit,
-		AtomicSimulatorI simulationEngine
-		) throws Exception
+			String uri,
+			TimeUnit simulatedTimeUnit,
+			AtomicSimulatorI simulationEngine
+			) throws Exception
 	{
 		super(uri, simulatedTimeUnit, simulationEngine);
 		this.integrationStep = new Duration(STEP, simulatedTimeUnit);
 		this.getSimulationEngine().setLogger(new StandardLogger());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -413,15 +442,23 @@ extends		AtomicHIOA
 	 *
 	 * @param s		the new state.
 	 */
+	@Override
 	public void			setState(State s)
 	{
-		this.currentState = s;
+		if (s == State.OFF) {
+			// from the temperature point of view State.OFF is assimilated to
+			// State.ON <i>i.e.</i>, not heating.
+			this.currentState = State.ON;
+		} else {
+			this.currentState = s;
+		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+				new NeoSim4JavaException(
+						"ChauffeEauTemperatureModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
-	}
+				new NeoSim4JavaException(
+						"ChauffeEauTemperatureModel.blackBoxInvariants(this)");}
 
 	/**
 	 * return the state of the ChauffeEau.
@@ -435,9 +472,51 @@ extends		AtomicHIOA
 	 *
 	 * @return	the current state.
 	 */
+	@Override
 	public State		getState()
 	{
 		return this.currentState;
+	}
+	
+	
+	
+	@Override
+	public void			setCurrentHeatingPower(double newPower, Time t)
+	{
+		assert	newPower >= 0.0 &&
+				newPower <= ChauffeEauElectricityModel.MAX_HEATING_POWER :
+			new NeoSim4JavaException(
+					"Precondition violation: newPower >= 0.0 && "
+					+ "newPower <= ChauffeEauElectricityModel.MAX_HEATING_POWER,"
+					+ " but newPower = " + newPower);
+
+		this.currentHeatingPower.setNewValue(newPower, t);
+
+
+		assert	glassBoxInvariants(this) :
+				new NeoSim4JavaException(
+						"ChauffeEauTemperatureModel.glassBoxInvariants(this)");
+		assert	blackBoxInvariants(this) :
+				new NeoSim4JavaException(
+						"ChauffeEauTemperatureModel.blackBoxInvariants(this)");
+	}
+	
+	/**
+	 * For SIL simulations, return the current value of the
+	 * {@code currentTemperature}.
+	 * 
+	 * <p><strong>Contract</strong></p>
+	 * 
+	 * <pre>
+	 * pre	{@code true}	// no precondition.
+	 * post	{@code true}	// no postcondition.
+	 * </pre>
+	 *
+	 * @return	the current value of the {@code currentTemperature}.
+	 */
+	public double		getCurrentTemperature()
+	{
+		return this.currentTemperature.getValue();
 	}
 
 	/**
@@ -463,14 +542,14 @@ extends		AtomicHIOA
 									ChauffeEauElectricityModel.MAX_HEATING_POWER);
 		return 1.0/(c*this.currentHeatingPower.getValue());
 	}*/
-	
+
 	// Méthode pour calculer la température moyenne dans le chauffe-eau après mélange
 	protected double computeMixedTemperature(double currentTemp, double debitSortie, double deltaT) {
-	    double volumeSortie = debitSortie * deltaT / 60.0; // Volume d'eau sorti en litres
-	    double volumeRestant = VOLUME_EAU - volumeSortie;
+		double volumeSortie = debitSortie * deltaT / 60.0; // Volume d'eau sorti en litres
+		double volumeRestant = VOLUME_EAU - volumeSortie;
 
-	    // Calcul de la nouvelle température après mélange
-	    return (currentTemp * volumeRestant + TEMPERATURE_EAU_FROIDE * volumeSortie) / VOLUME_EAU;
+		// Calcul de la nouvelle température après mélange
+		return (currentTemp * volumeRestant + TEMPERATURE_EAU_FROIDE * volumeSortie) / VOLUME_EAU;
 	}
 
 	/**
@@ -511,21 +590,21 @@ extends		AtomicHIOA
 												INSULATION_TRANSFER_CONSTANT;
 		return currentTempDerivative;
 	}*/
-	
+
 	protected double computeDerivatives(Double current) {
-	    double currentTempDerivative = 0.0;
+		double currentTempDerivative = 0.0;
 
-	    if (this.currentState == State.HEATING ) {
-	        // Contribution du chauffage
-	        currentTempDerivative = (POWER_HEATING * STEP) /
-	                                (VOLUME_EAU * 4186);
-	    }
+		if (this.currentState == State.HEATING ) {
+			// Contribution du chauffage
+			currentTempDerivative = (POWER_HEATING * STEP) /
+					(VOLUME_EAU * 4186);
+		}
 
-	    // Contribution du mélange avec l'eau froide
-	    double deltaTempMix = (TEMPERATURE_EAU_FROIDE - current) / VOLUME_EAU;
-	    currentTempDerivative += deltaTempMix;
+		// Contribution du mélange avec l'eau froide
+		double deltaTempMix = (TEMPERATURE_EAU_FROIDE - current) / VOLUME_EAU;
+		currentTempDerivative += deltaTempMix;
 
-	    return currentTempDerivative;
+		return currentTempDerivative;
 	}
 
 	/**
@@ -562,24 +641,24 @@ extends		AtomicHIOA
 		return newTemp;
 	}*/
 	protected double computeNewTemperature(double deltaT) {
-	    Time t = this.currentTemperature.getTime();
-	    double oldTemp = this.currentTemperature.evaluateAt(t);
+		Time t = this.currentTemperature.getTime();
+		double oldTemp = this.currentTemperature.evaluateAt(t);
 
-	    // Calcul de la température mélangée
-	    double mixedTemp = computeMixedTemperature(oldTemp, DEBIT_EAU, deltaT);
+		// Calcul de la température mélangée
+		double mixedTemp = computeMixedTemperature(oldTemp, DEBIT_EAU, deltaT);
 
-	    double newTemp;
-	    if (deltaT > TEMPERATURE_UPDATE_TOLERANCE) {
-	        // Intégration Euler avec les dérivées
-	        double derivative = computeDerivatives(mixedTemp);
-	        newTemp = mixedTemp + derivative * deltaT;
-	    } else {
-	        newTemp = mixedTemp;
-	    }
+		double newTemp;
+		if (deltaT > TEMPERATURE_UPDATE_TOLERANCE) {
+			// Intégration Euler avec les dérivées
+			double derivative = computeDerivatives(mixedTemp);
+			newTemp = mixedTemp + derivative * deltaT;
+		} else {
+			newTemp = mixedTemp;
+		}
 
-	    // Accumulation de température pour la moyenne
-	    this.temperatureAcc += ((oldTemp + newTemp) / 2.0) * deltaT;
-	    return newTemp;
+		// Accumulation de température pour la moyenne
+		this.temperatureAcc += ((oldTemp + newTemp) / 2.0) * deltaT;
+		return newTemp;
 	}
 
 	// -------------------------------------------------------------------------
@@ -600,11 +679,12 @@ extends		AtomicHIOA
 		this.logMessage("simulation begins.\n");
 
 		super.initialiseState(initialTime);
-
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -628,7 +708,7 @@ extends		AtomicHIOA
 		// Only one variable must be initialised, the current temperature, and
 		// it depends upon only one variable, the external temperature.
 		if (!this.currentTemperature.isInitialised() &&
-									this.externalTemperature.isInitialised()) {
+				this.externalTemperature.isInitialised()) {
 			// If the current temperature is not initialised yet but the
 			// external temperature is, then initialise the current temperature
 			// and say one more variable is initialised at this execution.
@@ -644,10 +724,11 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
-
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.blackBoxInvariants(this)");
 		return new Pair<>(justInitialised, notInitialisedYet);
 	}
 
@@ -683,10 +764,10 @@ extends		AtomicHIOA
 		double newDerivative = this.computeDerivatives(newTemp);
 		// Finally, set the new temperature value and derivative
 		this.currentTemperature.setNewValue(
-						newTemp,
-						newDerivative,
-						new Time(this.getCurrentStateTime().getSimulatedTime(),
-								 this.getSimulatedTimeUnit()));
+				newTemp,
+				newDerivative,
+				new Time(this.getCurrentStateTime().getSimulatedTime(),
+						this.getSimulatedTimeUnit()));
 
 		// Tracing
 		String mark = this.currentState == State.HEATING ? " (h)" : " (-)";
@@ -699,11 +780,12 @@ extends		AtomicHIOA
 		this.logMessage(message.toString());
 
 		super.userDefinedInternalTransition(elapsedTime);
-
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -737,18 +819,20 @@ extends		AtomicHIOA
 		double newDerivative = this.computeDerivatives(newTemp);
 		// Finally, set the new temperature value and derivative
 		this.currentTemperature.setNewValue(
-					newTemp,
-					newDerivative,
-					new Time(this.getCurrentStateTime().getSimulatedTime()
-										+ elapsedTime.getSimulatedDuration(),
-							 this.getSimulatedTimeUnit()));
+				newTemp,
+				newDerivative,
+				new Time(this.getCurrentStateTime().getSimulatedTime()
+						+ elapsedTime.getSimulatedDuration(),
+						this.getSimulatedTimeUnit()));
 
 		super.userDefinedExternalTransition(elapsedTime);
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.glassBoxInvariants(this)");
 		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ChauffeEauTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -759,7 +843,7 @@ extends		AtomicHIOA
 	{
 		this.meanTemperature =
 				this.temperatureAcc/
-						endTime.subtract(this.start).getSimulatedDuration();
+				endTime.subtract(this.start).getSimulatedDuration();
 
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
@@ -799,9 +883,9 @@ extends		AtomicHIOA
 		protected double	meanTemperature;
 
 		public			ChauffeEauTemperatureReport(
-			String modelURI,
-			double meanTemperature
-			)
+				String modelURI,
+				double meanTemperature
+				)
 		{
 			super();
 			this.modelURI = modelURI;
@@ -834,6 +918,31 @@ extends		AtomicHIOA
 		}
 	}
 
+
+	// -------------------------------------------------------------------------
+	// Optional DEVS simulation protocol: simulation run parameters
+	// -------------------------------------------------------------------------
+
+	/**
+	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#setSimulationRunParameters(java.util.Map)
+	 */
+	@Override
+	public void			setSimulationRunParameters(
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
+	{
+		// this gets the reference on the owner component which is required
+		// to have simulation models able to make the component perform some
+		// operations or tasks or to get the value of variables held by the
+		// component when necessary.
+		if (simParams.containsKey(
+				AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+			// by the following, all of the logging will appear in the owner
+			// component logger
+			this.getSimulationEngine().setLogger(
+					AtomicSimulatorPlugin.createComponentLogger(simParams));
+		}
+	}
 	/**
 	 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#getFinalReport()
 	 */

@@ -79,7 +79,7 @@ implements	HeaterMeasureI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.measures.HeaterMeasureI#isStateMeasure()
+	 * @see fr.sorbonne_u.components.ChauffeEauMeasureI.equipments.heater.measures.HeaterMeasureI#isStateMeasure()
 	 */
 	@Override
 	public boolean	isStateMeasure()	{ return true; }

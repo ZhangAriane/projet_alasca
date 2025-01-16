@@ -33,7 +33,12 @@ package projet_alasca.equipements.chauffeEau.mil;
 // knowledge of the CeCILL-C license and that you accept its terms.
 
 import java.util.ArrayList;
+import java.util.Map;
 import java.util.concurrent.TimeUnit;
+
+import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
+import fr.sorbonne_u.devs_simulation.exceptions.MissingRunParameterException;
+import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.annotations.ModelExportedVariable;
 import fr.sorbonne_u.devs_simulation.hioa.models.AtomicHIOA;
@@ -106,9 +111,16 @@ extends		AtomicHIOA
 	// -------------------------------------------------------------------------
 
 	private static final long serialVersionUID = 1L;
-	/** URI for a model; works when only one instance is created.			*/
-	public static final String		URI = ExternalTemperatureModel.class.
-															getSimpleName();
+	/** URI for a MIL model; works when only one instance is created.		*/
+	public static final String		MIL_URI = ExternalTemperatureModel.class.
+													getSimpleName() + "-MIL";
+	/** URI for a MIL real time model; works when only one instance is
+	 *  created.															*/
+	public static final String		MIL_RT_URI = ExternalTemperatureModel.class.
+													getSimpleName() + "-MIL-RT";
+	/** URI for a SIL model; works when only one instance is created.		*/
+	public static final String		SIL_URI = ExternalTemperatureModel.class.
+													getSimpleName() + "-SIL";
 
 	// TODO: define as simulation run parameters
 	/** minimal water temperature.										*/
@@ -162,7 +174,8 @@ extends		AtomicHIOA
 		)
 	{
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
 		boolean ret = true;
 		/*ret &= InvariantChecking.checkGlassBoxInvariant(
@@ -200,16 +213,26 @@ extends		AtomicHIOA
 		ExternalTemperatureModel instance
 		)
 	{
-		// TODO Auto-generated method stub
 		assert	instance != null :
-				new AssertionError("Precondition violation: instance != null");
+			new NeoSim4JavaException("Precondition violation: "
+					+ "instance != null");
 
-		boolean ret = true;
-		ret &= InvariantChecking.checkBlackBoxInvariant(
-					URI != null && !URI.isEmpty(),
-					ExternalTemperatureModel.class,
-					instance,
-					"URI != null && !URI.isEmpty()");
+	boolean ret = true;
+	ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_URI != null && !MIL_URI.isEmpty(),
+				ExternalTemperatureModel.class,
+				instance,
+				"MIL_URI != null && !MIL_URI.isEmpty()");
+	ret &= InvariantChecking.checkBlackBoxInvariant(
+				MIL_RT_URI != null && !MIL_RT_URI.isEmpty(),
+				ExternalTemperatureModel.class,
+				instance,
+				"MIL_RT_URI != null && !MIL_RT_URI.isEmpty()");
+	ret &= InvariantChecking.checkBlackBoxInvariant(
+				SIL_URI != null && !SIL_URI.isEmpty(),
+				ExternalTemperatureModel.class,
+				instance,
+				"URI != null && !URI.isEmpty()");
 		ret &= InvariantChecking.checkBlackBoxInvariant(
 					MAX_EXTERNAL_TEMPERATURE > MIN_EXTERNAL_TEMPERATURE,
 					ExternalTemperatureModel.class,
@@ -260,9 +283,11 @@ extends		AtomicHIOA
 		this.getSimulationEngine().setLogger(new StandardLogger());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	// -------------------------------------------------------------------------
@@ -282,9 +307,11 @@ extends		AtomicHIOA
 		this.externalTemperature.initialise(MIN_EXTERNAL_TEMPERATURE);
 
 		assert	glassBoxInvariants(this) :
-			new AssertionError("White-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -322,10 +349,11 @@ extends		AtomicHIOA
 		}
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
-
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.blackBoxInvariants(this)");
 		return ret;
 	}
 
@@ -338,9 +366,11 @@ extends		AtomicHIOA
 		super.initialiseVariables();
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("Glass-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -409,9 +439,11 @@ extends		AtomicHIOA
 		this.logMessage(message.toString());
 
 		assert	glassBoxInvariants(this) :
-				new AssertionError("White-box invariants violation!");
-		assert	blackBoxInvariants(this) :
-				new AssertionError("Black-box invariants violation!");
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.glassBoxInvariants(this)");
+	assert	blackBoxInvariants(this) :
+			new NeoSim4JavaException(
+					"ExternalTemperatureModel.blackBoxInvariants(this)");
 	}
 
 	/**
@@ -423,6 +455,31 @@ extends		AtomicHIOA
 		this.logMessage("simulation ends.\n");
 		super.endSimulation(endTime);
 	}
+	
+	// -------------------------------------------------------------------------
+		// Optional DEVS simulation protocol: simulation run parameters
+		// -------------------------------------------------------------------------
+
+		/**
+		 * @see fr.sorbonne_u.devs_simulation.models.interfaces.ModelI#setSimulationRunParameters(java.util.Map)
+		 */
+		@Override
+		public void			setSimulationRunParameters(
+			Map<String, Object> simParams
+			) throws MissingRunParameterException
+		{
+			// this gets the reference on the owner component which is required
+			// to have simulation models able to make the component perform some
+			// operations or tasks or to get the value of variables held by the
+			// component when necessary.
+			if (simParams.containsKey(
+							AtomicSimulatorPlugin.OWNER_RUNTIME_PARAMETER_NAME)) {
+				// by the following, all of the logging will appear in the owner
+				// component logger
+				this.getSimulationEngine().setLogger(
+							AtomicSimulatorPlugin.createComponentLogger(simParams));
+			}
+		}
 
 	// -------------------------------------------------------------------------
 	// Optional DEVS simulation protocol: simulation report

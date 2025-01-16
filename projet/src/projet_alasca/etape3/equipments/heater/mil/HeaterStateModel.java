@@ -258,7 +258,7 @@ implements	HeaterOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.mil.HeaterOperationI#setState(fr.sorbonne_u.components.hem2024e3.equipments.heater.mil.HeaterStateModel.State)
+	 * @see fr.sorbonne_u.components.ChauffeEauOperationI.equipments.heater.mil.HeaterOperationI#setState(fr.sorbonne_u.components.ChauffeEauStateModel.equipments.heater.mil.HeaterStateModel.State)
 	 */
 	@Override
 	public void			setState(State s)
@@ -267,7 +267,7 @@ implements	HeaterOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.mil.HeaterOperationI#getState()
+	 * @see fr.sorbonne_u.components.ChauffeEauOperationI.equipments.heater.mil.HeaterOperationI#getState()
 	 */
 	@Override
 	public State		getState()
@@ -276,7 +276,7 @@ implements	HeaterOperationI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.mil.HeaterOperationI#setCurrentHeatingPower(double, fr.sorbonne_u.devs_simulation.models.time.Time)
+	 * @see fr.sorbonne_u.components.ChauffeEauOperationI.equipments.heater.mil.HeaterOperationI#setCurrentHeatingPower(double, fr.sorbonne_u.devs_simulation.models.time.Time)
 	 */
 	@Override
 	public void			setCurrentHeatingPower(double newPower, Time t)

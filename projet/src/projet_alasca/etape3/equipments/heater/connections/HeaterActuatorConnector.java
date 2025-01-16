@@ -64,7 +64,7 @@ extends		AbstractConnector
 implements	HeaterActuatorCI
 {
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.HeaterActuatorCI#startHeating()
+	 * @see fr.sorbonne_u.components.ChauffeEauActuatorCI.equipments.heater.HeaterActuatorCI#startHeating()
 	 */
 	@Override
 	public void			startHeating() throws Exception
@@ -73,7 +73,7 @@ implements	HeaterActuatorCI
 	}
 
 	/**
-	 * @see fr.sorbonne_u.components.hem2024e3.equipments.heater.HeaterActuatorCI#stopHeating()
+	 * @see fr.sorbonne_u.components.ChauffeEauActuatorCI.equipments.heater.HeaterActuatorCI#stopHeating()
 	 */
 	@Override
 	public void			stopHeating() throws Exception

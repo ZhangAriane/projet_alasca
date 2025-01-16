@@ -15,5 +15,5 @@
 		</attributes>
 	</classpathentry>
 	<classpathentry exported="true" kind="lib" path="projet/ALASCA-etape-2/ALASCA-etape-2/HEM-2024-etape2-14102024.jar"/>
-	<classpathentry kind="output" path="projet/ALASCA-etape-2/ALASCA-etape-2/bin"/>
+	<classpathentry kind="output" path="projet/bin"/>
 </classpath>
