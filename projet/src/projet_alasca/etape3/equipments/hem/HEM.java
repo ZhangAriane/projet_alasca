@@ -43,13 +43,17 @@ import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.hem2024.bases.AdjustableCI;
 import fr.sorbonne_u.components.hem2024e1.equipments.hem.AdjustableOutboundPort;
 import fr.sorbonne_u.components.hem2024e1.equipments.hem.HeaterConnector;
+//import fr.sorbonne_u.components.hem2024e1.equipments.hem.ChauffeEauConnector;
 import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeterCI;
 import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeterConnector;
 import fr.sorbonne_u.components.hem2024e1.equipments.meter.ElectricMeterOutboundPort;
 import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import projet_alasca.equipements.chauffeEau.ChauffeEau;
+import projet_alasca.equipements.gestionEnergie.ChauffeEauConnector;
 import projet_alasca.etape3.CVMIntegrationTest;
 import projet_alasca.etape3.equipments.heater.Heater;
+//import projet_alasca.etape3.equipments.ChauffeEau.ChauffeEau;
 import projet_alasca.etape3.equipments.meter.ElectricMeter;
 import projet_alasca.etape3.utils.SimulationType;
 
@@ -106,8 +110,12 @@ extends		AbstractComponent
 
 	/** port to connect to the electric meter.								*/
 	protected ElectricMeterOutboundPort		meterop;
-	/** port to connect to the heater.										*/
+	/** port to connect to the Heater.										*/
 	protected AdjustableOutboundPort		heaterop;
+	
+	/** port to connect to the ChauffeEau.										*/
+	protected AdjustableOutboundPort  chauffeEauop;
+
 
 	/** period of the HEM control loop.										*/
 	protected final long					PERIOD_IN_SECONDS = 60L;
@@ -222,6 +230,13 @@ extends		AbstractComponent
 					this.heaterop.getPortURI(),
 					Heater.EXTERNAL_CONTROL_INBOUND_PORT_URI,
 					HeaterConnector.class.getCanonicalName());
+			
+			this.chauffeEauop = new AdjustableOutboundPort(this);
+			this.chauffeEauop.publishPort();
+			this.doPortConnection(
+					this.chauffeEauop.getPortURI(),
+					ChauffeEau.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+					ChauffeEauConnector.class.getCanonicalName());
 		} catch (Exception e) {
 			throw new ComponentStartException(e) ;
 		}
@@ -264,7 +279,7 @@ extends		AbstractComponent
 			this.logMessage("HEM schedules the SIL integration test.");
 			this.loop(first, end, ac);
 		} else {
-			// Integration test for the meter and the heater
+			// Integration test for the meter and the ChauffeEau
 			Instant meterTest = ac.getStartInstant().plusSeconds(60L);
 			long delay = ac.nanoDelayUntilInstant(meterTest);
 			this.logMessage("HEM schedules the meter integration test in "
@@ -289,90 +304,179 @@ extends		AbstractComponent
 					}
 				}, delay, TimeUnit.NANOSECONDS);
 
-			// For the heater, perform a series of call that will also test the
+			// For the ChauffeEau, perform a series of call that will also test the
 			// adjustable interface.
-			Instant heater1 = ac.getStartInstant().plusSeconds(30L);
-			delay = ac.nanoDelayUntilInstant(heater1);
-			this.logMessage("HEM schedules the heater first call in "
+			Instant ChauffeEau1 = ac.getStartInstant().plusSeconds(30L);
+			delay = ac.nanoDelayUntilInstant(ChauffeEau1);
+			this.logMessage("HEM schedules the ChauffeEau first call in "
 										+ delay + " " + TimeUnit.NANOSECONDS);
 			this.scheduleTaskOnComponent(
 					new AbstractComponent.AbstractTask() {
 						@Override
 						public void run() {
 							try {
-								traceMessage("HEM heater first call begins.\n");
-								traceMessage("Heater maxMode index? " +
-											   heaterop.maxMode() + "\n");
-								traceMessage("Heater current mode index? " +
-											   heaterop.currentMode() + "\n");
-								traceMessage("Heater going down one mode? " +
-											   heaterop.downMode() + "\n");
-								traceMessage("Heater current mode is? " +
-											   heaterop.currentMode() + "\n");
-								traceMessage("Heater going up one mode? " +
-											   heaterop.upMode() + "\n");
-								traceMessage("Heater current mode is? " +
-											   heaterop.currentMode() + "\n");
-								traceMessage("Heater setting current mode? " +
-											   heaterop.setMode(2) + "\n");
-								traceMessage("Heater current mode is? " +
-											   heaterop.currentMode() + "\n");
-								traceMessage("Heater is suspended? " +
-											   heaterop.suspended() + "\n");
-								traceMessage("HEM heater first call ends.\n");
+								traceMessage("HEM ChauffeEau first call begins.\n");
+								traceMessage("ChauffeEau maxMode index? " +
+											   chauffeEauop.maxMode() + "\n");
+								traceMessage("ChauffeEau current mode index? " +
+											   chauffeEauop.currentMode() + "\n");
+								traceMessage("ChauffeEau going down one mode? " +
+											   chauffeEauop.downMode() + "\n");
+								traceMessage("ChauffeEau current mode is? " +
+											   chauffeEauop.currentMode() + "\n");
+								traceMessage("ChauffeEau going up one mode? " +
+											   chauffeEauop.upMode() + "\n");
+								traceMessage("ChauffeEau current mode is? " +
+											   chauffeEauop.currentMode() + "\n");
+								traceMessage("ChauffeEau setting current mode? " +
+											   chauffeEauop.setMode(2) + "\n");
+								traceMessage("ChauffeEau current mode is? " +
+											   chauffeEauop.currentMode() + "\n");
+								traceMessage("ChauffeEau is suspended? " +
+											   chauffeEauop.suspended() + "\n");
+								traceMessage("HEM ChauffeEau first call ends.\n");
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
 					}, delay, TimeUnit.NANOSECONDS);
 
-			Instant heater2 = ac.getStartInstant().plusSeconds(120L);
-			delay = ac.nanoDelayUntilInstant(heater2);
-			this.logMessage("HEM schedules the heater second call in "
+			Instant ChauffeEau2 = ac.getStartInstant().plusSeconds(120L);
+			delay = ac.nanoDelayUntilInstant(ChauffeEau2);
+			this.logMessage("HEM schedules the ChauffeEau second call in "
 										+ delay + " " + TimeUnit.NANOSECONDS);
 			this.scheduleTaskOnComponent(
 					new AbstractComponent.AbstractTask() {
 						@Override
 						public void run() {
 							try {
-								traceMessage("HEM heater second call begins.\n");
-								traceMessage("Heater suspends? " +
-											   heaterop.suspend() + "\n");
-								traceMessage("Heater is suspended? " +
-											   heaterop.suspended() + "\n");
-								traceMessage("Heater emergency? " +
-											   heaterop.emergency() + "\n");
-								traceMessage("HEM heater second call ends.\n");
+								traceMessage("HEM ChauffeEau second call begins.\n");
+								traceMessage("ChauffeEau suspends? " +
+											   chauffeEauop.suspend() + "\n");
+								traceMessage("ChauffeEau is suspended? " +
+											   chauffeEauop.suspended() + "\n");
+								traceMessage("ChauffeEau emergency? " +
+											   chauffeEauop.emergency() + "\n");
+								traceMessage("HEM ChauffeEau second call ends.\n");
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
 					}, delay, TimeUnit.NANOSECONDS);
 
-			Instant heater3 = ac.getStartInstant().plusSeconds(240L);
-			delay = ac.nanoDelayUntilInstant(heater3);
-			this.logMessage("HEM schedules the heater third call in "
+			Instant ChauffeEau3 = ac.getStartInstant().plusSeconds(240L);
+			delay = ac.nanoDelayUntilInstant(ChauffeEau3);
+			this.logMessage("HEM schedules the ChauffeEau third call in "
 										+ delay + " " + TimeUnit.NANOSECONDS);
 			this.scheduleTaskOnComponent(
 					new AbstractComponent.AbstractTask() {
 						@Override
 						public void run() {
 							try {
-								traceMessage("HEM heater third call begins.\n");
-								traceMessage("Heater emergency? " +
-											   heaterop.emergency() + "\n");
-								traceMessage("Heater resumes? " +
-											   heaterop.resume() + "\n");
-								traceMessage("Heater is suspended? " +
-											   heaterop.suspended() + "\n");
-								traceMessage("Heater current mode is? " +
-											   heaterop.currentMode() + "\n");
-								traceMessage("HEM heater third call ends.\n");
+								traceMessage("HEM ChauffeEau third call begins.\n");
+								traceMessage("ChauffeEau emergency? " +
+											   chauffeEauop.emergency() + "\n");
+								traceMessage("ChauffeEau resumes? " +
+											   chauffeEauop.resume() + "\n");
+								traceMessage("ChauffeEau is suspended? " +
+											   chauffeEauop.suspended() + "\n");
+								traceMessage("ChauffeEau current mode is? " +
+											   chauffeEauop.currentMode() + "\n");
+								traceMessage("HEM ChauffeEau third call ends.\n");
 							} catch (Exception e) {
 								e.printStackTrace();
 							}
 						}
 					}, delay, TimeUnit.NANOSECONDS);
+			
+			
+			
+			// Heater : 
+			
+			// For the Heater, perform a series of call that will also test the
+						// adjustable interface.
+						Instant Heater1 = ac.getStartInstant().plusSeconds(280L);
+						delay = ac.nanoDelayUntilInstant(Heater1);
+						this.logMessage("HEM schedules the Heater first call in "
+													+ delay + " " + TimeUnit.NANOSECONDS);
+						this.scheduleTaskOnComponent(
+								new AbstractComponent.AbstractTask() {
+									@Override
+									public void run() {
+										try {
+											traceMessage("HEM Heater first call begins.\n");
+											traceMessage("Heater maxMode index? " +
+														   heaterop.maxMode() + "\n");
+											traceMessage("Heater current mode index? " +
+														   heaterop.currentMode() + "\n");
+											traceMessage("Heater going down one mode? " +
+														   heaterop.downMode() + "\n");
+											traceMessage("Heater current mode is? " +
+															heaterop.currentMode() + "\n");
+											traceMessage("Heater going up one mode? " +
+													heaterop.upMode() + "\n");
+											traceMessage("Heater current mode is? " +
+													heaterop.currentMode() + "\n");
+											traceMessage("Heater setting current mode? " +
+													heaterop.setMode(2) + "\n");
+											traceMessage("Heater current mode is? " +
+													heaterop.currentMode() + "\n");
+											traceMessage("Heater is suspended? " +
+													heaterop.suspended() + "\n");
+											traceMessage("HEM Heater first call ends.\n");
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+									}
+								}, delay, TimeUnit.NANOSECONDS);
+
+						Instant Heater2 = ac.getStartInstant().plusSeconds(3200L);
+						delay = ac.nanoDelayUntilInstant(Heater2);
+						this.logMessage("HEM schedules the Heater second call in "
+													+ delay + " " + TimeUnit.NANOSECONDS);
+						this.scheduleTaskOnComponent(
+								new AbstractComponent.AbstractTask() {
+									@Override
+									public void run() {
+										try {
+											traceMessage("HEM Heater second call begins.\n");
+											traceMessage("Heater suspends? " +
+													heaterop.suspend() + "\n");
+											traceMessage("Heater is suspended? " +
+													heaterop.suspended() + "\n");
+											traceMessage("Heater emergency? " +
+													heaterop.emergency() + "\n");
+											traceMessage("HEM Heater second call ends.\n");
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+									}
+								}, delay, TimeUnit.NANOSECONDS);
+
+						Instant Heater3 = ac.getStartInstant().plusSeconds(360L);
+						delay = ac.nanoDelayUntilInstant(Heater3);
+						this.logMessage("HEM schedules the Heater third call in "
+													+ delay + " " + TimeUnit.NANOSECONDS);
+						this.scheduleTaskOnComponent(
+								new AbstractComponent.AbstractTask() {
+									@Override
+									public void run() {
+										try {
+											traceMessage("HEM Heater third call begins.\n");
+											traceMessage("Heater emergency? " +
+													heaterop.emergency() + "\n");
+											traceMessage("Heater resumes? " +
+													heaterop.resume() + "\n");
+											traceMessage("Heater is suspended? " +
+													heaterop.suspended() + "\n");
+											traceMessage("Heater current mode is? " +
+													heaterop.currentMode() + "\n");
+											traceMessage("HEM Heater third call ends.\n");
+										} catch (Exception e) {
+											e.printStackTrace();
+										}
+									}
+								}, delay, TimeUnit.NANOSECONDS);
 		}
 	}
 
@@ -385,6 +489,7 @@ extends		AbstractComponent
 		this.logMessage("HEM ends.");
 		this.doPortDisconnection(this.meterop.getPortURI());
 		this.doPortDisconnection(this.heaterop.getPortURI());
+		this.doPortDisconnection(this.chauffeEauop.getPortURI());
 		super.finalise();
 	}
 
@@ -397,6 +502,7 @@ extends		AbstractComponent
 		try {
 			this.meterop.unpublishPort();
 			this.heaterop.unpublishPort();
+			this.chauffeEauop.unpublishPort();
 		} catch (Exception e) {
 			throw new ComponentShutdownException(e) ;
 		}

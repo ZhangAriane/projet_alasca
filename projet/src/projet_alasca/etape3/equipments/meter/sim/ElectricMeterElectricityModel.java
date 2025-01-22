@@ -99,6 +99,8 @@ import projet_alasca.etape3.equipments.meter.ElectricMeter;
 type = Double.class)
 @ModelImportedVariable(name = "currentVentilateurIntensity",
 type = Double.class)
+@ModelImportedVariable(name = "currentChauffeEauIntensity",
+type = Double.class)
 //-----------------------------------------------------------------------------
 public class			ElectricMeterElectricityModel
 extends		AtomicHIOA
@@ -149,6 +151,9 @@ extends		AtomicHIOA
 	
 	@ImportedVariable(type = Double.class)
 	protected Value<Double>			currentVentilateurIntensity;
+	
+	@ImportedVariable(type = Double.class)
+	protected Value<Double>			currentChauffeEauIntensity;
 
 	/** current total power consumption of the house in amperes.			*/
 	@InternalVariable(type = Double.class)
@@ -231,7 +236,8 @@ extends		AtomicHIOA
 		double i = this.currentHairDryerIntensity.getValue()
 				   + this.currentHeaterIntensity.getValue()
 				   + this.currentMachineCafeIntensity.getValue()
-				   + this.currentVentilateurIntensity.getValue();
+				   + this.currentVentilateurIntensity.getValue()
+				   +this.currentChauffeEauIntensity.getValue();
 
 		return i;
 	}
@@ -262,7 +268,8 @@ extends		AtomicHIOA
 						&& this.currentHairDryerIntensity.isInitialised()
 						&& this.currentHeaterIntensity.isInitialised()
 						&& this.currentMachineCafeIntensity.isInitialised()
-						&& this.currentVentilateurIntensity.isInitialised()) {
+						&& this.currentVentilateurIntensity.isInitialised()
+						&& this.currentChauffeEauIntensity.isInitialised()) {
 			double i = this.computePowerConsumption();
 			this.currentPowerConsumption.initialise(i);
 			this.currentCumulativeConsumption.initialise(0.0);

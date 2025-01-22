@@ -49,6 +49,15 @@ import fr.sorbonne_u.devs_simulation.models.architectures.CoupledModelDescriptor
 import fr.sorbonne_u.devs_simulation.models.events.EventI;
 import fr.sorbonne_u.devs_simulation.models.events.EventSink;
 import fr.sorbonne_u.devs_simulation.models.events.EventSource;
+import projet_alasca.equipements.chauffeEau.ChauffeEau;
+import projet_alasca.equipements.chauffeEau.ChauffeEauUser;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauCoupledModel;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauUnitTesterModel;
+import projet_alasca.equipements.chauffeEau.mil.events.SetPowerChauffeEau;
+import projet_alasca.equipements.chauffeEau.mil.events.SwitchOffChauffeEau;
+import projet_alasca.equipements.chauffeEau.mil.events.SwitchOnChauffeEau;
+import projet_alasca.equipements.chauffeEau.mil.events.Heat;
+import projet_alasca.equipements.chauffeEau.mil.events.DoNotHeat;
 import projet_alasca.equipements.machineCafe.MachineCafe;
 import projet_alasca.equipements.machineCafe.MachineCafeUser;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeCoupledModel;
@@ -77,8 +86,6 @@ import projet_alasca.etape3.equipments.heater.Heater;
 import projet_alasca.etape3.equipments.heater.HeaterUser;
 import projet_alasca.etape3.equipments.heater.mil.HeaterCoupledModel;
 import projet_alasca.etape3.equipments.heater.mil.HeaterUnitTesterModel;
-import projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat;
-import projet_alasca.etape3.equipments.heater.mil.events.Heat;
 import projet_alasca.etape3.equipments.heater.mil.events.SetPowerHeater;
 import projet_alasca.etape3.equipments.heater.mil.events.SwitchOffHeater;
 import projet_alasca.etape3.equipments.heater.mil.events.SwitchOnHeater;
@@ -176,14 +183,14 @@ public abstract class	ComponentSimulationArchitectures
 							SetPowerHeater.class,
 							SwitchOnHeater.class,
 							SwitchOffHeater.class,
-							Heat.class,
-							DoNotHeat.class},
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{
 								SetPowerHeater.class,
 								SwitchOnHeater.class,
 								SwitchOffHeater.class,
-								Heat.class,
-								DoNotHeat.class},
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class,
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						simulatedTimeUnit,
 						Heater.REFLECTION_INBOUND_PORT_URI));
 		atomicModelDescriptors.put(
@@ -195,8 +202,8 @@ public abstract class	ComponentSimulationArchitectures
 							SwitchOnHeater.class,
 							SwitchOffHeater.class,
 							SetPowerHeater.class,
-							Heat.class,
-							DoNotHeat.class},
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						simulatedTimeUnit,
 						HeaterUser.REFLECTION_INBOUND_PORT_URI));
 
@@ -213,8 +220,24 @@ public abstract class	ComponentSimulationArchitectures
 							SetPowerHeater.class,
 							SwitchOnHeater.class,
 							SwitchOffHeater.class,
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class,
+							
+							SwitchOnMachineCafe.class,
+							SwitchOffMachineCafe.class,
+							
+							SwitchOnVentilateur.class,
+							SwitchOffVentilateur.class,
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							
+							SetPowerChauffeEau.class,
+							SwitchOnChauffeEau.class,
+							SwitchOffChauffeEau.class,
 							Heat.class,
-							DoNotHeat.class},
+							DoNotHeat.class
+							
+							},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						simulatedTimeUnit,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
@@ -277,6 +300,40 @@ public abstract class	ComponentSimulationArchitectures
 							SetMediumVentilateur.class},
 						simulatedTimeUnit,
 						VentilateurUser.REFLECTION_INBOUND_PORT_URI));
+		//ChauffeEau 
+		
+		atomicModelDescriptors.put(
+				ChauffeEauCoupledModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						ChauffeEauCoupledModel.MIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SetPowerChauffeEau.class,
+							SwitchOnChauffeEau.class,
+							SwitchOffChauffeEau.class,
+							Heat.class,
+							DoNotHeat.class},
+						(Class<? extends EventI>[]) new Class<?>[]{
+								SetPowerChauffeEau.class,
+								SwitchOnChauffeEau.class,
+								SwitchOffChauffeEau.class,
+								Heat.class,
+								DoNotHeat.class},
+						simulatedTimeUnit,
+						ChauffeEau.REFLECTION_INBOUND_PORT_URI));
+		atomicModelDescriptors.put(
+				ChauffeEauUnitTesterModel.MIL_URI,
+				ComponentAtomicModelDescriptor.create(
+						ChauffeEauUnitTesterModel.MIL_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnChauffeEau.class,
+							SwitchOffChauffeEau.class,
+							SetPowerChauffeEau.class,
+							Heat.class,
+							DoNotHeat.class},
+						simulatedTimeUnit,
+						ChauffeEauUser.REFLECTION_INBOUND_PORT_URI));
+		
 
 
 
@@ -298,6 +355,10 @@ public abstract class	ComponentSimulationArchitectures
 		//ventilateur
 		submodels.add(VentilateurStateModel.MIL_URI);
 		submodels.add(VentilateurUserModel.MIL_URI);
+		
+		//ChauffeEau
+		submodels.add(ChauffeEauCoupledModel.MIL_URI);
+		submodels.add(ChauffeEauUnitTesterModel.MIL_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
@@ -384,17 +445,17 @@ public abstract class	ComponentSimulationArchitectures
 						});
 				connections.put(
 						new EventSource(HeaterUnitTesterModel.MIL_URI,
-								Heat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class),
 						new EventSink[] {
 								new EventSink(HeaterCoupledModel.MIL_URI,
-										Heat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.Heat.class)
 						});
 				connections.put(
 						new EventSource(HeaterUnitTesterModel.MIL_URI,
-								DoNotHeat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class),
 						new EventSink[] {
 								new EventSink(HeaterCoupledModel.MIL_URI,
-										DoNotHeat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class)
 						});
 
 				connections.put(
@@ -420,18 +481,18 @@ public abstract class	ComponentSimulationArchitectures
 						});
 				connections.put(
 						new EventSource(HeaterCoupledModel.MIL_URI,
-								Heat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class),
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.MIL_URI,
-										Heat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.Heat.class)
 						});
 				connections.put(
 						new EventSource(HeaterCoupledModel.MIL_URI,
-								DoNotHeat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class),
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.MIL_URI,
-										DoNotHeat.class)
-						});
+										projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class)
+						}); 
 
 				//machine cafe
 				connections.put(
@@ -537,6 +598,79 @@ public abstract class	ComponentSimulationArchitectures
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.MIL_URI,
 										SetMediumVentilateur.class)
+						});
+				
+				//ChauffeEau 
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
+								SetPowerChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_URI,
+										SetPowerChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
+								SwitchOnChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_URI,
+										SwitchOnChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
+								SwitchOffChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_URI,
+										SwitchOffChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
+								Heat.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_URI,
+								DoNotHeat.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_URI,
+										DoNotHeat.class)
+						});
+
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_URI,
+								SetPowerChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SetPowerChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_URI,
+								SwitchOnChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOnChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_URI,
+								SwitchOffChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										SwitchOffChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_URI,
+								Heat.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_URI,
+								DoNotHeat.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_URI,
+										DoNotHeat.class)
 						});
 
 
@@ -635,14 +769,14 @@ public abstract class	ComponentSimulationArchitectures
 							SetPowerHeater.class,		// notice that the
 							SwitchOnHeater.class,		// imported events of
 							SwitchOffHeater.class,		// the coupled model
-							Heat.class,					// appear here
-							DoNotHeat.class},
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,					// appear here
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{
 								SetPowerHeater.class,		// notice that the
 								SwitchOnHeater.class,		// reexported events of
 								SwitchOffHeater.class,		// the coupled model
-								Heat.class,					// appear here
-								DoNotHeat.class},
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class,					// appear here
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						simulatedTimeUnit,
 						Heater.REFLECTION_INBOUND_PORT_URI));
 		atomicModelDescriptors.put(
@@ -654,8 +788,8 @@ public abstract class	ComponentSimulationArchitectures
 							SwitchOnHeater.class,
 							SwitchOffHeater.class,
 							SetPowerHeater.class,
-							Heat.class,
-							DoNotHeat.class},
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						simulatedTimeUnit,
 						HeaterUser.REFLECTION_INBOUND_PORT_URI));
 
@@ -671,8 +805,26 @@ public abstract class	ComponentSimulationArchitectures
 							SwitchOnHeater.class,
 							SwitchOffHeater.class,
 							SetPowerHeater.class,
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class,
+							
+							SwitchOnMachineCafe.class,
+							SwitchOffMachineCafe.class,
+
+							
+							SwitchOnVentilateur.class,
+							SwitchOffVentilateur.class,
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							
+							SetPowerChauffeEau.class,
+							SwitchOnChauffeEau.class,
+							SwitchOffChauffeEau.class,
 							Heat.class,
-							DoNotHeat.class},
+							DoNotHeat.class
+							
+							
+							},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						simulatedTimeUnit,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
@@ -742,6 +894,40 @@ public abstract class	ComponentSimulationArchitectures
 						},	// appear here
 						simulatedTimeUnit,
 						VentilateurUser.REFLECTION_INBOUND_PORT_URI));
+		
+		//ChauffeEau
+		
+		atomicModelDescriptors.put(
+				ChauffeEauCoupledModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						ChauffeEauCoupledModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SetPowerChauffeEau.class,		// notice that the
+							SwitchOnChauffeEau.class,		// imported events of
+							SwitchOffChauffeEau.class,		// the coupled model
+							Heat.class,					// appear here
+							DoNotHeat.class},
+						(Class<? extends EventI>[]) new Class<?>[]{
+								SetPowerChauffeEau.class,		// notice that the
+								SwitchOnChauffeEau.class,		// reexported events of
+								SwitchOffChauffeEau.class,		// the coupled model
+								Heat.class,					// appear here
+								DoNotHeat.class},
+						simulatedTimeUnit,
+						ChauffeEau.REFLECTION_INBOUND_PORT_URI));
+		atomicModelDescriptors.put(
+				ChauffeEauUnitTesterModel.MIL_RT_URI,
+				RTComponentAtomicModelDescriptor.create(
+						ChauffeEauUnitTesterModel.MIL_RT_URI,
+						(Class<? extends EventI>[]) new Class<?>[]{},
+						(Class<? extends EventI>[]) new Class<?>[]{
+							SwitchOnChauffeEau.class,
+							SwitchOffChauffeEau.class,
+							SetPowerChauffeEau.class,
+							Heat.class,
+							DoNotHeat.class},
+						simulatedTimeUnit,
+						ChauffeEauUser.REFLECTION_INBOUND_PORT_URI));
 
 
 		// map that will contain the coupled model descriptors to construct
@@ -762,6 +948,9 @@ public abstract class	ComponentSimulationArchitectures
 		//ventilateur
 		submodels.add(VentilateurStateModel.MIL_RT_URI);
 		submodels.add(VentilateurUserModel.MIL_RT_URI);
+		//ChauffeEau
+		submodels.add(ChauffeEauCoupledModel.MIL_RT_URI);
+		submodels.add(ChauffeEauUnitTesterModel.MIL_RT_URI);
 
 		// event exchanging connections between exporting and importing
 		// models
@@ -848,17 +1037,17 @@ public abstract class	ComponentSimulationArchitectures
 						});
 				connections.put(
 						new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
-								Heat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class),
 						new EventSink[] {
 								new EventSink(HeaterCoupledModel.MIL_RT_URI,
-										Heat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.Heat.class)
 						});
 				connections.put(
 						new EventSource(HeaterUnitTesterModel.MIL_RT_URI,
-								DoNotHeat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class),
 						new EventSink[] {
 								new EventSink(HeaterCoupledModel.MIL_RT_URI,
-										DoNotHeat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class)
 						});
 
 				connections.put(
@@ -884,17 +1073,17 @@ public abstract class	ComponentSimulationArchitectures
 						});
 				connections.put(
 						new EventSource(HeaterCoupledModel.MIL_RT_URI,
-								Heat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class),
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-										Heat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.Heat.class)
 						});
 				connections.put(
 						new EventSource(HeaterCoupledModel.MIL_RT_URI,
-								DoNotHeat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class),
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
-										DoNotHeat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class)
 						});
 
 				//machine cafe
@@ -1001,6 +1190,80 @@ public abstract class	ComponentSimulationArchitectures
 								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
 										SetMediumVentilateur.class)
 						});
+				
+				//ChauffeEau 
+				
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
+								SetPowerChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_RT_URI,
+										SetPowerChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
+								SwitchOnChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_RT_URI,
+										SwitchOnChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
+								SwitchOffChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_RT_URI,
+										SwitchOffChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
+								Heat.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_RT_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauUnitTesterModel.MIL_RT_URI,
+								DoNotHeat.class),
+						new EventSink[] {
+								new EventSink(ChauffeEauCoupledModel.MIL_RT_URI,
+										DoNotHeat.class)
+						});
+
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_RT_URI,
+								SetPowerChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SetPowerChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_RT_URI,
+								SwitchOnChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOnChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_RT_URI,
+								SwitchOffChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										SwitchOffChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_RT_URI,
+								Heat.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.MIL_RT_URI,
+								DoNotHeat.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.MIL_RT_URI,
+										DoNotHeat.class)
+						});
 
 
 
@@ -1089,14 +1352,14 @@ public abstract class	ComponentSimulationArchitectures
 							SetPowerHeater.class,		// notice that the
 							SwitchOnHeater.class,		// imported events of
 							SwitchOffHeater.class,		// the coupled model
-							Heat.class,					// appear here
-							DoNotHeat.class},
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,					// appear here
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						(Class<? extends EventI>[]) new Class<?>[]{
 								SetPowerHeater.class,		// notice that the
 								SwitchOnHeater.class,		// reexported events of
 								SwitchOffHeater.class,		// the coupled model
-								Heat.class,					// appear here
-								DoNotHeat.class},
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class,					// appear here
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class},
 						simulatedTimeUnit,
 						Heater.REFLECTION_INBOUND_PORT_URI));
 
@@ -1113,8 +1376,23 @@ public abstract class	ComponentSimulationArchitectures
 							SetPowerHeater.class,
 							SwitchOnHeater.class,
 							SwitchOffHeater.class,
+							projet_alasca.etape3.equipments.heater.mil.events.Heat.class,
+							projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class ,
+							
+							SwitchOnMachineCafe.class,
+							SwitchOffMachineCafe.class,
+							
+							SwitchOnVentilateur.class,
+							SwitchOffVentilateur.class,
+							SetLowVentilateur.class,
+							SetHighVentilateur.class,
+							
+							SetPowerChauffeEau.class,
+							SwitchOnChauffeEau.class,
+							SwitchOffChauffeEau.class,
 							Heat.class,
-							DoNotHeat.class},
+							DoNotHeat.class
+							},
 						(Class<? extends EventI>[]) new Class<?>[]{},
 						simulatedTimeUnit,
 						ElectricMeter.REFLECTION_INBOUND_PORT_URI));
@@ -1158,6 +1436,29 @@ public abstract class	ComponentSimulationArchitectures
 								simulatedTimeUnit,
 								Ventilateur.REFLECTION_INBOUND_PORT_URI
 								));
+		
+		//ChauffeEau
+				atomicModelDescriptors.put(
+						ChauffeEauCoupledModel.SIL_URI,
+						RTComponentAtomicModelDescriptor.create(
+								ChauffeEauCoupledModel.SIL_URI,
+								(Class<? extends EventI>[]) new Class<?>[]{
+									SetPowerChauffeEau.class,		// notice that the
+									SwitchOnChauffeEau.class,		// imported events of
+									SwitchOffChauffeEau.class,		// the coupled model
+									Heat.class,					// appear here
+									DoNotHeat.class
+								},
+								(Class<? extends EventI>[]) new Class<?>[]{
+										SetPowerChauffeEau.class,		// notice that the
+										SwitchOnChauffeEau.class,		// reexported events of
+										SwitchOffChauffeEau.class,		// the coupled model
+										Heat.class,					// appear here
+										DoNotHeat.class
+								},
+								simulatedTimeUnit,
+								ChauffeEau.REFLECTION_INBOUND_PORT_URI
+								));
 
 
 
@@ -1175,6 +1476,9 @@ public abstract class	ComponentSimulationArchitectures
 		submodels.add(MachineCafeStateModel.SIL_URI);
 		//ventilateur
 		submodels.add(VentilateurStateModel.SIL_URI);
+		//ChauffeEau
+		submodels.add(ChauffeEauCoupledModel.SIL_URI);
+		
 
 		// event exchanging connections between exporting and importing
 		// models
@@ -1235,17 +1539,17 @@ public abstract class	ComponentSimulationArchitectures
 						});
 				connections.put(
 						new EventSource(HeaterCoupledModel.SIL_URI,
-								Heat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.Heat.class),
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.SIL_URI,
-										Heat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.Heat.class)
 						});
 				connections.put(
 						new EventSource(HeaterCoupledModel.SIL_URI,
-								DoNotHeat.class),
+								projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class),
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.SIL_URI,
-										DoNotHeat.class)
+										projet_alasca.etape3.equipments.heater.mil.events.DoNotHeat.class)
 						});
 
 				//machine cafe.
@@ -1299,6 +1603,44 @@ public abstract class	ComponentSimulationArchitectures
 						new EventSink[] {
 								new EventSink(ElectricMeterCoupledModel.SIL_URI,
 										SetMediumVentilateur.class)
+						});
+				
+				//ChauffeEau
+				
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.SIL_URI,
+								SetPowerChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SetPowerChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.SIL_URI,
+								SwitchOnChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOnChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.SIL_URI,
+								SwitchOffChauffeEau.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										SwitchOffChauffeEau.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.SIL_URI,
+								Heat.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										Heat.class)
+						});
+				connections.put(
+						new EventSource(ChauffeEauCoupledModel.SIL_URI,
+								DoNotHeat.class),
+						new EventSink[] {
+								new EventSink(ElectricMeterCoupledModel.SIL_URI,
+										DoNotHeat.class)
 						});
 
 

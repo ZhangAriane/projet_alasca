@@ -42,6 +42,13 @@ import fr.sorbonne_u.devs_simulation.exceptions.NeoSim4JavaException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.exceptions.VerboseException;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import projet_alasca.equipements.chauffeEau.ChauffeEau;
+import projet_alasca.equipements.chauffeEau.ChauffeEauController;
+import projet_alasca.equipements.chauffeEau.ChauffeEauController.ControlMode;
+import projet_alasca.equipements.chauffeEau.ChauffeEauUser;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauCoupledModel;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauStateModel;
+import projet_alasca.equipements.chauffeEau.mil.ChauffeEauUnitTesterModel;
 import projet_alasca.equipements.machineCafe.MachineCafe;
 import projet_alasca.equipements.machineCafe.MachineCafeUser;
 import projet_alasca.equipements.machineCafe.mil.MachineCafeStateModel;
@@ -57,7 +64,7 @@ import projet_alasca.etape3.equipments.hairdryer.mil.HairDryerUserModel;
 import projet_alasca.etape3.equipments.heater.Heater;
 import projet_alasca.etape3.equipments.heater.HeaterController;
 import projet_alasca.etape3.equipments.heater.HeaterUser;
-import projet_alasca.etape3.equipments.heater.HeaterController.ControlMode;
+//import projet_alasca.etape3.equipments.heater.HeaterController.ControlMode;
 import projet_alasca.etape3.equipments.heater.mil.HeaterCoupledModel;
 import projet_alasca.etape3.equipments.heater.mil.HeaterUnitTesterModel;
 import projet_alasca.etape3.equipments.hem.HEM;
@@ -221,6 +228,9 @@ extends		AbstractCVM
 	public static String			START_INSTANT = "2023-11-22T00:00:00.00Z";
 
 	/** the control mode of the heater controller for the next run.			*/
+	public static projet_alasca.etape3.equipments.heater.HeaterController.ControlMode		CONTROL_MODE_Heater = projet_alasca.etape3.equipments.heater.HeaterController.ControlMode.PULL;
+	
+	/** the control mode of the heater controller for the next run.			*/
 	public static ControlMode		CONTROL_MODE = ControlMode.PULL;
 
 	// -------------------------------------------------------------------------
@@ -293,6 +303,20 @@ extends		AbstractCVM
 		VentilateurUser.VERBOSE = true;
 		VentilateurUser.X_RELATIVE_POSITION = 2;
 		VentilateurUser.Y_RELATIVE_POSITION = 1;
+		
+		//ChauffeEau
+		
+		ChauffeEau.VERBOSE = true;
+		ChauffeEau.X_RELATIVE_POSITION = 1;
+		ChauffeEau.Y_RELATIVE_POSITION = 3;
+		ChauffeEauUser.VERBOSE = true;
+		ChauffeEauUser.X_RELATIVE_POSITION = 0;
+		ChauffeEauUser.Y_RELATIVE_POSITION = 3;
+		ChauffeEauController.VERBOSE = true;
+		ChauffeEauController.X_RELATIVE_POSITION = 2;
+		ChauffeEauController.Y_RELATIVE_POSITION = 3;
+		
+		
 	}
 
 	// -------------------------------------------------------------------------
@@ -321,10 +345,14 @@ extends		AbstractCVM
 		String hairDryerUserLocalArchitectureURI = "";
 		// URI of the Heater local simulation architecture for the current
 		// run, if relevant.
+		     
 		String heaterLocalArchitectureURI = "";
 		// URI of the HeaterUser local simulation architecture for the current
 		// run, if relevant.
+		    
 		String heaterUserLocalArchitectureURI = "";
+		
+		
 		// URI of the ElectricMeter local simulation architecture for the
 		// current run, if relevant.
 		String meterLocalArchitectureURI = "";
@@ -336,6 +364,10 @@ extends		AbstractCVM
 		//ventilateur
 		String ventilateurLocalArchitectureURI = "";
 		String ventilateurUserLocalArchitectureURI = "";
+		
+		//ChauffeEau
+		String chauffeEauLocalArchitectureURI = "";
+		String chauffeEauUserLocalArchitectureURI = "";
 
 		long current = System.currentTimeMillis();
 		// start time of the components in Unix epoch time in milliseconds.
@@ -362,6 +394,9 @@ extends		AbstractCVM
 			//ventilateur
 			ventilateurLocalArchitectureURI = VentilateurStateModel.MIL_URI;
 			ventilateurUserLocalArchitectureURI = VentilateurUserModel.MIL_URI;
+			//ChauffeEau
+			chauffeEauLocalArchitectureURI = ChauffeEauCoupledModel.MIL_URI;
+			chauffeEauUserLocalArchitectureURI = ChauffeEauUnitTesterModel.MIL_URI;
 			break;
 		case MIL_RT_SIMULATION:
 			globalArchitectureURI = GlobalSupervisor.MIL_SIM_ARCHITECTURE_URI;
@@ -376,6 +411,9 @@ extends		AbstractCVM
 			//ventilateur
 			ventilateurLocalArchitectureURI = VentilateurStateModel.MIL_RT_URI;
 			ventilateurUserLocalArchitectureURI = VentilateurUserModel.MIL_RT_URI;
+			//ChauffeEau
+			chauffeEauLocalArchitectureURI = ChauffeEauCoupledModel.MIL_RT_URI;
+			chauffeEauUserLocalArchitectureURI = ChauffeEauUnitTesterModel.MIL_RT_URI;
 			break;
 		case SIL_SIMULATION:
 			globalArchitectureURI = GlobalSupervisor.SIL_SIM_ARCHITECTURE_URI;
@@ -390,6 +428,9 @@ extends		AbstractCVM
 			//ventilateur
 			ventilateurLocalArchitectureURI = VentilateurStateModel.SIL_URI;
 			ventilateurUserLocalArchitectureURI = VentilateurUserModel.SIL_URI;
+			//ChauffeEau
+			chauffeEauLocalArchitectureURI = ChauffeEauCoupledModel.SIL_URI;
+			chauffeEauUserLocalArchitectureURI = "not-used";
 			break;
 		case NO_SIMULATION:
 		default:
@@ -439,7 +480,7 @@ extends		AbstractCVM
 							 Heater.ACTUATOR_INBOUND_PORT_URI,
 							 HeaterController.STANDARD_HYSTERESIS,
 							 HeaterController.STANDARD_CONTROL_PERIOD,
-							 CONTROL_MODE,
+							 CONTROL_MODE_Heater,
 							 CURRENT_EXECUTION_TYPE,
 							 CURRENT_SIMULATION_TYPE,
 							 CLOCK_URI});
@@ -515,6 +556,46 @@ extends		AbstractCVM
 							 SIMULATION_TIME_UNIT,
 							 ACCELERATION_FACTOR,
 							 CLOCK_URI});
+		
+		//ChauffeEau
+		
+				AbstractComponent.createComponent(
+						ChauffeEau.class.getCanonicalName(),
+						new Object[]{ChauffeEau.REFLECTION_INBOUND_PORT_URI,
+									ChauffeEau.USER_INBOUND_PORT_URI,
+									ChauffeEau.INTERNAL_CONTROL_INBOUND_PORT_URI,
+									ChauffeEau.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+									ChauffeEau.SENSOR_INBOUND_PORT_URI,
+									ChauffeEau.ACTUATOR_INBOUND_PORT_URI,
+									 CURRENT_EXECUTION_TYPE,
+									 CURRENT_SIMULATION_TYPE,
+									 globalArchitectureURI,
+									 chauffeEauLocalArchitectureURI,
+									 SIMULATION_TIME_UNIT,
+									 ACCELERATION_FACTOR,
+									 CLOCK_URI});
+				AbstractComponent.createComponent(
+						ChauffeEauController.class.getCanonicalName(),
+						new Object[]{ChauffeEau.SENSOR_INBOUND_PORT_URI,
+									ChauffeEau.ACTUATOR_INBOUND_PORT_URI,
+									ChauffeEauController.STANDARD_HYSTERESIS,
+									ChauffeEauController.STANDARD_CONTROL_PERIOD,
+									 CONTROL_MODE,
+									 CURRENT_EXECUTION_TYPE,
+									 CURRENT_SIMULATION_TYPE,
+									 CLOCK_URI});
+				AbstractComponent.createComponent(
+						ChauffeEauUser.class.getCanonicalName(),
+						new Object[]{ChauffeEau.USER_INBOUND_PORT_URI,
+									ChauffeEau.INTERNAL_CONTROL_INBOUND_PORT_URI,
+									ChauffeEau.EXTERNAL_CONTROL_INBOUND_PORT_URI,
+								 	 CURRENT_EXECUTION_TYPE,
+								 	 CURRENT_SIMULATION_TYPE,
+								 	 globalArchitectureURI,
+								 	 chauffeEauUserLocalArchitectureURI,
+								 	 SIMULATION_TIME_UNIT,
+								 	 ACCELERATION_FACTOR,
+								 	 CLOCK_URI});
 
 
 		AbstractComponent.createComponent(
@@ -536,6 +617,7 @@ extends		AbstractCVM
 						SIMULATION_START_TIME,
 						SIMULATION_DURATION,
 						SIMULATION_TIME_UNIT});
+		
 
 		if (CURRENT_SIMULATION_TYPE.isSimulated()) {
 			AbstractComponent.createComponent(

@@ -73,6 +73,10 @@ extends AtomicHIOA {
 		@ImportedVariable(type = Double.class)
 		protected Value<Double>			currentHairDryerIntensity;
 		
+		/** current intensity of the chauffeEau in amperes.							*/
+		@ImportedVariable(type = Double.class)
+		protected Value<Double>			currentChauffeEauIntensity;
+		
 		/** current intensity of the refrigerator in amperes.					*/
 		@ImportedVariable(type = Double.class)
 		protected Value<Double>			currentRefrigeratorIntensity;
@@ -141,6 +145,7 @@ extends AtomicHIOA {
 			double i = this.currentPanneauSolaireIntensity.getValue() -
 					  (this.currentHairDryerIntensity.getValue() +
 					   this.currentHeaterIntensity.getValue() +
+					   this.currentChauffeEauIntensity.getValue() +
 					   this.currentRefrigeratorIntensity.getValue());
 			return i;
 		}

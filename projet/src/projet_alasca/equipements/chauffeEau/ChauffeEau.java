@@ -6,10 +6,12 @@ import java.util.concurrent.TimeUnit;
 
 import fr.sorbonne_u.components.AbstractComponent;
 import fr.sorbonne_u.components.annotations.OfferedInterfaces;
+import fr.sorbonne_u.components.annotations.RequiredInterfaces;
 import fr.sorbonne_u.components.cyphy.AbstractCyPhyComponent;
 import fr.sorbonne_u.components.cyphy.plugins.devs.AtomicSimulatorPlugin;
 import fr.sorbonne_u.components.cyphy.plugins.devs.RTAtomicSimulatorPlugin;
 import fr.sorbonne_u.components.cyphy.utils.aclocks.AcceleratedAndSimulationClock;
+import fr.sorbonne_u.components.cyphy.utils.aclocks.ClocksServerWithSimulationCI;
 import fr.sorbonne_u.components.cyphy.utils.aclocks.ClocksServerWithSimulationConnector;
 import fr.sorbonne_u.components.cyphy.utils.aclocks.ClocksServerWithSimulationOutboundPort;
 import fr.sorbonne_u.components.exceptions.BCMException;
@@ -17,6 +19,7 @@ import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.hem2024e1.utils.Measure;
 import fr.sorbonne_u.components.hem2024e1.utils.MeasurementUnit;
+import fr.sorbonne_u.components.interfaces.DataOfferedCI;
 import fr.sorbonne_u.devs_simulation.architectures.Architecture;
 import fr.sorbonne_u.devs_simulation.models.time.Duration;
 import fr.sorbonne_u.devs_simulation.models.time.Time;
@@ -56,6 +59,8 @@ import projet_alasca.equipements.chauffeEau.measures.ChauffeEauStateMeasure;
 		ChauffeEauExternalControlCI.class,
 		ChauffeEauSensorDataCI.ChauffeEauSensorOfferedPullCI.class,
 		ChauffeEauActuatorCI.class})
+@RequiredInterfaces(required={DataOfferedCI.PushCI.class,
+		  ClocksServerWithSimulationCI.class})
 public class ChauffeEau 
 extends AbstractCyPhyComponent 
 implements ChauffeEauUserI, 
@@ -97,6 +102,10 @@ implements ChauffeEauUserI,
 	protected static final double	MAX_POWER_LEVEL = 2000.0;
 	/** standard target temperature for the ChauffeEau.							*/
 	protected static final double	STANDARD_TARGET_TEMPERATURE = 19.0;
+	
+	public static final MeasurementUnit	TEMPERATURE_UNIT =
+			MeasurementUnit.CELSIUS;
+
 
 	/** URI of the ChauffeEau port for user interactions.						*/
 	public static final String		USER_INBOUND_PORT_URI =
@@ -297,10 +306,10 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 						ChauffeEau.class, h,
 						"REFLECTION_INBOUND_PORT_URI != null && "
 									+ "!REFLECTION_INBOUND_PORT_URI.isEmpty()");
-//			ret &= InvariantChecking.checkBlackBoxInvariant(
-//						TEMPERATURE_UNIT != null,
-//						ChauffeEau.class, h,
-//						"TEMPERATURE_UNIT != null");
+			ret &= InvariantChecking.checkBlackBoxInvariant(
+						TEMPERATURE_UNIT != null,
+						ChauffeEau.class, h,
+						"TEMPERATURE_UNIT != null");
 			ret &= InvariantChecking.checkBlackBoxInvariant(
 						USER_INBOUND_PORT_URI != null &&
 												!USER_INBOUND_PORT_URI.isEmpty(),
@@ -599,8 +608,8 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 			this.hecip = new ChauffeEauExternalControlInboundPort(
 										ChauffeEauExternalControlInboundPortURI, this);
 			this.hecip.publishPort();
-			this.rop = new RegistrationOutboundPort(this.registrationOutboundPortURI,this);
-			this.rop.publishPort();
+		//	this.rop = new RegistrationOutboundPort(this.registrationOutboundPortURI,this);
+			//this.rop.publishPort();
 			this.sensorInboundPort = new ChauffeEauSensorDataInboundPort(
 										ChauffeEauSensorInboundPortURI, this);
 			this.sensorInboundPort.publishPort();
@@ -691,10 +700,10 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 		// create the simulation plug-in given the current type of simulation
 		// and its local architecture i.e., for the current execution
 		try {
-			this.doPortConnection(
+			/*this.doPortConnection(
 					this.rop.getPortURI(),
 					GestionEnergie.registrationInboundPortURI,
-					RegistrationConnector.class.getCanonicalName());
+					RegistrationConnector.class.getCanonicalName());*/
 			
 			switch (this.currentSimulationType) {
 			case MIL_SIMULATION:
@@ -814,12 +823,12 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	}
 
 	
-	@Override
+	/*@Override
 	public synchronized void	finalise() throws Exception
 	{
 		this.rop.doDisconnection();
 		super.finalise();
-	}
+	}*/
 	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
@@ -831,7 +840,7 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 			this.hip.unpublishPort();
 			this.hicip.unpublishPort();
 			this.hecip.unpublishPort();
-			this.rop.unpublishPort();
+			//this.rop.unpublishPort();
 			this.sensorInboundPort.unpublishPort();
 			this.actuatorInboundPort.unpublishPort();
 		} catch (Exception e) {
@@ -851,7 +860,7 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	public boolean		on() throws Exception
 	{
 		if (ChauffeEau.VERBOSE) {
-			this.traceMessage("ChauffeEau returns its state: " +
+			this.traceMessage("ChauffeEau#on() returns its state: " +
 											this.currentState + ".\n");
 		}
 		return this.currentState == ChauffeEauState.ON ||
@@ -864,15 +873,15 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public void			switchOn() throws Exception
 	{
+		assert	!on() : new PreconditionException("!on()");
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau switches on.\n");
 		}
 
-		assert	!this.on() : new PreconditionException("!on()");
 
 		this.currentState = ChauffeEauState.ON;
 		
-		this.rop.register(this.chauffeEauID, this.registrationOutboundPortURI, null);
+		//this.rop.register(this.chauffeEauID, this.registrationOutboundPortURI, null);
 
 		if (this.currentSimulationType.isSILSimulation()) {
 			// For SIL simulation, an operation done in the component code
@@ -899,11 +908,13 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public void			switchOff() throws Exception
 	{
+		assert	this.on() : new PreconditionException("on()");
+		
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau switches off.\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+		
 
 		this.currentState = ChauffeEauState.OFF;
 		
@@ -934,13 +945,14 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public void			setTargetTemperature(double target) throws Exception
 	{
+		assert	target >= -50.0 && target <= 50.0 :
+			new PreconditionException("target >= -50.0 && target <= 50.0");
+		
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau sets a new target "
 										+ "temperature: " + target + ".\n");
 		}
 
-		assert	target >= -50.0 && target <= 50.0 :
-				new PreconditionException("target >= -50.0 && target <= 50.0");
 
 		this.targetTemperature = target;
 
@@ -954,12 +966,15 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public double		getTargetTemperature() throws Exception
 	{
+		
+		double ret = this.targetTemperature;
+		
+		
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau returns its target"
-							+ " temperature " + this.targetTemperature + ".\n");
+							+ " temperature " +ret + ".\n");
 		}
 
-		double ret = this.targetTemperature;
 
 		assert	ret >= -50.0 && ret <= 50.0 :
 				new PostconditionException("return >= -50.0 && return <= 50.0");
@@ -1002,12 +1017,14 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public boolean		heating() throws Exception
 	{
+		assert	this.on() : new PreconditionException("on()");
+
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau returns its heating status " + 
 						(this.currentState == ChauffeEauState.HEATING) + ".\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
+	
 
 		return this.currentState == ChauffeEauState.HEATING;
 	}
@@ -1018,11 +1035,14 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public void			startHeating() throws Exception
 	{
+		
+		assert	this.on() : new PreconditionException("on()");
+		assert	!this.heating() : new PreconditionException("!heating()");
+		
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau starts heating.\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	!this.heating() : new PreconditionException("!heating()");
+	
 
 		this.currentState = ChauffeEauState.HEATING;
 		
@@ -1051,11 +1071,15 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public void			stopHeating() throws Exception
 	{
+		
+		assert	this.on() : new PreconditionException("on()");
+		assert	this.heating() : new PreconditionException("heating()");
+		
+		
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau stops heating.\n");
 		}
-		assert	this.on() : new PreconditionException("on()");
-		assert	this.heating() : new PreconditionException("heating()");
+		
 
 		this.currentState = ChauffeEauState.ON;
 		
@@ -1138,14 +1162,13 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public double		getCurrentPowerLevel() throws Exception
 	{
+		double ret = this.currentPowerLevel;
+		
 		if (ChauffeEau.VERBOSE) {
 			this.traceMessage("ChauffeEau returns its current power level " + 
-					this.currentPowerLevel + ".\n");
+					ret + ".\n");
 		}
 
-		assert	this.on() : new PreconditionException("on()");
-
-		double ret = this.currentPowerLevel;
 
 		assert	ret >= 0.0 && ret <= getMaxPowerLevel() :
 				new PostconditionException(

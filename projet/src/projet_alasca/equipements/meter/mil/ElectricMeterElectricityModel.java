@@ -269,6 +269,7 @@ extends		AtomicHIOA
 				"currentChauffeEauIntensity == null || "
 				+ "!currentChauffeEauIntensity.isInitialised() || "
 				+ "currentChauffeEauIntensity.getValue() >= 0.0");
+		
 		return ret;
 	}
 
