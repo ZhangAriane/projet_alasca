@@ -8,7 +8,9 @@ import fr.sorbonne_u.devs_simulation.models.time.Time;
 import fr.sorbonne_u.devs_simulation.simulators.interfaces.AtomicSimulatorI;
 import fr.sorbonne_u.devs_simulation.utils.StandardLogger;
 
-public class PanneauSolaireElectricityModel extends AtomicHIOA {
+public class PanneauSolaireElectricityModel
+extends AtomicHIOA
+{
 	
 	 public static final String URI = PanneauSolaireElectricityModel.class.getSimpleName();
 	 

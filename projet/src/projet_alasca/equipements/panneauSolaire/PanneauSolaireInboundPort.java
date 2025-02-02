@@ -3,7 +3,10 @@ package projet_alasca.equipements.panneauSolaire;
 import fr.sorbonne_u.components.ComponentI;
 import fr.sorbonne_u.components.ports.AbstractInboundPort;
 
-public class PanneauSolaireInboundPort extends		AbstractInboundPort implements PanneauSolaireCI{
+public class PanneauSolaireInboundPort
+extends		AbstractInboundPort 
+implements PanneauSolaireCI
+{
 
 	private static final long serialVersionUID = 1L;
 

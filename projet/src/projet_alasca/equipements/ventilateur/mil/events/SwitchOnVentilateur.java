@@ -129,7 +129,7 @@ extends		AbstractVentilateurEvent
 //			// consumption changed boolean to true
 //			m.toggleConsumptionHasChanged();
 //		}
-		assert	model instanceof HairDryerOperationI;
+		assert	model instanceof VentilateurOperationI;
 
 		((VentilateurOperationI)model).turnOn();
 	}
