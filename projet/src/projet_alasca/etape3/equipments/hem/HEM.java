@@ -41,6 +41,7 @@ import fr.sorbonne_u.components.cyphy.utils.aclocks.ClocksServerWithSimulationOu
 import fr.sorbonne_u.components.exceptions.ComponentShutdownException;
 import fr.sorbonne_u.components.exceptions.ComponentStartException;
 import fr.sorbonne_u.components.hem2024.bases.AdjustableCI;
+import fr.sorbonne_u.components.hem2024.bases.RegistrationCI;
 import fr.sorbonne_u.components.hem2024e1.equipments.hem.AdjustableOutboundPort;
 import fr.sorbonne_u.components.hem2024e1.equipments.hem.HeaterConnector;
 //import fr.sorbonne_u.components.hem2024e1.equipments.hem.ChauffeEauConnector;
@@ -51,6 +52,7 @@ import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
 import projet_alasca.equipements.chauffeEau.ChauffeEau;
 import projet_alasca.equipements.gestionEnergie.ChauffeEauConnector;
+import projet_alasca.equipements.refrigerateur.connections.RegistrationInboundPort;
 import projet_alasca.etape3.CVMIntegrationTest;
 import projet_alasca.etape3.equipments.heater.Heater;
 //import projet_alasca.etape3.equipments.ChauffeEau.ChauffeEau;
@@ -58,6 +60,7 @@ import projet_alasca.etape3.equipments.meter.ElectricMeter;
 import projet_alasca.etape3.utils.SimulationType;
 
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 
 // -----------------------------------------------------------------------------
@@ -95,7 +98,7 @@ import java.util.concurrent.TimeUnit;
 @RequiredInterfaces(required = {AdjustableCI.class, ElectricMeterCI.class,
 								ClocksServerWithSimulationCI.class})
 public class			HEM
-extends		AbstractComponent
+extends		AbstractComponent implements RegistrationCI
 {
 	// -------------------------------------------------------------------------
 	// Constants and variables
@@ -115,6 +118,11 @@ extends		AbstractComponent
 	
 	/** port to connect to the ChauffeEau.										*/
 	protected AdjustableOutboundPort  chauffeEauop;
+	
+	protected RegistrationInboundPort registrationInboundPort;
+
+	private ArrayList<String> equipementEnregistrer;
+	public static final String registrationInboundPortURI = "registrationInboundPorURI";
 
 
 	/** period of the HEM control loop.										*/
@@ -155,6 +163,17 @@ extends		AbstractComponent
 												  Y_RELATIVE_POSITION);
 			this.toggleTracing();
 		}
+		try {
+			this.registrationInboundPort = new RegistrationInboundPort(this.registrationInboundPortURI,this);
+			this.registrationInboundPort.publishPort();
+
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+
+
+		this.equipementEnregistrer = new ArrayList<>();
 	}
 
 	// -------------------------------------------------------------------------
@@ -508,5 +527,32 @@ extends		AbstractComponent
 		}
 		super.shutdown();
 	}
+	
+	// -------------------------------------------------------------------------
+		// Service methods
+		// -------------------------------------------------------------------------
+
+
+		@Override
+		public boolean registered(String uid) throws Exception {
+			boolean res = this.equipementEnregistrer.contains(uid);
+			this.logMessage("Connection ? " + res );
+			return res;
+		}
+
+		@Override
+		public boolean register(String uid, String controlPortURI, String xmlControlAdapter) throws Exception {
+			this.logMessage("Register : " + uid);
+
+			this.equipementEnregistrer.add(uid);
+			return this.equipementEnregistrer.contains(uid);
+		}
+
+		@Override
+		public void unregister(String uid) throws Exception {
+			this.logMessage("Unregister : " + uid);
+			this.equipementEnregistrer.remove(uid);
+
+		}
 }
 // -----------------------------------------------------------------------------

@@ -3,12 +3,12 @@
 	<classpathentry kind="src" path="src"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.junit.JUNIT_CONTAINER/5"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER/org.eclipse.jdt.internal.debug.ui.launcher.StandardVMType/java-8-openjdk-amd64"/>
-	<classpathentry kind="lib" path="commons-math3-3.6.1.jar"/>
-	<classpathentry kind="lib" path="javassist.jar"/>
-	<classpathentry kind="lib" path="jing.jar"/>
 	<classpathentry kind="lib" path="BCM4Java-18112024.jar"/>
 	<classpathentry kind="lib" path="BCM4Java-CyPhy-19112024.jar"/>
+	<classpathentry kind="lib" path="commons-math3-3.6.1.jar"/>
+	<classpathentry kind="lib" path="javassist.jar"/>
 	<classpathentry kind="lib" path="jfreechart-1.6.0-snapshot.jar"/>
+	<classpathentry kind="lib" path="jing.jar"/>
 	<classpathentry kind="lib" path="NeoSim4Java-19112024.jar"/>
 	<classpathentry kind="lib" path="ALASCA-etape-2/ALASCA-etape-2/HEM-2024-etape2-14102024.jar"/>
 	<classpathentry kind="output" path="bin"/>

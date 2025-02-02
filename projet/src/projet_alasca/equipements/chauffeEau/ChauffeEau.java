@@ -48,6 +48,7 @@ import projet_alasca.equipements.chauffeEau.mil.events.SwitchOnChauffeEau;
 import projet_alasca.equipements.gestionEnergie.GestionEnergie;
 import projet_alasca.equipements.gestionEnergie.RegistrationConnector;
 import projet_alasca.equipements.gestionEnergie.RegistrationOutboundPort;
+import projet_alasca.etape3.equipments.hem.HEM;
 import projet_alasca.etape3.utils.ExecutionType;
 import projet_alasca.etape3.utils.SimulationType;
 
@@ -608,8 +609,8 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 			this.hecip = new ChauffeEauExternalControlInboundPort(
 										ChauffeEauExternalControlInboundPortURI, this);
 			this.hecip.publishPort();
-		//	this.rop = new RegistrationOutboundPort(this.registrationOutboundPortURI,this);
-			//this.rop.publishPort();
+			this.rop = new RegistrationOutboundPort(this.registrationOutboundPortURI,this);
+			this.rop.publishPort();
 			this.sensorInboundPort = new ChauffeEauSensorDataInboundPort(
 										ChauffeEauSensorInboundPortURI, this);
 			this.sensorInboundPort.publishPort();
@@ -700,10 +701,15 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 		// create the simulation plug-in given the current type of simulation
 		// and its local architecture i.e., for the current execution
 		try {
-			/*this.doPortConnection(
+			this.doPortConnection(
 					this.rop.getPortURI(),
 					GestionEnergie.registrationInboundPortURI,
-					RegistrationConnector.class.getCanonicalName());*/
+					RegistrationConnector.class.getCanonicalName());
+			
+			this.doPortConnection(
+					this.rop.getPortURI(),
+					HEM.registrationInboundPortURI,
+					RegistrationConnector.class.getCanonicalName());
 			
 			switch (this.currentSimulationType) {
 			case MIL_SIMULATION:
@@ -823,12 +829,12 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	}
 
 	
-	/*@Override
+	@Override
 	public synchronized void	finalise() throws Exception
 	{
 		this.rop.doDisconnection();
 		super.finalise();
-	}*/
+	}
 	
 	/**
 	 * @see fr.sorbonne_u.components.AbstractComponent#shutdown()
@@ -840,7 +846,7 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 			this.hip.unpublishPort();
 			this.hicip.unpublishPort();
 			this.hecip.unpublishPort();
-			//this.rop.unpublishPort();
+			this.rop.unpublishPort();
 			this.sensorInboundPort.unpublishPort();
 			this.actuatorInboundPort.unpublishPort();
 		} catch (Exception e) {
@@ -881,7 +887,7 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 
 		this.currentState = ChauffeEauState.ON;
 		
-		//this.rop.register(this.chauffeEauID, this.registrationOutboundPortURI, null);
+		this.rop.register(this.chauffeEauID, this.registrationOutboundPortURI, null);
 
 		if (this.currentSimulationType.isSILSimulation()) {
 			// For SIL simulation, an operation done in the component code
