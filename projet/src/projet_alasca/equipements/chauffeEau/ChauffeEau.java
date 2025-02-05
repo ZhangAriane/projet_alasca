@@ -196,7 +196,7 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 
 		protected static final String		CURRENT_TEMPERATURE_NAME =
 															"currentTemperature";
-
+		private boolean unittest;
 		
 		// -------------------------------------------------------------------------
 		// Invariants
@@ -507,6 +507,84 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 			assert	ChauffeEau.blackBoxInvariants(this) :
 					new InvariantException("ChauffeEau.blackBoxInvariants(this)");
 		}
+	
+	protected			ChauffeEau(
+			String reflectionInboundPortURI,
+			String ChauffeEauUserInboundPortURI,
+			String ChauffeEauInternalControlInboundPortURI,
+			String ChauffeEauExternalControlInboundPortURI,
+			String ChauffeEauSensorInboundPortURI,
+			String ChauffeEauActuatorInboundPortURI,
+			ExecutionType currentExecutionType,
+			SimulationType currentSimulationType,
+			String globalArchitectureURI,
+			String localArchitectureURI,
+			TimeUnit simulationTimeUnit,
+			double accFactor,
+			String clockURI,
+			boolean unittest
+			) throws Exception
+		{
+			super(reflectionInboundPortURI, 2, 1);
+
+			assert	currentExecutionType != null :
+					new PreconditionException("currentExecutionType != null");
+			assert	!currentExecutionType.isStandard() ||
+										clockURI != null && !clockURI.isEmpty() :
+					new PreconditionException(
+							"!currentExecutionType.isStandard() || "
+							+ "clockURI != null && !clockURI.isEmpty()");
+			assert	!currentExecutionType.isStandard() ||
+										currentSimulationType.isNoSimulation() :
+					new PreconditionException(
+							"!currentExecutionType.isStandard() || "
+							+ "currentSimulationType.isNoSimulation()");
+			assert	currentSimulationType.isNoSimulation() ||
+								(globalArchitectureURI != null &&
+											!globalArchitectureURI.isEmpty()) :
+					new PreconditionException(
+							"currentSimulationType.isNoSimulation() ||  "
+							+ "(globalArchitectureURI != null && "
+							+ "!globalArchitectureURI.isEmpty())");
+			assert	currentSimulationType.isNoSimulation() ||
+								(localArchitectureURI != null &&
+												!localArchitectureURI.isEmpty()) :
+					new PreconditionException(
+							"currentSimulationType.isNoSimulation() ||  "
+							+ "(localArchitectureURI != null && "
+							+ "!localArchitectureURI.isEmpty())");
+			assert	!currentSimulationType.isSimulated() ||
+														simulationTimeUnit != null :
+					new PreconditionException(
+							"!currentSimulationType.isSimulated() || "
+							+ "simulationTimeUnit != null");
+			assert	!currentSimulationType.isRealTimeSimulation() ||
+																accFactor > 0.0 :
+					new PreconditionException(
+							"!currentExecutionType.isRealTimeSimulation() || "
+							+ "accFactor > 0.0");
+
+			this.currentExecutionType = currentExecutionType;
+			this.currentSimulationType = currentSimulationType;
+			this.globalArchitectureURI = globalArchitectureURI;
+			this.localArchitectureURI = localArchitectureURI;
+			this.simulationTimeUnit = simulationTimeUnit;
+			this.accFactor = accFactor;
+			this.clockURI = clockURI;
+			this.clock = new CompletableFuture<AcceleratedClock>();
+
+			this.initialise(ChauffeEauUserInboundPortURI,
+							ChauffeEauInternalControlInboundPortURI,
+							ChauffeEauExternalControlInboundPortURI,
+							ChauffeEauSensorInboundPortURI,
+							ChauffeEauActuatorInboundPortURI);
+			this.unittest = unittest;
+
+			assert	ChauffeEau.glassBoxInvariants(this) :
+					new InvariantException("ChauffeEau.glassBoxInvariants(this)");
+			assert	ChauffeEau.blackBoxInvariants(this) :
+					new InvariantException("ChauffeEau.blackBoxInvariants(this)");
+		}
 
 	/**
 	 * create a new thermostated ChauffeEau.
@@ -701,15 +779,16 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 		// create the simulation plug-in given the current type of simulation
 		// and its local architecture i.e., for the current execution
 		try {
-			this.doPortConnection(
+			/*this.doPortConnection(
 					this.rop.getPortURI(),
 					GestionEnergie.registrationInboundPortURI,
-					RegistrationConnector.class.getCanonicalName());
-			
+					RegistrationConnector.class.getCanonicalName());*/
+			if(!this.unittest) {
 			this.doPortConnection(
 					this.rop.getPortURI(),
 					HEM.registrationInboundPortURI,
 					RegistrationConnector.class.getCanonicalName());
+			}
 			
 			switch (this.currentSimulationType) {
 			case MIL_SIMULATION:
@@ -832,7 +911,8 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 	@Override
 	public synchronized void	finalise() throws Exception
 	{
-		this.rop.doDisconnection();
+		if(!this.unittest) {
+		this.rop.doDisconnection();}
 		super.finalise();
 	}
 	
@@ -886,8 +966,9 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 
 
 		this.currentState = ChauffeEauState.ON;
-		
+		if(!this.unittest) {
 		this.rop.register(this.chauffeEauID, this.registrationOutboundPortURI, null);
+		}
 
 		if (this.currentSimulationType.isSILSimulation()) {
 			// For SIL simulation, an operation done in the component code
@@ -923,8 +1004,8 @@ public static final String		ACTUATOR_INBOUND_PORT_URI =
 		
 
 		this.currentState = ChauffeEauState.OFF;
-		
-		this.rop.unregister(chauffeEauID);
+		if(!this.unittest) {
+		this.rop.unregister(chauffeEauID);}
 		
 		if (this.currentSimulationType.isSILSimulation()) {
 			// For SIL simulation, an operation done in the component code

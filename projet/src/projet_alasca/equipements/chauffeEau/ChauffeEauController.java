@@ -50,6 +50,7 @@ import fr.sorbonne_u.exceptions.InvariantException;
 import fr.sorbonne_u.exceptions.PreconditionException;
 import fr.sorbonne_u.utils.aclocks.AcceleratedClock;
 import fr.sorbonne_u.utils.aclocks.ClocksServer;
+import fr.sorbonne_u.utils.aclocks.ClocksServerOutboundPort;
 import projet_alasca.equipements.chauffeEau.ChauffeEau.ChauffeEauState;
 import projet_alasca.equipements.chauffeEau.ChauffeEauSensorDataCI.ChauffeEauSensorRequiredPullCI;
 import projet_alasca.equipements.chauffeEau.connections.ChauffeEauActuatorConnector;
@@ -172,7 +173,7 @@ implements	ChauffeEauPushImplementationI
 	protected final SimulationType				currentSimulationType;
 
 //	/** outbound port to connect to the centralised clock server.			*/
-//	protected ClocksServerOutboundPort			clockServerOBP;
+	//protected ClocksServerOutboundPort			clockServerOBP;
 	/** URI of the clock to be used to synchronise the test scenarios and
 	 *  the simulation.														*/
 	protected final String						clockURI;
